@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>ReModa | Interior Design Packages & Pricing (DFW)</title>
+<meta name="description" content="Clear, transparent interior design packages & pricing by ReModa Design | Build in Dallas–Fort Worth. From consultation and e‑design to full‑home and renovation design." />
+<meta property="og:title" content="ReModa | Interior Design Packages & Pricing" />
+<meta property="og:description" content="From quick consults to full‑home transformations. Explore ReModa’s interior design packages, services, and pricing." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#0b1a2a" />
+
+<style>
+  /* =========================
+     THEME (colors + spacing)
+     Tweak spacing in one place
+     ========================= */
+  :root{
+    /* Colors */
+    --bg:#0b1a2a;        /* page background (deep navy) */
+    --card:#0f2034;      /* card background */
+    --line:#2b4666;      /* borders/dividers */
+    --ink:#ffffff;       /* main text */
+    --muted:#b9c7d8;     /* secondary text */
+    --accent:#ffffff;    /* CTA button */
+
+    /* SPACING TOKENS (edit these first) */
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 28px;
+    --space-8: 32px;
+
+    /* SECTION GAPS (quick knobs) */
+    --gap-header-bottom: var(--space-4);            /* space below logo/title */
+    --gap-hero-top: var(--space-2);                 /* hero top padding */
+    --gap-hero-bottom: var(--space-5);              /* space below hero */
+    --gap-trust-bottom: var(--space-5);             /* space below trust strip */
+    --gap-compare-bottom: var(--space-6);           /* space below comparison table */
+    --gap-grid-bottom: var(--space-6);              /* space below services grid */
+    --gap-process-top: var(--space-4);              /* space above "How it works" */
+  }
+
+  /* Base */
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:1100px;margin:0 auto;padding:var(--space-7)}
+
+  /* =========================
+     HEADER (Logo + Title only)
+     ========================= */
+  .site-header{
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    gap:var(--space-2);margin: var(--space-3) 0 var(--gap-header-bottom);
+  }
+  .site-header .logo{max-width:160px;height:auto}
+  .site-header .site-title{margin:0;font-size:clamp(22px,2.5vw,28px)}
+  .site-header .sub{font-size:14px;opacity:.9}
+  .site-header .cta{display:none !important} /* safety: no CTA up here */
+
+  /* =========================
+     HERO (primary CTA lives here)
+     ========================= */
+  .hero{text-align:center;padding-top:var(--gap-hero-top);margin-top:0;margin-bottom:var(--gap-hero-bottom)}
+  .hero h1{font-size:28px;margin:0 0 var(--space-2)}
+  .hero-sub{color:var(--muted);margin:var(--space-1,4px) 0 var(--space-3)}
+  .cta{
+    display:inline-block;margin-top:var(--space-3);background:var(--accent);color:var(--bg);
+    text-decoration:none;padding:10px 14px;border-radius:10px;font-weight:700
+  }
+
+  /* =========================
+     TRUST STRIP
+     ========================= */
+  .trust{
+    display:flex;gap:var(--space-3);flex-wrap:wrap;justify-content:center;
+    color:var(--muted);font-size:13px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:var(--space-3) var(--space-2);margin:var(--space-3) 0 var(--gap-trust-bottom)
+  }
+
+  /* =========================
+     COMPARISON TABLE
+     ========================= */
+  .compare{margin:0 0 var(--gap-compare-bottom)}
+  .compare h2,.process h2,.faq h2{font-size:18px;margin:0 0 var(--space-2)}
+  .table{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .row{display:grid;grid-template-columns:1.1fr 2fr 1.3fr .8fr;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
+  .row.head{background:#0f2136;font-weight:700;border-top:0}
+  @media(max-width:720px){.row{grid-template-columns: 1.2fr 1.6fr .9fr .7fr; font-size:13px; gap:6px }}
+
+  /* =========================
+     SERVICES GRID (cards)
+     ========================= */
+  .grid{display:grid;gap:14px;margin:0 0 var(--gap-grid-bottom)}
+  @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+  /* keep tablets (even landscape) at 2 cols; desktop jumps to 3 */
+  @media(min-width:1280px){.grid{grid-template-columns:1fr 1fr 1fr}}
+
+  details.card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    transition:box-shadow .2s ease, transform .1s ease;
+  }
+  details.card[open]{box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  summary{
+    list-style:none; cursor:pointer; padding:18px; display:flex; align-items:center; gap:12px;
+  }
+  summary::-webkit-details-marker{display:none}
+  .badge{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:var(--muted)}
+  .title{font-weight:700;font-size:17px}
+  .price{margin-left:auto;font-weight:700}
+  .chev{width:10px;height:10px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(-45deg);opacity:.7}
+  details[open] .chev{transform:rotate(45deg)}
+  .body{padding:0 18px 16px;border-top:1px solid var(--line)}
+  .row{display:grid;gap:10px;margin-top:14px}
+  @media(min-width:680px){.row{grid-template-columns:1fr 1fr}}
+  ul{margin:8px 0 0 18px}
+  li{margin:4px 0}
+  .muted{color:var(--muted);font-size:13px}
+
+  /* LEGIBILITY: list columns per device */
+  @media (max-width:819px){ .card .row{grid-template-columns:1fr !important} }
+  @media (min-width:820px) and (max-width:1279px){
+    .card .row{grid-template-columns:1fr 1fr;column-gap:14px}
+    .card ul{margin-left:16px}
+    .card li{
+      font-size:13.5px;line-height:1.45;word-break:normal;overflow-wrap:break-word;
+      hyphens:auto;-webkit-hyphens:auto;text-wrap:pretty;
+    }
+  }
+
+  /* =========================
+     PROCESS / FINANCE / FAQ
+     ========================= */
+  .process{border-top:1px solid var(--line);padding-top:14px;margin-top:var(--gap-process-top)}
+  .process ol{margin:8px 0 0 18px}
+  .process li{margin:4px 0}
+  .finance{border:1px dashed var(--line);border-radius:12px;padding:12px;text-align:center;margin:16px 0;color:var(--muted)}
+  .finance strong{color:var(--ink)}
+  .faq details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+  .faq summary{cursor:pointer;font-weight:700}
+  .faq p{margin:6px 0 0 0;color:var(--muted)}
+
+  /* =========================
+     FOOTER + STICKY CTA
+     ========================= */
+  footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
+  .sticky-cta{
+    position:fixed;left:12px;right:12px;bottom:12px;background:var(--accent);color:var(--bg);
+    text-align:center;padding:12px 16px;border-radius:999px;font-weight:800;text-decoration:none;z-index:999;
+    box-shadow:0 6px 20px rgba(0,0,0,.35)
+  }
+  @media(min-width:900px){ .sticky-cta{display:none} }
+  /* make room for sticky CTA on mobile + iOS safe area */
+  @media (max-width:899px){ body{padding-bottom:88px} }
+  .sticky-cta{padding-bottom:max(12px,env(safe-area-inset-bottom))}
+  @supports (padding:max(0px)){
+    @media (max-width:899px){
+      body{padding-bottom:max(88px,calc(env(safe-area-inset-bottom)+76px))}
+    }
+  }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- =========================
+       HEADER (no CTA here)
+       ========================= -->
+  <header class="site-header">
+    <img src="images/images/remoda-logo.png?v=1" alt="ReModa Logo" class="logo">
+    <h1 class="site-title">Interior Design Services</h1>
+    <div class="sub">ReModa • Design | Build • Dallas–Fort Worth</div>
+  </header>
+
+  <!-- =========================
+       HERO (single primary CTA)
+       Adjust gap via: --gap-hero-top / --gap-hero-bottom
+       ========================= -->
+  <section class="hero">
+    <h1>Interior Design Packages & Pricing</h1>
+    <p class="hero-sub">Clear packages. Transparent pricing. From quick consults to full‑home transformations in DFW.</p>
+    <a class="cta" href="https://form.jotform.com/252160860802047" target="_blank" rel="noopener">Start with a Consultation</a>
+  </section>
+
+  <!-- =========================
+       TRUST STRIP
+       Adjust bottom gap via: --gap-trust-bottom
+       ========================= -->
+  <section class="trust">
+    <span>Design • Build • Dallas–Fort Worth</span>
+    <span>Licensed & Insured</span>
+    <span>5‑Star Client Reviews</span>
+    <span>Synchrony Financing Available</span>
+  </section>
+
+  <!-- =========================
+       COMPARISON
+       Adjust bottom gap via: --gap-compare-bottom
+       ========================= -->
+  <section class="compare">
+    <h2>Which package fits your project?</h2>
+    <div class="table">
+      <div class="row head">
+        <div>Package</div><div>Deliverables</div><div>Best For</div><div>From</div>
+      </div>
+      <div class="row"><div>E‑Design</div><div>Moodboard, 2D plan, links</div><div>DIY & remote</div><div>$850</div></div>
+      <div class="row"><div>Full Service Room</div><div>Plans, selections, purchasing, styling</div><div>1–2 rooms, turnkey</div><div>$2,000–$3,500</div></div>
+      <div class="row"><div>Full Home</div><div>Whole‑home plan, coordination, styling</div><div>New builds & major remodels</div><div>$10k–$25k</div></div>
+      <div class="row"><div>Renovation / New Construction</div><div>Plans, specs, builder coordination</div><div>Kitchens, baths, additions</div><div>$3k+</div></div>
+    </div>
+  </section>
+
+  <!-- =========================
+       SERVICES GRID (cards)
+       Adjust bottom gap via: --gap-grid-bottom
+       ========================= -->
+  <div class="grid">
+
+    <!-- 1. Design Consultation -->
+    <details class="card" id="consult">
+      <summary>
+        <span class="badge">Starter</span>
+        <span class="title">Design Consultation</span>
+        <span class="price">$150–$350</span>
+        <span class="chev"></span>
+      </summary>
+      <div class="body">
+        <div class="muted">Virtual 60 min ($150) • In‑person up to 90 min ($350)</div>
+        <div class="row">
+          <div>
+            <strong>What’s Included</strong>
+            <ul>
+              <li>Style & function assessment</li>
+              <li>Verbal recommendations & direction</li>
+              <li>Budget & timeline guidance</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Notes</strong>
+            <ul>
+              <li>No drawings or sourcing lists</li>
+              <li>Fee may credit toward a package (14 days)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 2. E‑Design (Per Room) -->
+    <details class="card" id="edesign">
+      <summary>
+        <span class="badge">Remote</span>
+        <span class="title">E‑Design Package (Per Room)</span>
+        <span class="price">from $850</span>
+        <span class="chev"></span>
+      </summary>
+      <div class="body">
+        <div class="row">
+          <div>
+            <strong>What You Get</strong>
+            <ul>
+              <li>Virtual consultation (60 min)</li>
+              <li>Mood board & color palette</li>
+              <li>Scaled 2D layout</li>
+              <li>Product list with links</li>
+              <li>Implementation tips</li>
+              <li>One revision</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Add‑Ons</strong>
+            <ul>
+              <li>Extra revisions — $75 each</li>
+              <li>3D renderings — $250/room</li>
+            </ul>
+            <strong>Notes</strong>
+            <ul>
+              <li>Client provides photos & measurements</li>
+              <li>Digital deliverables only</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 3. Full Service Room Design -->
+    <details class="card" id="room">
+      <summary>
+        <span class="badge">Popular</span>
+        <span class="title">Full Service Room Design</span>
+        <span class="price">$2,000–$3,500</span>
+        <span class="chev"></span>
+      </summary>
+      <div class="body">
+        <div class="muted">Premium option available: $5,000–$8,000</div>
+        <div class="row">
+          <div>
+            <strong>What You Get</strong>
+            <ul>
+              <li>Plans, mood boards, finish palettes</li>
+              <li>Furniture, lighting & materials selection</li>
+              <li>Purchasing & contractor coordination</li>
+              <li>On‑site styling (final)</li>
+              <li>2 rounds of revisions</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Add‑Ons</strong>
+            <ul>
+              <li>3D renderings — $300–$500/room</li>
+              <li>Extra revisions — $100/hr</li>
+              <li>Extended management — $95/hr</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 4. Full Home -->
+    <details class="card" id="home">
+      <summary>
+        <span class="badge">Whole Home</span>
+        <span class="title">Full Home Interior Design</span>
+        <span class="price">$10k–$25k</span>
+        <span class="chev"></span>
+      </summary>
+      <div class="body">
+        <div class="muted">Up to 2,500 SF: $10k–$18k • 2,500–4,000 SF: $18k–$25k • Luxury: Custom</div>
+        <div class="row">
+          <div>
+            <strong>What You Get</strong>
+            <ul>
+              <li>Design for every room + scaled layouts</li>
+              <li>Materials, finishes, palettes</li>
+              <li>Lighting & fixture selections</li>
+              <li>Furniture sourcing & placement</li>
+              <li>Purchasing & vendor coordination</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Also Includes</strong>
+            <ul>
+              <li>Cabinetry layouts (kitchen/baths/built‑ins)</li>
+              <li>On‑site visits during project</li>
+              <li>Final styling & accessories</li>
+              <li>2–3 rounds of revisions</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 5. Renovation / New Construction -->
+    <details class="card" id="reno">
+      <summary>
+        <span class="badge">Build</span>
+        <span class="title">Renovation / New Construction Design</span>
+        <span class="price">from $3,000</span>
+        <span class="chev"></span>
+      </summary>
+      <div class="body">
+        <div class="muted">Kitchen/Bath plans $3k–$5k • Full design + oversight from $7.5k</div>
+        <div class="row">
+          <div>
+            <strong>What You Get</strong>
+            <ul>
+              <li>Collaboration with architects/builders</li>
+              <li>Plans, elevations, specifications</li>
+              <li>Finish & fixture selections</li>
+              <li>Cabinetry & millwork designs</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Management</strong>
+            <ul>
+              <li>Product ordering coordination</li>
+              <li>Site visits for design QC</li>
+              <li>Extended project management — $95/hr</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 6. A La Carte -->
+    <details class="card" id="alacarte">
+      <summary>
+        <span class="badge">Flexible</span>
+        <span class="title">A La Carte / Add‑On Services</span>
+        <span class="price">$95/hr+</span>
+        <span class="chev"></span>
+      </summary>
+      <div class="body">
+        <div class="row">
+          <div>
+            <strong>Menu</strong>
+            <ul>
+              <li>Mood board — $200/room</li>
+              <li>Material/finish selection — $750/room</li>
+              <li>Paint color selection — $250</li>
+              <li>Furniture sourcing — $300/room</li>
+            </ul>
+          </div>
+          <div>
+            <strong>More</strong>
+            <ul>
+              <li>Cabinetry layout plan — $750–$1,200</li>
+              <li>3D renderings — $250–$500/room</li>
+              <li>Revisions — $100/hr</li>
+              <li>Styling / PM — $95/hr</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 7. Airbnb -->
+    <details class="card" id="airbnb">
+      <summary>
+        <span class="badge">Investors</span>
+        <span class="title">Airbnb / Vacation Rental Design</span>
+        <span class="price">$2,500–$5,000</span>
+        <span class="chev"></span>
+      </summary>
+      <div class="body">
+        <div class="row">
+          <div>
+            <strong>What You Get</strong>
+            <ul>
+              <li>Layout optimization for bookings</li>
+              <li>Durable, rental‑friendly furnishings</li>
+              <li>Décor & accessories + ordering</li>
+              <li>Photo‑ready styling</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Notes</strong>
+            <ul>
+              <li>Furnishings billed separately</li>
+              <li>Turnkey install available</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 8. Commercial -->
+    <details class="card" id="commercial">
+      <summary>
+        <span class="badge">B2B</span>
+        <span class="title">Commercial / Office Interior Design</span>
+        <span class="price">$5,000–$20,000</span>
+        <span class="chev"></span>
+      </summary>
+      <div class="body">
+        <div class="row">
+          <div>
+            <strong>What You Get</strong>
+            <ul>
+              <li>Brand‑driven design concepts</li>
+              <li>Space planning for workflow</li>
+              <li>Materials, furniture & lighting specs</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Management</strong>
+            <ul>
+              <li>Contractor/vendor coordination</li>
+              <li>Staging & final styling</li>
+              <li>Phased build support</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <!-- =========================
+       PROCESS
+       Adjust top gap via: --gap-process-top
+       ========================= -->
+  <section class="process">
+    <h2>How it works</h2>
+    <ol>
+      <li><strong>Discovery</strong> – consultation to align on scope & budget</li>
+      <li><strong>Concept</strong> – moodboards, space plans, material direction</li>
+      <li><strong>Selections</strong> – finishes, fixtures, furnishings</li>
+      <li><strong>Coordination</strong> – vendors & contractor alignment</li>
+      <li><strong>Styling</strong> – delivery, placement, and final details</li>
+    </ol>
+  </section>
+
+  <!-- =========================
+       FINANCING
+       ========================= -->
+  <section class="finance">
+    <p><strong>Financing available:</strong> Ask about monthly payments through Synchrony during your consultation.</p>
+  </section>
+
+  <!-- =========================
+       FAQ
+       ========================= -->
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>What’s the difference between E‑Design and Full Service?</summary>
+      <p>E‑Design delivers a plan you implement yourself. Full Service includes purchasing, coordination, and on‑site styling.</p>
+    </details>
+    <details><summary>Do you coordinate with contractors?</summary>
+      <p>Yes. Our Design | Build model streamlines decisions, scheduling, and install details with your GC or our team.</p>
+    </details>
+    <details><summary>How many revisions are included?</summary>
+      <p>Each package includes a defined number (see cards). Additional revisions are available hourly.</p>
+    </details>
+    <details><summary>Do you offer financing?</summary>
+      <p>Yes—through Synchrony. We’ll review options at your consultation.</p>
+    </details>
+  </section>
+
+  <footer>© ReModa | Design • Build • DFW • (469) 209‑9288 • info@remodapro.com</footer>
+</div>
+
+<!-- Sticky CTA (mobile only) -->
+<a class="sticky-cta" href="https://form.jotform.com/252160860802047" target="_blank" rel="noopener">Book Consultation • From $150</a>
+
+</body>
+</html>
