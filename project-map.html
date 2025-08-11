@@ -5,58 +5,119 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ReModa | Project Map</title>
 
-  <!-- Leaflet (free, no signup) -->
+  <!-- Leaflet core -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
   <style>
-    :root{ --navy:#0C1D3A; --bg:#0a1227; --white:#fff; --muted:#a9b8d8; --accent:#7cc6ff; --radius:16px; }
+    :root{
+      --navy:#0C1D3A;
+      --navy-700:#122a58;
+      --bg:#0a1227;
+      --white:#fff;
+      --muted:#a9b8d8;
+      --accent:#7cc6ff;
+      --radius:16px;
+    }
+
     html,body{height:100%;margin:0;background:var(--bg);color:var(--white);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
     .page{display:grid;grid-template-rows:auto 1fr;height:100%}
 
     /* Top bar */
-    .topbar{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,var(--navy),#0b1f3f)}
+    .topbar{
+      display:flex;align-items:center;gap:12px;justify-content:space-between;
+      padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,var(--navy),#0b1f3f)
+    }
     .brand{display:flex;align-items:center;gap:10px}
     .brand img{height:28px}
     .brand span{font-weight:700;letter-spacing:.2px}
     .topbar a{color:#cfe8ff;text-decoration:none;font-size:14px}
+    .topbar button{
+      background:transparent;border:1px solid rgba(255,255,255,.3);color:#cfe8ff;
+      border-radius:10px;padding:6px 10px;cursor:pointer
+    }
 
-    /* Map */
     .map-wrap{position:relative}
     #map{position:absolute;inset:0}
 
-    /* Filters card */
+    /* Controls card (moved to right, navy labels) */
     .controls{
-      position:absolute;top:16px;left:16px;z-index:500;
-      width:min(420px, calc(100vw - 32px));
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px);
-      border-radius:var(--radius); overflow:hidden; box-shadow:0 8px 34px rgba(0,0,0,.35);
+      position:absolute;top:16px;right:16px;z-index:500;
+      width:min(400px, calc(100vw - 32px));
+      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.92));
+      color:#0f1830;
+      border:1px solid rgba(0,0,0,.08); border-radius:var(--radius);
+      overflow:hidden; box-shadow:0 8px 34px rgba(0,0,0,.35);
     }
-    .controls header{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
-    .controls h2{margin:0;font-size:15px}
+    .controls header{
+      padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);
+      display:flex;justify-content:space-between;align-items:center
+    }
+    .controls h2{margin:0;font-size:15px;color:var(--navy)}
     .controls .body{padding:12px 14px;display:grid;gap:10px}
-    label{font-size:12px;color:#cfe0ff}
-    input,select,button{width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(10,18,39,.6);color:#eaf2ff;padding:10px 12px;font-size:14px;outline:none}
-    input::placeholder{color:#a9b8d8}
-    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,198,255,.18)}
+    label{font-size:12px;color:var(--navy);font-weight:600}
+    input,select,button{
+      width:100%;border-radius:12px;border:1px solid rgba(0,0,0,.15);
+      background:#f5f7fb;color:#0f1830;padding:10px 12px;font-size:14px;outline:none
+    }
+    input::placeholder{color:#6b7a9b}
+    input:focus,select:focus{border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(18,42,88,.18)}
     .row{display:grid;gap:8px}
     .row.inline{grid-template-columns:1fr 1fr;gap:10px}
     .chips{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{border:1px solid rgba(255,255,255,.14);padding:8px 10px;border-radius:999px;background:rgba(15,24,48,.55);font-size:12px;cursor:pointer}
-    .chip.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(124,198,255,.18) inset}
-    .footer{padding:10px 14px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px}
-    .btn{background:linear-gradient(180deg,#1c3872,#122a58);border:1px solid rgba(255,255,255,.12);padding:10px 12px;border-radius:12px;color:#eaf2ff;font-weight:600;cursor:pointer}
-    .btn.secondary{background:transparent}
+    .chip{
+      border:1px solid rgba(0,0,0,.15);padding:8px 10px;border-radius:999px;
+      background:#fff;font-size:12px;cursor:pointer;color:#0f1830
+    }
+    .chip.active{border-color:var(--navy-700);box-shadow:0 0 0 2px rgba(18,42,88,.18) inset}
+    .footer{padding:10px 14px;border-top:1px solid rgba(0,0,0,.06);display:flex;gap:10px}
+    .btn{
+      background:linear-gradient(180deg,#1c3872,#122a58);
+      border:1px solid rgba(0,0,0,.15);padding:10px 12px;border-radius:12px;
+      color:#eaf2ff;font-weight:600;cursor:pointer
+    }
+    .btn.secondary{background:#f5f7fb;color:#0f1830}
 
-    /* Popups */
+    /* Popup */
     .popup{min-width:260px;background:#0c1633;color:#eaf2ff;border-radius:12px;border:1px solid rgba(255,255,255,.14);overflow:hidden}
-    .pop-img{height:120px;background:#111 center/cover}
+    .pop-img{height:140px;background:#111 center/cover}
     .pop-body{padding:10px 12px}
     .pop-title{margin:0;font-size:15px;font-weight:700}
     .pop-sub{margin:4px 0 6px;color:#cfe0ff;font-size:12px}
-    .tag{display:inline-block;margin:4px 6px 0 0;font-size:11px;padding:4px 8px;border-radius:999px;background:rgba(124,198,255,.15);border:1px solid rgba(124,198,255,.35)}
-    @media (max-width:640px){ .controls{left:50%;transform:translateX(-50%);top:10px} }
+    .pop-link{
+      display:inline-block;margin-top:10px;padding:8px 10px;border-radius:10px;
+      background:#1c3872;color:#eaf2ff;text-decoration:none;border:1px solid rgba(255,255,255,.15)
+    }
+    .pop-link:hover{filter:brightness(1.05)}
+
+    /* Custom ReModa marker + custom cluster */
+    .rmd-pin{
+      width:26px;height:26px;border-radius:50%;
+      background:#fff url('images/remoda-logo.png') center/80% no-repeat;
+      box-shadow:0 0 0 2px #0c1633, 0 0 16px rgba(124,198,255,.45);
+    }
+    .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large{
+      background:rgba(16,46,102,.85);
+      color:#eaf2ff;
+      border:2px solid #9bc9ff;
+      box-shadow:0 6px 18px rgba(0,0,0,.35);
+    }
+    .marker-cluster div{
+      background:transparent;
+      color:#eaf2ff;
+      font-weight:700;
+      border:none;
+    }
+
+    @media (max-width:720px){
+      .controls{left:50%;right:auto;transform:translateX(-50%);width:min(94vw,420px)}
+    }
   </style>
 </head>
 <body>
@@ -66,21 +127,24 @@
         <img src="images/remoda-logo.png" alt="ReModa">
         <span>Project Map</span>
       </div>
-      <a href="/">Home</a>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a href="/">Home</a>
+        <button id="toggleFilters">Filters</button>
+      </div>
     </div>
 
     <div class="map-wrap">
-      <div id="map"></div>
+      <div id="map" aria-label="Interactive map of ReModa completed projects"></div>
 
       <aside class="controls" aria-label="Project filters">
         <header>
           <h2>Explore Completed Projects</h2>
-          <small style="color:#a9b8d8">Dallas–Fort Worth + beyond</small>
+          <small style="color:#4b5c84">Dallas–Fort Worth + beyond</small>
         </header>
         <div class="body">
           <div class="row">
             <label for="q">Search</label>
-            <input id="q" type="search" placeholder="Client, address, notes…"/>
+            <input id="q" type="search" placeholder="Client, project, notes…"/>
           </div>
           <div class="row inline">
             <div>
@@ -106,54 +170,47 @@
   </div>
 
   <script>
-    // 1) Init Leaflet map centered on Dallas
-    const map = L.map('map', { zoomControl: false }).setView([32.7767, -96.7970], 10);
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© OpenStreetMap'
+    // Basemap: CARTO Dark Matter (polished, free)
+    const map = L.map('map', { zoomControl:false }).setView([32.7767, -96.7970], 11);
+    L.control.zoom({ position:'bottomright' }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20
     }).addTo(map);
 
-    // 2) Demo data (we’ll move to projects.json in the next step)
+    // Custom ReModa marker icon (uses your logo file)
+    const ReModaIcon = L.DivIcon.extend({ options:{ className:'rmd-pin', iconSize:[26,26] } });
+
+    // Marker cluster group with subtle styling
+    const clusters = L.markerClusterGroup({
+      showCoverageOnHover:false,
+      maxClusterRadius:50,
+      spiderfyOnMaxZoom:true
+    }).addTo(map);
+
+    // ~20 sample projects around DFW
     const sampleProjects = [
-      {
-        id: "rmd-5410",
-        title: "5410 Galahad Ln – Full Remodel",
-        city: "Richardson, TX",
-        year: 2024,
-        services: ["Kitchen","Bathrooms","Flooring","Painting","Accent Wall"],
-        coords: [32.9998, -96.6774],
-        cover: "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop",
-        url: "#",
-        tags: ["Design-Build","Residential"],
-        blurb: "Kitchen repaint & bath remodel, new floors, accent wall, and finishing."
-      },
-      {
-        id: "rmd-outdoors-1",
-        title: "Frisco – Pergola & Patio Expansion",
-        city: "Frisco, TX",
-        year: 2025,
-        services: ["Pergola","Concrete","Outdoor Kitchen"],
-        coords: [33.1507, -96.8236],
-        cover: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop",
-        url: "#",
-        tags: ["ReModa Outdoors","Exterior"],
-        blurb: "Custom pergola, expanded patio, and gas line for outdoor kitchen."
-      },
-      {
-        id: "rmd-bath-elite",
-        title: "Preston Hollow – Master Bath",
-        city: "Dallas, TX",
-        year: 2025,
-        services: ["Bathrooms","Tile","Plumbing"],
-        coords: [32.8654, -96.8103],
-        cover: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop",
-        url: "#",
-        tags: ["Luxury","Residential"],
-        blurb: "Curbless shower, floating vanity, LED mirrors."
-      }
+      {id:"rmd-rich-5410", title:"5410 Galahad Ln – Full Remodel", city:"Richardson, TX", year:2024, services:["Kitchen","Bathrooms","Flooring","Painting"], coords:[32.9998,-96.6774], cover:"https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Full-home refresh with new finishes & fixtures.", tags:["Residential"]},
+      {id:"rmd-frisco-perg", title:"Frisco – Pergola & Patio Expansion", city:"Frisco, TX", year:2025, services:["Pergola","Concrete","Outdoor Kitchen"], coords:[33.1507,-96.8236], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Custom pergola + expanded patio.", tags:["ReModa Outdoors"]},
+      {id:"rmd-dal-bath", title:"Preston Hollow – Master Bath", city:"Dallas, TX", year:2025, services:["Bathrooms","Tile","Plumbing"], coords:[32.8654,-96.8103], cover:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Curbless shower, floating vanity, LED mirrors.", tags:["Luxury"]},
+      {id:"rmd-plano-fire", title:"Plano – Fireplace Feature Wall", city:"Plano, TX", year:2025, services:["Accent Wall","Fireplace","Millwork"], coords:[33.0198,-96.6989], cover:"https://images.unsplash.com/photo-1503174971373-b1f69850bded?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Dekton cladding + inset lighting.", tags:["Feature"]},
+      {id:"rmd-irv-kitch", title:"Irving – Kitchen Refresh", city:"Irving, TX", year:2024, services:["Kitchen","Painting","Countertops"], coords:[32.8140,-96.9489], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Painted cabinets + quartz tops.", tags:["Residential"]},
+      {id:"rmd-allen-bath", title:"Allen – Guest Bath Upgrade", city:"Allen, TX", year:2025, services:["Bathrooms","Tile"], coords:[33.1032,-96.6706], cover:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Large-format tile and frameless glass.", tags:["Residential"]},
+      {id:"rmd-mck-kitch", title:"McKinney – Open Kitchen Plan", city:"McKinney, TX", year:2025, services:["Kitchen","Electrical","Flooring"], coords:[33.1976,-96.6153], cover:"https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Wall removal + island upgrade.", tags:["Residential"]},
+      {id:"rmd-garland-fl", title:"Garland – Whole‑Home Flooring", city:"Garland, TX", year:2024, services:["Flooring","Baseboards"], coords:[32.9126,-96.6389], cover:"https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Luxury vinyl plank throughout.", tags:["Residential"]},
+      {id:"rmd-mesq-bath", title:"Mesquite – Tub‑to‑Shower", city:"Mesquite, TX", year:2025, services:["Bathrooms","Plumbing","Tile"], coords:[32.7668,-96.5992], cover:"https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Low‑maintenance shower conversion.", tags:["Residential"]},
+      {id:"rmd-addison-fw", title:"Addison – Feature Wall", city:"Addison, TX", year:2024, services:["Accent Wall","Painting"], coords:[32.9618,-96.8292], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Slatted wood + integrated lighting.", tags:["Residential"]},
+      {id:"rmd-carrollton", title:"Carrollton – Bath + Vanity", city:"Carrollton, TX", year:2025, services:["Bathrooms","Vanity","Lighting"], coords:[32.9756,-96.8899], cover:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Floating vanity, LED mirror.", tags:["Residential"]},
+      {id:"rmd-lewisville", title:"Lewisville – Kitchen Backsplash", city:"Lewisville, TX", year:2024, services:["Kitchen","Tile"], coords:[33.0462,-96.9942], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Marble mosaic backsplash.", tags:["Residential"]},
+      {id:"rmd-denton-ext", title:"Denton – Outdoor Living", city:"Denton, TX", year:2025, services:["Pergola","Concrete"], coords:[33.2148,-97.1331], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Stained pergola + stamped concrete.", tags:["Outdoors"]},
+      {id:"rmd-fw-bath", title:"Fort Worth – Spa Bath", city:"Fort Worth, TX", year:2025, services:["Bathrooms","Tile","Lighting"], coords:[32.7555,-97.3308], cover:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Rain head + linear drain.", tags:["Luxury"]},
+      {id:"rmd-arlington", title:"Arlington – Paint & Trim", city:"Arlington, TX", year:2024, services:["Painting","Trim"], coords:[32.7357,-97.1081], cover:"https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Crisp base + crown upgrade.", tags:["Residential"]},
+      {id:"rmd-frisco-bath", title:"Frisco – Primary Bath", city:"Frisco, TX", year:2024, services:["Bathrooms","Tile"], coords:[33.1701,-96.8437], cover:"https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Porcelain slab walls.", tags:["Residential"]},
+      {id:"rmd-richardson", title:"Richardson – Office Millwork", city:"Richardson, TX", year:2025, services:["Millwork","Painting"], coords:[32.9482,-96.7297], cover:"https://images.unsplash.com/photo-1503174971373-b1f69850bded?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Custom built‑ins.", tags:["Feature"]},
+      {id:"rmd-plano-kitch", title:"Plano – Cabinet Refinish", city:"Plano, TX", year:2024, services:["Kitchen","Painting"], coords:[33.0551,-96.7480], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Factory‑finish spray.", tags:["Residential"]},
+      {id:"rmd-mck-ext", title:"McKinney – Patio Cover", city:"McKinney, TX", year:2024, services:["Pergola","Electrical"], coords:[33.1900,-96.6500], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Lighting + fan package.", tags:["Outdoors"]},
+      {id:"rmd-dallas-kitch", title:"Dallas – Modern Kitchen", city:"Dallas, TX", year:2025, services:["Kitchen","Countertops","Flooring"], coords:[32.8000,-96.8000], cover:"https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Island waterfall edge.", tags:["Residential"]}
     ];
 
-    // 3) Filters + markers
     let allProjects = sampleProjects.slice();
     let filtered = allProjects.slice();
     let activeServices = new Set();
@@ -162,7 +219,6 @@
     const $year = document.getElementById('year');
     const $services = document.getElementById('services');
     const $q = document.getElementById('q');
-    const layerGroup = L.layerGroup().addTo(map);
 
     function unique(list, key){ return [...new Set(list.map(x=>x[key]))].filter(Boolean).sort(); }
     function uniqueYears(list){ return [...new Set(list.map(x=>x.year))].filter(Boolean).sort((a,b)=>b-a); }
@@ -179,28 +235,31 @@
     }
 
     function popupHTML(p){
-      const services = p.services.map(s=>`<span class="tag">${s}</span>`).join('');
-      const tags = (p.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
       return `
         <div class="popup">
           <div class="pop-img" style="background-image:url('${p.cover||''}')"></div>
           <div class="pop-body">
             <h3 class="pop-title">${p.title}</h3>
             <p class="pop-sub">${p.city} • ${p.year}</p>
-            ${services}${tags?'<div style="margin-top:4px">'+tags+'</div>':''}
             ${p.blurb?`<p style="margin:6px 0 0;color:#cfe0ff">${p.blurb}</p>`:''}
-            ${p.url && p.url !== '#' ? `<a class="pop-link" href="${p.url}" target="_blank" rel="noopener">View project ›</a>`:''}
+            ${p.url && p.url!=='#' ? `<a class="pop-link" href="${p.url}" target="_blank" rel="noopener">View project ›</a>`:''}
           </div>
         </div>`;
     }
 
     function draw(){
-      layerGroup.clearLayers();
+      clusters.clearLayers();
+      const latlngs=[];
       filtered.forEach(p=>{
-        const m = L.circleMarker(p.coords, { radius:7, weight:1.5, color:'#0c1633', fillColor:'#7cc6ff', fillOpacity:1 })
-          .bindPopup(popupHTML(p), { maxWidth: 320 });
-        m.addTo(layerGroup);
+        const m = L.marker(p.coords, { icon:new ReModaIcon() }).bindPopup(popupHTML(p), { maxWidth: 320 });
+        clusters.addLayer(m);
+        latlngs.push(p.coords);
       });
+      if(latlngs.length){
+        map.fitBounds(latlngs, { padding:[40,40] });
+      } else {
+        map.flyTo([32.7767,-96.7970], 11);
+      }
     }
 
     function applyFilters(){
@@ -220,17 +279,22 @@
         return true;
       });
       draw();
-      if(filtered.length){ map.flyTo({ center: filtered[0].coords, zoom: 11 }); }
     }
 
     document.getElementById('apply').onclick = applyFilters;
     document.getElementById('reset').onclick = ()=>{
       $q.value=''; $city.value=''; $year.value='';
       activeServices.clear(); [...$services.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
-      filtered = allProjects.slice(); draw(); map.flyTo({ center:[32.7767,-96.7970], zoom:10 });
+      filtered = allProjects.slice(); draw();
     };
     let t=null; $q.oninput=()=>{ clearTimeout(t); t=setTimeout(applyFilters,250); };
 
+    // Filters toggle (mobile convenience)
+    const $panel = document.querySelector('.controls');
+    document.getElementById('toggleFilters').onclick=()=>{ $panel.style.display = $panel.style.display==='none' ? '' : 'none'; };
+    if (matchMedia('(max-width:640px)').matches) $panel.style.display='none';
+
+    // Init
     populateFilters(); draw();
   </script>
 </body>
