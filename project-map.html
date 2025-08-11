@@ -124,15 +124,14 @@
 
     /* HQ pin — bigger + STRONGER, gold glow */
     .rmd-hq {
-      width:44px; height:44px; border-radius:50%;
-      background:#fff url('images/remoda-pin.png?v=2') center/88% no-repeat;
-      /* three-tier glow: inner ring, medium glow, far aura */
-      box-shadow:
-        0 0 0 3px #0c1633,
-        0 0 24px rgba(255, 211, 110, .85),
-        0 0 60px rgba(255, 211, 110, .55);
-      position:relative;
-    }
+  width:44px; height:44px; border-radius:50%;
+  background:#0C1D3A url('images/remoda-pin.png') center/88% no-repeat; /* navy disk behind icon */
+  box-shadow:
+    0 0 0 3px #0c1633,
+    0 0 24px rgba(255, 211, 110, .95),
+    0 0 70px rgba(255, 211, 110, .60);
+  position:relative;
+}
     /* constant subtle halo */
     .rmd-hq::before{
       content:""; position:absolute; inset:-6px; border-radius:50%;
