@@ -22,8 +22,8 @@
       --white:#fff;
       --ink:#0f1830;
       --muted:#6e7aa1;
-      --accent:#7cc6ff;   /* general accent */
-      --hqglow:#FFD36E;   /* unique HQ glow (gold) */
+      --accent:#7cc6ff;
+      --hqglow:#FFD36E;   /* gold aura for HQ */
       --radius:16px;
     }
 
@@ -110,42 +110,41 @@
     .pop-sub{margin:4px 0 6px;color:#cfe0ff;font-size:12px}
     .pop-link{
       display:inline-block;margin-top:10px;padding:8px 10px;border-radius:10px;
-      background:#1c3872;color:#eaf2ff;text-decoration:none;border:1px solid rgba(255,255,255,.15)
+      background:#1c3872;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.15)
     }
-    /* keep popups above everything */
-    .leaflet-popup { z-index: 1000 !important; }
+    .popup a, .pop-link { color:#fff !important; } /* ensure white links on dark popup */
+    .pop-link:hover{ filter:brightness(1.08); text-decoration:underline; }
+    .leaflet-popup { z-index: 1000 !important; } /* keep popups above everything */
 
-    /* Project pin (logo) */
+    /* Project pin (your logo on navy disk) */
     .rmd-pin{
       width:34px; height:34px; border-radius:50%;
-      background:#fff url('images/remoda-logo.png?v=2') center/95% no-repeat;
+      background:#0C1D3A url('images/remoda-logo.png?v=3') center/95% no-repeat;
       box-shadow:0 0 0 2px #0c1633, 0 0 16px rgba(124,198,255,.45);
     }
 
-    /* HQ pin — bigger + STRONGER, gold glow */
+    /* HQ pin — bigger + strong gold glow */
     .rmd-hq {
-  width:44px; height:44px; border-radius:50%;
-  background:#0C1D3A url('images/remoda-pin.png') center/88% no-repeat; /* navy disk behind icon */
-  box-shadow:
-    0 0 0 3px #0c1633,
-    0 0 24px rgba(255, 211, 110, .95),
-    0 0 70px rgba(255, 211, 110, .60);
-  position:relative;
-}
-    /* constant subtle halo */
+      width:44px; height:44px; border-radius:50%;
+      background:#0C1D3A url('images/remoda-pin.png?v=3') center/88% no-repeat; /* navy behind your white icon */
+      box-shadow:
+        0 0 0 3px #0c1633,
+        0 0 24px rgba(255, 211, 110, .95),
+        0 0 70px rgba(255, 211, 110, .60);
+      position:relative;
+    }
     .rmd-hq::before{
       content:""; position:absolute; inset:-6px; border-radius:50%;
-      box-shadow:0 0 0 2px rgba(255,211,110,.55);
+      box-shadow:0 0 0 2px rgba(255,211,110,.6);
     }
-    /* animated pulse ring */
-    .rmd-hq::after {
+    .rmd-hq::after{
       content:""; position:absolute; inset:0; border-radius:50%;
-      box-shadow:0 0 0 0 rgba(255,211,110,.55);
+      box-shadow:0 0 0 0 rgba(255,211,110,.7);
       animation:rmdPulse 2.2s ease-out infinite;
     }
     @keyframes rmdPulse {
-      0%   { box-shadow:0 0 0 0 rgba(255,211,110,.55); }
-      60%  { box-shadow:0 0 0 26px rgba(255,211,110,0); }
+      0%   { box-shadow:0 0 0 0 rgba(255,211,110,.7); }
+      60%  { box-shadow:0 0 0 28px rgba(255,211,110,0); }
       100% { box-shadow:0 0 0 0 rgba(255,211,110,0); }
     }
 
@@ -230,7 +229,7 @@
       attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20
     }).addTo(map);
 
-    // Project marker (logo)
+    // Project marker (logo on navy disk)
     const ReModaIcon = L.DivIcon.extend({ options:{ className:'rmd-pin', iconSize:[34,34] } });
 
     // Cluster (stops clustering when close)
@@ -241,35 +240,37 @@
       disableClusteringAtZoom:15
     }).addTo(map);
 
-    // HQ pin (not clustered), your coordinates + icon
+    // HQ pin (not clustered), your coordinates + storefront photo + Place ID directions
     const HQ_LAT = 32.9453261;
     const HQ_LNG = -96.7355908;
     const ReModaHQIcon = L.DivIcon.extend({
       options: { className: 'rmd-hq', iconSize: [44, 44], iconAnchor: [22, 40], popupAnchor: [0, -34] }
     });
     const hq = L.marker([HQ_LAT, HQ_LNG], {
-  icon: new ReModaHQIcon(),
-  zIndexOffset: 1500
-})
-.addTo(map)
-.bindPopup(`
-  <div class="popup">
-    <div class="pop-img" style="background-image:url('images/remoda-hq.jpg?v=1')"></div>
-    <div class="pop-body">
-      <h3 class="pop-title">ReModa HQ</h3>
-      <p class="pop-sub">401 S. Sherman Street #217 • Richardson, TX 75081</p>
-      <a class="pop-link" href="https://www.google.com/maps/search/?api=1&query=401+S.+Sherman+Street+%23217%2C+Richardson%2C+TX+75081" target="_blank" rel="noopener">
-        Directions ›
-      </a>
-    </div>
-  </div>
-`, { maxWidth: 300 })
-.bindTooltip('ReModa HQ', { direction: 'top', offset: [0, -22] });
+      icon: new ReModaHQIcon(),
+      zIndexOffset: 1500
+    })
+    .addTo(map)
+    .bindPopup(`
+      <div class="popup">
+        <img src="images/remoda-hq.jpg?v=2" alt="ReModa HQ storefront" style="width:100%;height:160px;object-fit:cover;display:block;border-bottom:1px solid rgba(255,255,255,.12)">
+        <div class="pop-body">
+          <h3 class="pop-title">ReModa HQ</h3>
+          <p class="pop-sub">401 S. Sherman Street #217 • Richardson, TX 75081</p>
+          <a class="pop-link"
+             href="https://www.google.com/maps/search/?api=1&query=place_id:ChIJw2dsxNzdxYcRAIjnr3bOHog"
+             target="_blank" rel="noopener">
+            Directions ›
+          </a>
+        </div>
+      </div>
+    `, { maxWidth: 320 })
+    .bindTooltip('ReModa HQ', { direction: 'top', offset: [0, -22] });
 
     // Allowed service chips
     const ALLOWED_SERVICES = ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"];
 
-    // ~20 sample projects
+    // ~20 sample projects (placeholders)
     const sampleProjects = [
       {id:"rmd-1", title:"5410 Galahad Ln – Full Remodel", city:"Richardson, TX", year:2024, services:["Kitchen","Bathroom","Flooring","Painting","Design Service"], coords:[32.9998,-96.6774], cover:"https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Design-build refresh with new finishes."},
       {id:"rmd-2", title:"Frisco – Pergola & Patio", city:"Frisco, TX", year:2025, services:["Exterior","Custom Builds","Design Service"], coords:[33.1507,-96.8236], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Pergola + expanded patio."},
@@ -305,6 +306,7 @@
     function unique(list, key){ return [...new Set(list.map(x=>x[key]))].filter(Boolean).sort(); }
     function uniqueYears(list){ return [...new Set(list.map(x=>x.year))].filter(Boolean).sort((a,b)=>b-a); }
 
+    // Build filters (city/year dynamic; services fixed list)
     function populateFilters(){
       unique(allProjects,'city').forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; $city.appendChild(o); });
       uniqueYears(allProjects).forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; $year.appendChild(o); });
@@ -317,6 +319,7 @@
       });
     }
 
+    // Normalize to our buckets (handles plurals/synonyms)
     function normalizeServices(list){
       const map = {
         "kitchen":"Kitchen",
