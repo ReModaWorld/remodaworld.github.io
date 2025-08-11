@@ -7,61 +7,55 @@
   <meta name="description" content="ReModa — premium design-build transformations in Dallas–Fort Worth.">
   <style>
     :root{
-      --navy:#0C1D3A;
-      --navy-900:#08142b;
-      --white:#ffffff;
-      --radius:18px;
-      --shadow-lg: 0 20px 60px rgba(0,0,0,.35);
+      --navy:#0C1D3A; --navy-900:#08142b; --white:#fff;
+      --radius:16px; --shadow-lg:0 14px 40px rgba(0,0,0,.35); --shadow-md:0 6px 20px rgba(0,0,0,.25);
     }
-
     html,body{height:100%;margin:0}
     body{
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
-      color: var(--white);
+      font-family: ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
+      color:var(--white);
       background:
-        radial-gradient(1000px 600px at 50% -10%, #163470 0%, transparent 60%),
+        radial-gradient(900px 520px at 50% -8%, #173875 0%, transparent 60%),
         linear-gradient(180deg, var(--navy), var(--navy-900));
       display:grid;place-items:center;
     }
 
+    /* Layout */
     .hero{
-      width:min(1100px, 92vw);
-      display:grid;justify-items:center;gap:28px;
-      text-align:center;
-      padding:48px 20px 28px;
-    }
-    .logo{
-      width:100px;height:100px;
-      background: url('images/remoda-logo.png?v=1') center/contain no-repeat;
+      width:min(1000px,92vw);
+      display:grid;justify-items:center;gap:18px;
+      text-align:center;padding:36px 16px 24px;
     }
 
+    /* Bigger, crisp logo */
+    .logo{
+      width:150px;height:150px;            /* ↑ bigger */
+      background:url('images/remoda-logo.png?v=1') center/contain no-repeat;
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,.35));
+      margin-bottom:6px;
+    }
+
+    /* Card grid smaller & tighter */
     .grid{
-      width:100%;
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap:18px;
-      margin-top:8px;
+      width:100%;max-width:900px;          /* ↓ narrower row */
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+      margin-top:6px;
     }
-    @media (max-width: 720px){
-      .grid{grid-template-columns: 1fr}
-    }
+    @media (max-width:720px){ .grid{grid-template-columns:1fr} }
 
     .card{
-      background: var(--white);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
+      background:var(--white);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-lg);
       color:#0f1830;
-      padding:24px;
+      padding:18px 18px;                    /* ↓ less padding */
       text-decoration:none;
-      transform: translateY(0);
-      transition: transform .25s ease, box-shadow .25s ease;
+      transform:translateY(0);
+      transition:transform .2s ease, box-shadow .2s ease;
     }
-    .card:hover{
-      transform: translateY(-4px);
-      box-shadow: 0 26px 70px rgba(0,0,0,.45);
-    }
-    .title{font-weight:800;font-size:18px;margin:0 0 6px}
-    .desc{margin:0;color:#334e7b;font-size:14px}
+    .card:hover{ transform:translateY(-3px); box-shadow:0 20px 56px rgba(0,0,0,.42); }
+    .title{margin:0 0 4px;font-weight:800;font-size:17px;letter-spacing:.2px}
+    .desc{margin:0;color:#334e7b;font-size:13.5px;line-height:1.35}
   </style>
 </head>
 <body>
@@ -69,13 +63,11 @@
     <div class="logo" aria-label="ReModa Logo"></div>
 
     <section class="grid">
-      <!-- Card 1: Design Services -->
       <a class="card" href="/remoda-design-services.html">
         <p class="title">Interior Design Services</p>
-        <p class="desc">Full-service design, selections, and high-value transformations.</p>
+        <p class="desc">Full‑service design, selections, and high‑value transformations.</p>
       </a>
 
-      <!-- Card 2: Project Map -->
       <a class="card" href="/project-map.html">
         <p class="title">Project Map</p>
         <p class="desc">Explore completed projects across Dallas–Fort Worth.</p>
