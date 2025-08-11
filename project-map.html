@@ -111,11 +111,13 @@
       display:inline-block;margin-top:10px;padding:8px 10px;border-radius:10px;
       background:#1c3872;color:#eaf2ff;text-decoration:none;border:1px solid rgba(255,255,255,.15)
     }
+    /* keep popups above everything */
+    .leaflet-popup { z-index: 1000 !important; }
 
     /* Custom ReModa marker + custom cluster */
-    .red-pin{
-      width:34px;height:34px;border-radius:50%;
-      background:#fff url('images/remoda-logo.png') center/95% no-repeat;
+    .rmd-pin{
+      width:34px; height:34px; border-radius:50%;
+      background:#fff url('images/remoda-logo.png?v=2') center/95% no-repeat;
       box-shadow:0 0 0 2px #0c1633, 0 0 16px rgba(124,198,255,.45);
     }
     .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large{
@@ -198,20 +200,21 @@
       attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20
     }).addTo(map);
 
-    // Custom ReModa marker icon (uses your logo file)
-    const ReModaIcon = L.DivIcon.extend({ options:{ className:'rmd-pin', iconSize:[26,26] } });
+    // Custom ReModa marker icon (uses your logo file) — BIGGER SIZE
+    const ReModaIcon = L.DivIcon.extend({ options:{ className:'rmd-pin', iconSize:[34,34] } });
 
-    // Marker cluster group
+    // Marker cluster group — stops clustering when zoomed in
     const clusters = L.markerClusterGroup({
       showCoverageOnHover:false,
       maxClusterRadius:50,
-      spiderfyOnMaxZoom:true
+      spiderfyOnMaxZoom:true,
+      disableClusteringAtZoom:15
     }).addTo(map);
 
-    // ---- Allowed service chips (exactly as requested) ----
+    // Allowed service chips
     const ALLOWED_SERVICES = ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"];
 
-    // ~20 sample projects around DFW (using only allowed categories)
+    // ~20 sample projects
     const sampleProjects = [
       {id:"rmd-1", title:"5410 Galahad Ln – Full Remodel", city:"Richardson, TX", year:2024, services:["Kitchen","Bathroom","Flooring","Painting","Design Service"], coords:[32.9998,-96.6774], cover:"https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Design-build refresh with new finishes."},
       {id:"rmd-2", title:"Frisco – Pergola & Patio", city:"Frisco, TX", year:2025, services:["Exterior","Custom Builds","Design Service"], coords:[33.1507,-96.8236], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Pergola + expanded patio."},
@@ -244,10 +247,10 @@
     const $services = document.getElementById('services');
     const $q = document.getElementById('q');
 
-    // Build filters (city/year dynamic; services restricted to allowed list)
     function unique(list, key){ return [...new Set(list.map(x=>x[key]))].filter(Boolean).sort(); }
     function uniqueYears(list){ return [...new Set(list.map(x=>x.year))].filter(Boolean).sort((a,b)=>b-a); }
 
+    // Build filters (city/year dynamic; services fixed list)
     function populateFilters(){
       unique(allProjects,'city').forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; $city.appendChild(o); });
       uniqueYears(allProjects).forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; $year.appendChild(o); });
@@ -259,7 +262,7 @@
       });
     }
 
-    // Normalize a project's service tags to our allowed set (handles plurals/synonyms)
+    // Normalize service tags to our buckets
     function normalizeServices(list){
       const map = {
         "kitchen":"Kitchen",
@@ -273,7 +276,6 @@
       return (list||[])
         .map(s=>String(s).toLowerCase())
         .map(s=>{
-          // try direct, then word-by-word
           if(map[s]) return map[s];
           for(const key in map){ if(s.includes(key)) return map[key]; }
           return null;
@@ -282,8 +284,7 @@
         .reduce((set,val)=> (set.includes(val)?set:[...set,val]), []);
     }
 
-    // Marker rendering
-    const clustersGroup = clusters;
+    // Popups + drawing
     function popupHTML(p){
       return `
         <div class="popup">
@@ -297,6 +298,7 @@
         </div>`;
     }
 
+    const clustersGroup = clusters;
     function draw(){
       clustersGroup.clearLayers();
       const latlngs=[];
@@ -322,12 +324,10 @@
         if(city && p.city!==city) return false;
         if(year && p.year!==year) return false;
 
-        // Only check against our allowed/normalized buckets
         const norm = normalizeServices(p.services);
         if(hasServices){
           const needed = [...activeServices];
-          const ok = needed.every(s => norm.includes(s));
-          if(!ok) return false;
+          if(!needed.every(s => norm.includes(s))) return false;
         }
 
         if(q){
