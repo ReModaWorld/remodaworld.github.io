@@ -46,7 +46,7 @@
 
     .map-wrap{position:relative}
     #map{position:absolute;inset:0}
-    /* Navy tint overlay to keep the map 'navy', not pure black */
+    /* Navy tint overlay so the map reads navy, not black */
     .map-tint{
       position:absolute;inset:0;pointer-events:none;z-index:300;
       background:
@@ -114,12 +114,32 @@
     /* keep popups above everything */
     .leaflet-popup { z-index: 1000 !important; }
 
-    /* Custom ReModa marker + custom cluster */
+    /* Custom ReModa project pin (uses your logo) */
     .rmd-pin{
       width:34px; height:34px; border-radius:50%;
       background:#fff url('images/remoda-logo.png?v=2') center/95% no-repeat;
       box-shadow:0 0 0 2px #0c1633, 0 0 16px rgba(124,198,255,.45);
     }
+
+    /* ReModa HQ pin — bigger with gentle pulse */
+    .rmd-hq {
+      width:40px; height:40px; border-radius:50%;
+      background:#fff url('images/remoda-pin.png?v=1') center/85% no-repeat;
+      box-shadow:0 0 0 2px #0c1633, 0 0 18px rgba(124,198,255,.55);
+      position:relative;
+    }
+    .rmd-hq::after {
+      content:""; position:absolute; inset:0; border-radius:50%;
+      box-shadow:0 0 0 0 rgba(124,198,255,.45);
+      animation:rmdPulse 2.2s ease-out infinite;
+    }
+    @keyframes rmdPulse {
+      0% { box-shadow:0 0 0 0 rgba(124,198,255,.45); }
+      70%{ box-shadow:0 0 0 16px rgba(124,198,255,0); }
+      100%{ box-shadow:0 0 0 0 rgba(124,198,255,0); }
+    }
+
+    /* Custom cluster look */
     .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large{
       background:rgba(16,46,102,.88);
       color:#eaf2ff;
@@ -193,17 +213,17 @@
   </div>
 
   <script>
-    // Basemap: CARTO Dark Matter + our navy tint overlay keeps it premium navy
+    // Basemap: CARTO Dark Matter + our navy tint overlay
     const map = L.map('map', { zoomControl:false }).setView([32.7767, -96.7970], 11);
     L.control.zoom({ position:'bottomright' }).addTo(map);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20
     }).addTo(map);
 
-    // Custom ReModa marker icon (uses your logo file) — BIGGER SIZE
+    // Custom ReModa project marker (DivIcon so we can style via CSS)
     const ReModaIcon = L.DivIcon.extend({ options:{ className:'rmd-pin', iconSize:[34,34] } });
 
-    // Marker cluster group — stops clustering when zoomed in
+    // Marker cluster — stops clustering when close
     const clusters = L.markerClusterGroup({
       showCoverageOnHover:false,
       maxClusterRadius:50,
@@ -211,10 +231,24 @@
       disableClusteringAtZoom:15
     }).addTo(map);
 
+    // HQ pin (not clustered) — uses your coordinates and icon
+    const HQ_LAT = 32.9453261;
+    const HQ_LNG = -96.7355908;
+    const ReModaHQIcon = L.DivIcon.extend({
+      options: { className: 'rmd-hq', iconSize: [40, 40], iconAnchor: [20, 36], popupAnchor: [0, -30] }
+    });
+    const hq = L.marker([HQ_LAT, HQ_LNG], {
+      icon: new ReModaHQIcon(),
+      zIndexOffset: 1500
+    })
+    .addTo(map)
+    .bindPopup(`<strong>ReModa HQ</strong><br>401 S. Sherman Street #217<br>Richardson, TX 75081`, { maxWidth: 260 })
+    .bindTooltip('ReModa HQ', { direction: 'top', offset: [0, -18] });
+
     // Allowed service chips
     const ALLOWED_SERVICES = ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"];
 
-    // ~20 sample projects
+    // ~20 sample projects (placeholders)
     const sampleProjects = [
       {id:"rmd-1", title:"5410 Galahad Ln – Full Remodel", city:"Richardson, TX", year:2024, services:["Kitchen","Bathroom","Flooring","Painting","Design Service"], coords:[32.9998,-96.6774], cover:"https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Design-build refresh with new finishes."},
       {id:"rmd-2", title:"Frisco – Pergola & Patio", city:"Frisco, TX", year:2025, services:["Exterior","Custom Builds","Design Service"], coords:[33.1507,-96.8236], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Pergola + expanded patio."},
@@ -250,11 +284,11 @@
     function unique(list, key){ return [...new Set(list.map(x=>x[key]))].filter(Boolean).sort(); }
     function uniqueYears(list){ return [...new Set(list.map(x=>x.year))].filter(Boolean).sort((a,b)=>b-a); }
 
-    // Build filters (city/year dynamic; services fixed list)
     function populateFilters(){
       unique(allProjects,'city').forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; $city.appendChild(o); });
       uniqueYears(allProjects).forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; $year.appendChild(o); });
 
+      const ALLOWED_SERVICES = ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"];
       ALLOWED_SERVICES.forEach(s=>{
         const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=s; b.dataset.value=s;
         b.onclick=()=>{ b.classList.toggle('active'); if(activeServices.has(s)) activeServices.delete(s); else activeServices.add(s); };
@@ -262,7 +296,7 @@
       });
     }
 
-    // Normalize service tags to our buckets
+    // Normalize to our buckets (handles plurals/synonyms)
     function normalizeServices(list){
       const map = {
         "kitchen":"Kitchen",
@@ -284,7 +318,6 @@
         .reduce((set,val)=> (set.includes(val)?set:[...set,val]), []);
     }
 
-    // Popups + drawing
     function popupHTML(p){
       return `
         <div class="popup">
