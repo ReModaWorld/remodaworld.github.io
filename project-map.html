@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ReModa | Project Map</title>
+
+  <!-- Leaflet (free, no signup) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root{ --navy:#0C1D3A; --bg:#0a1227; --white:#fff; --muted:#a9b8d8; --accent:#7cc6ff; --radius:16px; }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--white);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .page{display:grid;grid-template-rows:auto 1fr;height:100%}
+
+    /* Top bar */
+    .topbar{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,var(--navy),#0b1f3f)}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand img{height:28px}
+    .brand span{font-weight:700;letter-spacing:.2px}
+    .topbar a{color:#cfe8ff;text-decoration:none;font-size:14px}
+
+    /* Map */
+    .map-wrap{position:relative}
+    #map{position:absolute;inset:0}
+
+    /* Filters card */
+    .controls{
+      position:absolute;top:16px;left:16px;z-index:500;
+      width:min(420px, calc(100vw - 32px));
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px);
+      border-radius:var(--radius); overflow:hidden; box-shadow:0 8px 34px rgba(0,0,0,.35);
+    }
+    .controls header{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
+    .controls h2{margin:0;font-size:15px}
+    .controls .body{padding:12px 14px;display:grid;gap:10px}
+    label{font-size:12px;color:#cfe0ff}
+    input,select,button{width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(10,18,39,.6);color:#eaf2ff;padding:10px 12px;font-size:14px;outline:none}
+    input::placeholder{color:#a9b8d8}
+    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,198,255,.18)}
+    .row{display:grid;gap:8px}
+    .row.inline{grid-template-columns:1fr 1fr;gap:10px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{border:1px solid rgba(255,255,255,.14);padding:8px 10px;border-radius:999px;background:rgba(15,24,48,.55);font-size:12px;cursor:pointer}
+    .chip.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(124,198,255,.18) inset}
+    .footer{padding:10px 14px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px}
+    .btn{background:linear-gradient(180deg,#1c3872,#122a58);border:1px solid rgba(255,255,255,.12);padding:10px 12px;border-radius:12px;color:#eaf2ff;font-weight:600;cursor:pointer}
+    .btn.secondary{background:transparent}
+
+    /* Popups */
+    .popup{min-width:260px;background:#0c1633;color:#eaf2ff;border-radius:12px;border:1px solid rgba(255,255,255,.14);overflow:hidden}
+    .pop-img{height:120px;background:#111 center/cover}
+    .pop-body{padding:10px 12px}
+    .pop-title{margin:0;font-size:15px;font-weight:700}
+    .pop-sub{margin:4px 0 6px;color:#cfe0ff;font-size:12px}
+    .tag{display:inline-block;margin:4px 6px 0 0;font-size:11px;padding:4px 8px;border-radius:999px;background:rgba(124,198,255,.15);border:1px solid rgba(124,198,255,.35)}
+    @media (max-width:640px){ .controls{left:50%;transform:translateX(-50%);top:10px} }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">
+        <img src="images/remoda-logo.png" alt="ReModa">
+        <span>Project Map</span>
+      </div>
+      <a href="/">Home</a>
+    </div>
+
+    <div class="map-wrap">
+      <div id="map"></div>
+
+      <aside class="controls" aria-label="Project filters">
+        <header>
+          <h2>Explore Completed Projects</h2>
+          <small style="color:#a9b8d8">Dallas–Fort Worth + beyond</small>
+        </header>
+        <div class="body">
+          <div class="row">
+            <label for="q">Search</label>
+            <input id="q" type="search" placeholder="Client, address, notes…"/>
+          </div>
+          <div class="row inline">
+            <div>
+              <label for="city">City</label>
+              <select id="city"><option value="">All Cities</option></select>
+            </div>
+            <div>
+              <label for="year">Year</label>
+              <select id="year"><option value="">All Years</option></select>
+            </div>
+          </div>
+          <div class="row">
+            <label>Service Type</label>
+            <div id="services" class="chips"></div>
+          </div>
+        </div>
+        <div class="footer">
+          <button class="btn" id="apply">Apply Filters</button>
+          <button class="btn secondary" id="reset">Reset</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // 1) Init Leaflet map centered on Dallas
+    const map = L.map('map', { zoomControl: false }).setView([32.7767, -96.7970], 10);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // 2) Demo data (we’ll move to projects.json in the next step)
+    const sampleProjects = [
+      {
+        id: "rmd-5410",
+        title: "5410 Galahad Ln – Full Remodel",
+        city: "Richardson, TX",
+        year: 2024,
+        services: ["Kitchen","Bathrooms","Flooring","Painting","Accent Wall"],
+        coords: [32.9998, -96.6774],
+        cover: "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop",
+        url: "#",
+        tags: ["Design-Build","Residential"],
+        blurb: "Kitchen repaint & bath remodel, new floors, accent wall, and finishing."
+      },
+      {
+        id: "rmd-outdoors-1",
+        title: "Frisco – Pergola & Patio Expansion",
+        city: "Frisco, TX",
+        year: 2025,
+        services: ["Pergola","Concrete","Outdoor Kitchen"],
+        coords: [33.1507, -96.8236],
+        cover: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop",
+        url: "#",
+        tags: ["ReModa Outdoors","Exterior"],
+        blurb: "Custom pergola, expanded patio, and gas line for outdoor kitchen."
+      },
+      {
+        id: "rmd-bath-elite",
+        title: "Preston Hollow – Master Bath",
+        city: "Dallas, TX",
+        year: 2025,
+        services: ["Bathrooms","Tile","Plumbing"],
+        coords: [32.8654, -96.8103],
+        cover: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop",
+        url: "#",
+        tags: ["Luxury","Residential"],
+        blurb: "Curbless shower, floating vanity, LED mirrors."
+      }
+    ];
+
+    // 3) Filters + markers
+    let allProjects = sampleProjects.slice();
+    let filtered = allProjects.slice();
+    let activeServices = new Set();
+
+    const $city = document.getElementById('city');
+    const $year = document.getElementById('year');
+    const $services = document.getElementById('services');
+    const $q = document.getElementById('q');
+    const layerGroup = L.layerGroup().addTo(map);
+
+    function unique(list, key){ return [...new Set(list.map(x=>x[key]))].filter(Boolean).sort(); }
+    function uniqueYears(list){ return [...new Set(list.map(x=>x.year))].filter(Boolean).sort((a,b)=>b-a); }
+    function uniqueServices(list){ const s=new Set(); list.forEach(p=>p.services.forEach(v=>s.add(v))); return [...s].sort(); }
+
+    function populateFilters(){
+      unique(allProjects,'city').forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; $city.appendChild(o); });
+      uniqueYears(allProjects).forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; $year.appendChild(o); });
+      uniqueServices(allProjects).forEach(s=>{
+        const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=s; b.dataset.value=s;
+        b.onclick=()=>{ b.classList.toggle('active'); if(activeServices.has(s)) activeServices.delete(s); else activeServices.add(s); };
+        $services.appendChild(b);
+      });
+    }
+
+    function popupHTML(p){
+      const services = p.services.map(s=>`<span class="tag">${s}</span>`).join('');
+      const tags = (p.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+      return `
+        <div class="popup">
+          <div class="pop-img" style="background-image:url('${p.cover||''}')"></div>
+          <div class="pop-body">
+            <h3 class="pop-title">${p.title}</h3>
+            <p class="pop-sub">${p.city} • ${p.year}</p>
+            ${services}${tags?'<div style="margin-top:4px">'+tags+'</div>':''}
+            ${p.blurb?`<p style="margin:6px 0 0;color:#cfe0ff">${p.blurb}</p>`:''}
+            ${p.url && p.url !== '#' ? `<a class="pop-link" href="${p.url}" target="_blank" rel="noopener">View project ›</a>`:''}
+          </div>
+        </div>`;
+    }
+
+    function draw(){
+      layerGroup.clearLayers();
+      filtered.forEach(p=>{
+        const m = L.circleMarker(p.coords, { radius:7, weight:1.5, color:'#0c1633', fillColor:'#7cc6ff', fillOpacity:1 })
+          .bindPopup(popupHTML(p), { maxWidth: 320 });
+        m.addTo(layerGroup);
+      });
+    }
+
+    function applyFilters(){
+      const q = ($q.value||'').toLowerCase().trim();
+      const city = $city.value;
+      const year = $year.value ? +$year.value : null;
+      const hasServices = activeServices.size>0;
+
+      filtered = allProjects.filter(p=>{
+        if(city && p.city!==city) return false;
+        if(year && p.year!==year) return false;
+        if(hasServices && ![...activeServices].every(s=>p.services.includes(s))) return false;
+        if(q){
+          const blob = [p.title,p.city,p.year,(p.services||[]).join(' '),(p.tags||[]).join(' '),p.blurb||''].join(' ').toLowerCase();
+          if(!blob.includes(q)) return false;
+        }
+        return true;
+      });
+      draw();
+      if(filtered.length){ map.flyTo({ center: filtered[0].coords, zoom: 11 }); }
+    }
+
+    document.getElementById('apply').onclick = applyFilters;
+    document.getElementById('reset').onclick = ()=>{
+      $q.value=''; $city.value=''; $year.value='';
+      activeServices.clear(); [...$services.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+      filtered = allProjects.slice(); draw(); map.flyTo({ center:[32.7767,-96.7970], zoom:10 });
+    };
+    let t=null; $q.oninput=()=>{ clearTimeout(t); t=setTimeout(applyFilters,250); };
+
+    populateFilters(); draw();
+  </script>
+</body>
+</html>
