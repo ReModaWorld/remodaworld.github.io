@@ -20,7 +20,8 @@
       --navy-700:#122a58;
       --bg:#0a1227;
       --white:#fff;
-      --muted:#a9b8d8;
+      --ink:#0f1830;
+      --muted:#6e7aa1;
       --accent:#7cc6ff;
       --radius:16px;
     }
@@ -45,56 +46,71 @@
 
     .map-wrap{position:relative}
     #map{position:absolute;inset:0}
+    /* Navy tint overlay to keep the map 'navy', not pure black */
+    .map-tint{
+      position:absolute;inset:0;pointer-events:none;z-index:300;
+      background:
+        radial-gradient(900px 520px at 50% -8%, rgba(12,29,58,.35) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(12,29,58,.40), rgba(12,29,58,.30));
+      mix-blend-mode:multiply;
+    }
 
-    /* Controls card (moved to right, navy labels) */
+    /* Controls card — branded */
     .controls{
       position:absolute;top:16px;right:16px;z-index:500;
       width:min(400px, calc(100vw - 32px));
-      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.92));
-      color:#0f1830;
+      background:linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,255,255,.94));
+      color:var(--ink);
       border:1px solid rgba(0,0,0,.08); border-radius:var(--radius);
-      overflow:hidden; box-shadow:0 8px 34px rgba(0,0,0,.35);
+      overflow:hidden; box-shadow:0 18px 48px rgba(0,0,0,.35)
     }
+    .ribbon{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 14px;background:linear-gradient(180deg,#133063,#0C1D3A);color:#eaf2ff;
+      border-bottom:1px solid rgba(255,255,255,.08)
+    }
+    .ribbon img{height:20px}
+    .ribbon strong{font-size:13px;letter-spacing:.3px}
     .controls header{
-      padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);
+      padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);
       display:flex;justify-content:space-between;align-items:center
     }
     .controls h2{margin:0;font-size:15px;color:var(--navy)}
     .controls .body{padding:12px 14px;display:grid;gap:10px}
-    label{font-size:12px;color:var(--navy);font-weight:600}
+    label{font-size:12px;color:var(--navy);font-weight:700}
     input,select,button{
       width:100%;border-radius:12px;border:1px solid rgba(0,0,0,.15);
-      background:#f5f7fb;color:#0f1830;padding:10px 12px;font-size:14px;outline:none
+      background:#f5f7fb;color:var(--ink);padding:10px 12px;font-size:14px;outline:none
     }
     input::placeholder{color:#6b7a9b}
     input:focus,select:focus{border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(18,42,88,.18)}
     .row{display:grid;gap:8px}
     .row.inline{grid-template-columns:1fr 1fr;gap:10px}
+
     .chips{display:flex;flex-wrap:wrap;gap:8px}
     .chip{
-      border:1px solid rgba(0,0,0,.15);padding:8px 10px;border-radius:999px;
-      background:#fff;font-size:12px;cursor:pointer;color:#0f1830
+      border:1px solid rgba(0,0,0,.15);padding:8px 12px;border-radius:999px;
+      background:#fff;font-size:12px;cursor:pointer;color:var(--ink);font-weight:600
     }
     .chip.active{border-color:var(--navy-700);box-shadow:0 0 0 2px rgba(18,42,88,.18) inset}
     .footer{padding:10px 14px;border-top:1px solid rgba(0,0,0,.06);display:flex;gap:10px}
     .btn{
       background:linear-gradient(180deg,#1c3872,#122a58);
       border:1px solid rgba(0,0,0,.15);padding:10px 12px;border-radius:12px;
-      color:#eaf2ff;font-weight:600;cursor:pointer
+      color:#eaf2ff;font-weight:700;cursor:pointer
     }
-    .btn.secondary{background:#f5f7fb;color:#0f1830}
+    .btn.secondary{background:#eef2fb;color:var(--ink)}
 
     /* Popup */
     .popup{min-width:260px;background:#0c1633;color:#eaf2ff;border-radius:12px;border:1px solid rgba(255,255,255,.14);overflow:hidden}
     .pop-img{height:140px;background:#111 center/cover}
     .pop-body{padding:10px 12px}
-    .pop-title{margin:0;font-size:15px;font-weight:700}
+    .pop-title{margin:0;font-size:15px;font-weight:800}
     .pop-sub{margin:4px 0 6px;color:#cfe0ff;font-size:12px}
     .pop-link{
       display:inline-block;margin-top:10px;padding:8px 10px;border-radius:10px;
       background:#1c3872;color:#eaf2ff;text-decoration:none;border:1px solid rgba(255,255,255,.15)
     }
-    .pop-link:hover{filter:brightness(1.05)}
 
     /* Custom ReModa marker + custom cluster */
     .rmd-pin{
@@ -103,7 +119,7 @@
       box-shadow:0 0 0 2px #0c1633, 0 0 16px rgba(124,198,255,.45);
     }
     .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large{
-      background:rgba(16,46,102,.85);
+      background:rgba(16,46,102,.88);
       color:#eaf2ff;
       border:2px solid #9bc9ff;
       box-shadow:0 6px 18px rgba(0,0,0,.35);
@@ -111,7 +127,7 @@
     .marker-cluster div{
       background:transparent;
       color:#eaf2ff;
-      font-weight:700;
+      font-weight:800;
       border:none;
     }
 
@@ -135,11 +151,16 @@
 
     <div class="map-wrap">
       <div id="map" aria-label="Interactive map of ReModa completed projects"></div>
+      <div class="map-tint" aria-hidden="true"></div>
 
       <aside class="controls" aria-label="Project filters">
+        <div class="ribbon">
+          <img src="images/remoda-logo.png" alt="ReModa">
+          <strong>ReModa • Filter Projects</strong>
+        </div>
         <header>
           <h2>Explore Completed Projects</h2>
-          <small style="color:#4b5c84">Dallas–Fort Worth + beyond</small>
+          <small style="color:var(--muted)">Dallas–Fort Worth + beyond</small>
         </header>
         <div class="body">
           <div class="row">
@@ -170,7 +191,7 @@
   </div>
 
   <script>
-    // Basemap: CARTO Dark Matter (polished, free)
+    // Basemap: CARTO Dark Matter + our navy tint overlay keeps it premium navy
     const map = L.map('map', { zoomControl:false }).setView([32.7767, -96.7970], 11);
     L.control.zoom({ position:'bottomright' }).addTo(map);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -180,35 +201,38 @@
     // Custom ReModa marker icon (uses your logo file)
     const ReModaIcon = L.DivIcon.extend({ options:{ className:'rmd-pin', iconSize:[26,26] } });
 
-    // Marker cluster group with subtle styling
+    // Marker cluster group
     const clusters = L.markerClusterGroup({
       showCoverageOnHover:false,
       maxClusterRadius:50,
       spiderfyOnMaxZoom:true
     }).addTo(map);
 
-    // ~20 sample projects around DFW
+    // ---- Allowed service chips (exactly as requested) ----
+    const ALLOWED_SERVICES = ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"];
+
+    // ~20 sample projects around DFW (using only allowed categories)
     const sampleProjects = [
-      {id:"rmd-rich-5410", title:"5410 Galahad Ln – Full Remodel", city:"Richardson, TX", year:2024, services:["Kitchen","Bathrooms","Flooring","Painting"], coords:[32.9998,-96.6774], cover:"https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Full-home refresh with new finishes & fixtures.", tags:["Residential"]},
-      {id:"rmd-frisco-perg", title:"Frisco – Pergola & Patio Expansion", city:"Frisco, TX", year:2025, services:["Pergola","Concrete","Outdoor Kitchen"], coords:[33.1507,-96.8236], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Custom pergola + expanded patio.", tags:["ReModa Outdoors"]},
-      {id:"rmd-dal-bath", title:"Preston Hollow – Master Bath", city:"Dallas, TX", year:2025, services:["Bathrooms","Tile","Plumbing"], coords:[32.8654,-96.8103], cover:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Curbless shower, floating vanity, LED mirrors.", tags:["Luxury"]},
-      {id:"rmd-plano-fire", title:"Plano – Fireplace Feature Wall", city:"Plano, TX", year:2025, services:["Accent Wall","Fireplace","Millwork"], coords:[33.0198,-96.6989], cover:"https://images.unsplash.com/photo-1503174971373-b1f69850bded?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Dekton cladding + inset lighting.", tags:["Feature"]},
-      {id:"rmd-irv-kitch", title:"Irving – Kitchen Refresh", city:"Irving, TX", year:2024, services:["Kitchen","Painting","Countertops"], coords:[32.8140,-96.9489], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Painted cabinets + quartz tops.", tags:["Residential"]},
-      {id:"rmd-allen-bath", title:"Allen – Guest Bath Upgrade", city:"Allen, TX", year:2025, services:["Bathrooms","Tile"], coords:[33.1032,-96.6706], cover:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Large-format tile and frameless glass.", tags:["Residential"]},
-      {id:"rmd-mck-kitch", title:"McKinney – Open Kitchen Plan", city:"McKinney, TX", year:2025, services:["Kitchen","Electrical","Flooring"], coords:[33.1976,-96.6153], cover:"https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Wall removal + island upgrade.", tags:["Residential"]},
-      {id:"rmd-garland-fl", title:"Garland – Whole‑Home Flooring", city:"Garland, TX", year:2024, services:["Flooring","Baseboards"], coords:[32.9126,-96.6389], cover:"https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Luxury vinyl plank throughout.", tags:["Residential"]},
-      {id:"rmd-mesq-bath", title:"Mesquite – Tub‑to‑Shower", city:"Mesquite, TX", year:2025, services:["Bathrooms","Plumbing","Tile"], coords:[32.7668,-96.5992], cover:"https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Low‑maintenance shower conversion.", tags:["Residential"]},
-      {id:"rmd-addison-fw", title:"Addison – Feature Wall", city:"Addison, TX", year:2024, services:["Accent Wall","Painting"], coords:[32.9618,-96.8292], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Slatted wood + integrated lighting.", tags:["Residential"]},
-      {id:"rmd-carrollton", title:"Carrollton – Bath + Vanity", city:"Carrollton, TX", year:2025, services:["Bathrooms","Vanity","Lighting"], coords:[32.9756,-96.8899], cover:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Floating vanity, LED mirror.", tags:["Residential"]},
-      {id:"rmd-lewisville", title:"Lewisville – Kitchen Backsplash", city:"Lewisville, TX", year:2024, services:["Kitchen","Tile"], coords:[33.0462,-96.9942], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Marble mosaic backsplash.", tags:["Residential"]},
-      {id:"rmd-denton-ext", title:"Denton – Outdoor Living", city:"Denton, TX", year:2025, services:["Pergola","Concrete"], coords:[33.2148,-97.1331], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Stained pergola + stamped concrete.", tags:["Outdoors"]},
-      {id:"rmd-fw-bath", title:"Fort Worth – Spa Bath", city:"Fort Worth, TX", year:2025, services:["Bathrooms","Tile","Lighting"], coords:[32.7555,-97.3308], cover:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Rain head + linear drain.", tags:["Luxury"]},
-      {id:"rmd-arlington", title:"Arlington – Paint & Trim", city:"Arlington, TX", year:2024, services:["Painting","Trim"], coords:[32.7357,-97.1081], cover:"https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Crisp base + crown upgrade.", tags:["Residential"]},
-      {id:"rmd-frisco-bath", title:"Frisco – Primary Bath", city:"Frisco, TX", year:2024, services:["Bathrooms","Tile"], coords:[33.1701,-96.8437], cover:"https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Porcelain slab walls.", tags:["Residential"]},
-      {id:"rmd-richardson", title:"Richardson – Office Millwork", city:"Richardson, TX", year:2025, services:["Millwork","Painting"], coords:[32.9482,-96.7297], cover:"https://images.unsplash.com/photo-1503174971373-b1f69850bded?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Custom built‑ins.", tags:["Feature"]},
-      {id:"rmd-plano-kitch", title:"Plano – Cabinet Refinish", city:"Plano, TX", year:2024, services:["Kitchen","Painting"], coords:[33.0551,-96.7480], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Factory‑finish spray.", tags:["Residential"]},
-      {id:"rmd-mck-ext", title:"McKinney – Patio Cover", city:"McKinney, TX", year:2024, services:["Pergola","Electrical"], coords:[33.1900,-96.6500], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Lighting + fan package.", tags:["Outdoors"]},
-      {id:"rmd-dallas-kitch", title:"Dallas – Modern Kitchen", city:"Dallas, TX", year:2025, services:["Kitchen","Countertops","Flooring"], coords:[32.8000,-96.8000], cover:"https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Island waterfall edge.", tags:["Residential"]}
+      {id:"rmd-1", title:"5410 Galahad Ln – Full Remodel", city:"Richardson, TX", year:2024, services:["Kitchen","Bathroom","Flooring","Painting","Design Service"], coords:[32.9998,-96.6774], cover:"https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Design-build refresh with new finishes."},
+      {id:"rmd-2", title:"Frisco – Pergola & Patio", city:"Frisco, TX", year:2025, services:["Exterior","Custom Builds","Design Service"], coords:[33.1507,-96.8236], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Pergola + expanded patio."},
+      {id:"rmd-3", title:"Preston Hollow – Master Bath", city:"Dallas, TX", year:2025, services:["Bathroom","Custom Builds","Design Service"], coords:[32.8654,-96.8103], cover:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Curbless shower + floating vanity."},
+      {id:"rmd-4", title:"Plano – Fireplace Feature", city:"Plano, TX", year:2025, services:["Custom Builds","Painting","Design Service"], coords:[33.0198,-96.6989], cover:"https://images.unsplash.com/photo-1503174971373-b1f69850bded?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Dekton cladding, inset lighting."},
+      {id:"rmd-5", title:"Irving – Kitchen Refresh", city:"Irving, TX", year:2024, services:["Kitchen","Painting","Design Service"], coords:[32.8140,-96.9489], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Painted cabinets + quartz tops."},
+      {id:"rmd-6", title:"Allen – Guest Bath", city:"Allen, TX", year:2025, services:["Bathroom","Design Service"], coords:[33.1032,-96.6706], cover:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Large-format tile + glass."},
+      {id:"rmd-7", title:"McKinney – Open Kitchen", city:"McKinney, TX", year:2025, services:["Kitchen","Flooring","Design Service"], coords:[33.1976,-96.6153], cover:"https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Wall removal + island."},
+      {id:"rmd-8", title:"Garland – Whole‑Home Flooring", city:"Garland, TX", year:2024, services:["Flooring"], coords:[32.9126,-96.6389], cover:"https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"LVP throughout."},
+      {id:"rmd-9", title:"Mesquite – Tub‑to‑Shower", city:"Mesquite, TX", year:2025, services:["Bathroom","Custom Builds"], coords:[32.7668,-96.5992], cover:"https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Low‑maintenance conversion."},
+      {id:"rmd-10", title:"Addison – Feature Wall", city:"Addison, TX", year:2024, services:["Custom Builds","Painting"], coords:[32.9618,-96.8292], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Slatted wood + lighting."},
+      {id:"rmd-11", title:"Carrollton – Vanity + Lighting", city:"Carrollton, TX", year:2025, services:["Bathroom"], coords:[32.9756,-96.8899], cover:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Floating vanity + LED mirror."},
+      {id:"rmd-12", title:"Lewisville – Backsplash", city:"Lewisville, TX", year:2024, services:["Kitchen"], coords:[33.0462,-96.9942], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Marble mosaic."},
+      {id:"rmd-13", title:"Denton – Outdoor Living", city:"Denton, TX", year:2025, services:["Exterior","Custom Builds"], coords:[33.2148,-97.1331], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Pergola + stamped concrete."},
+      {id:"rmd-14", title:"Fort Worth – Spa Bath", city:"Fort Worth, TX", year:2025, services:["Bathroom","Custom Builds"], coords:[32.7555,-97.3308], cover:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Rain head + linear drain."},
+      {id:"rmd-15", title:"Arlington – Paint & Trim", city:"Arlington, TX", year:2024, services:["Painting"], coords:[32.7357,-97.1081], cover:"https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Crisp base + crown."},
+      {id:"rmd-16", title:"Frisco – Primary Bath", city:"Frisco, TX", year:2024, services:["Bathroom"], coords:[33.1701,-96.8437], cover:"https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Porcelain slab walls."},
+      {id:"rmd-17", title:"Richardson – Office Millwork", city:"Richardson, TX", year:2025, services:["Custom Builds","Painting"], coords:[32.9482,-96.7297], cover:"https://images.unsplash.com/photo-1503174971373-b1f69850bded?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Built‑ins + paint."},
+      {id:"rmd-18", title:"Plano – Cabinet Refinish", city:"Plano, TX", year:2024, services:["Kitchen","Painting"], coords:[33.0551,-96.7480], cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Factory‑finish spray."},
+      {id:"rmd-19", title:"McKinney – Patio Cover", city:"McKinney, TX", year:2024, services:["Exterior","Custom Builds"], coords:[33.1900,-96.6500], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Lighting + fan package."},
+      {id:"rmd-20", title:"Dallas – Modern Kitchen", city:"Dallas, TX", year:2025, services:["Kitchen","Flooring","Design Service"], coords:[32.8000,-96.8000], cover:"https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Island waterfall edge."}
     ];
 
     let allProjects = sampleProjects.slice();
@@ -220,20 +244,46 @@
     const $services = document.getElementById('services');
     const $q = document.getElementById('q');
 
+    // Build filters (city/year dynamic; services restricted to allowed list)
     function unique(list, key){ return [...new Set(list.map(x=>x[key]))].filter(Boolean).sort(); }
     function uniqueYears(list){ return [...new Set(list.map(x=>x.year))].filter(Boolean).sort((a,b)=>b-a); }
-    function uniqueServices(list){ const s=new Set(); list.forEach(p=>p.services.forEach(v=>s.add(v))); return [...s].sort(); }
 
     function populateFilters(){
       unique(allProjects,'city').forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; $city.appendChild(o); });
       uniqueYears(allProjects).forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; $year.appendChild(o); });
-      uniqueServices(allProjects).forEach(s=>{
+
+      ALLOWED_SERVICES.forEach(s=>{
         const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=s; b.dataset.value=s;
         b.onclick=()=>{ b.classList.toggle('active'); if(activeServices.has(s)) activeServices.delete(s); else activeServices.add(s); };
         $services.appendChild(b);
       });
     }
 
+    // Normalize a project's service tags to our allowed set (handles plurals/synonyms)
+    function normalizeServices(list){
+      const map = {
+        "kitchen":"Kitchen",
+        "bathroom":"Bathroom","bathrooms":"Bathroom","bath":"Bathroom",
+        "floor":"Flooring","flooring":"Flooring",
+        "paint":"Painting","painting":"Painting",
+        "exterior":"Exterior","outdoor":"Exterior","pergola":"Exterior","patio":"Exterior",
+        "design":"Design Service","design service":"Design Service","design-service":"Design Service","design-build":"Design Service",
+        "custom":"Custom Builds","custom builds":"Custom Builds","millwork":"Custom Builds","feature wall":"Custom Builds","fireplace":"Custom Builds","accent wall":"Custom Builds"
+      };
+      return (list||[])
+        .map(s=>String(s).toLowerCase())
+        .map(s=>{
+          // try direct, then word-by-word
+          if(map[s]) return map[s];
+          for(const key in map){ if(s.includes(key)) return map[key]; }
+          return null;
+        })
+        .filter(Boolean)
+        .reduce((set,val)=> (set.includes(val)?set:[...set,val]), []);
+    }
+
+    // Marker rendering
+    const clustersGroup = clusters;
     function popupHTML(p){
       return `
         <div class="popup">
@@ -248,11 +298,11 @@
     }
 
     function draw(){
-      clusters.clearLayers();
+      clustersGroup.clearLayers();
       const latlngs=[];
       filtered.forEach(p=>{
         const m = L.marker(p.coords, { icon:new ReModaIcon() }).bindPopup(popupHTML(p), { maxWidth: 320 });
-        clusters.addLayer(m);
+        clustersGroup.addLayer(m);
         latlngs.push(p.coords);
       });
       if(latlngs.length){
@@ -271,9 +321,17 @@
       filtered = allProjects.filter(p=>{
         if(city && p.city!==city) return false;
         if(year && p.year!==year) return false;
-        if(hasServices && ![...activeServices].every(s=>p.services.includes(s))) return false;
+
+        // Only check against our allowed/normalized buckets
+        const norm = normalizeServices(p.services);
+        if(hasServices){
+          const needed = [...activeServices];
+          const ok = needed.every(s => norm.includes(s));
+          if(!ok) return false;
+        }
+
         if(q){
-          const blob = [p.title,p.city,p.year,(p.services||[]).join(' '),(p.tags||[]).join(' '),p.blurb||''].join(' ').toLowerCase();
+          const blob = [p.title,p.city,p.year,(p.services||[]).join(' '),p.blurb||''].join(' ').toLowerCase();
           if(!blob.includes(q)) return false;
         }
         return true;
