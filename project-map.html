@@ -94,11 +94,25 @@
   .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(16,46,102,.88);color:#eaf2ff;border:2px solid #9bc9ff;box-shadow:0 6px 18px rgba(0,0,0,.35)}
   .marker-cluster div{background:transparent;color:#eaf2ff;font-weight:800;border:none}
 
+  /* Privacy note */
+  .privacy-note{
+    position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
+    z-index:600;display:flex;align-items:center;gap:8px;
+    font-size:12px; color:rgba(255,255,255,.88);
+    padding:6px 10px;border-radius:10px;
+    background:rgba(12,29,58,.45); /* subtle navy glass for legibility */
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    border:1px solid rgba(255,255,255,.12);
+    pointer-events:none; /* won’t block map clicks */
+  }
+  .privacy-note svg{width:14px;height:14px;flex:none;opacity:.95}
+
   /* Responsive scaling */
   @media (max-width:720px){
     .controls{left:50%;right:auto;transform:translateX(-50%);width:min(94vw,420px)}
     .brand img{height:32px;}
     .ribbon img{height:26px;}
+    .privacy-note{font-size:11px; padding:6px 8px; bottom:8px;}
   }
 </style>
 </head>
@@ -121,6 +135,16 @@
   <div class="map-wrap">
     <div id="map" aria-label="Interactive map of ReModa completed projects"></div>
     <div class="map-tint" aria-hidden="true"></div>
+
+    <!-- Privacy disclaimer with shield icon -->
+    <div class="privacy-note" aria-live="polite">
+      <!-- Inline shield SVG (white) -->
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2.5l7 3v6.3c0 4.2-2.7 8-7 10.2-4.3-2.2-7-6-7-10.2V5.5l7-3z" stroke="white" stroke-width="1.4" fill="rgba(255,255,255,.12)"/>
+        <path d="M9.2 12.3l1.8 1.8 3.8-4.1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>We respect our clients’ privacy — locations are approximate, not exact.</span>
+    </div>
 
     <aside class="controls" aria-label="Project filters">
       <div class="ribbon">
@@ -196,7 +220,7 @@
     `, { maxWidth: 320 })
     .bindTooltip('ReModa HQ', { direction:'top', offset:[0,-22] })
     .on('popupopen', () => {
-      // Smart fallbacks for your storefront file name/extension (kept just in case)
+      // Photo fallbacks (kept just in case)
       const img = document.getElementById('hq-photo');
       const candidates = [
         'images/remoda-hq.jpeg?v=3','images/remoda-hq.jpg?v=3','images/remoda-hq.webp?v=3','images/remoda-hq.png?v=3',
