@@ -248,12 +248,23 @@
       options: { className: 'rmd-hq', iconSize: [44, 44], iconAnchor: [22, 40], popupAnchor: [0, -34] }
     });
     const hq = L.marker([HQ_LAT, HQ_LNG], {
-      icon: new ReModaHQIcon(),
-      zIndexOffset: 1500
-    })
-    .addTo(map)
-    .bindPopup(`<strong>ReModa HQ</strong><br>401 S. Sherman Street #217<br>Richardson, TX 75081`, { maxWidth: 260 })
-    .bindTooltip('ReModa HQ', { direction: 'top', offset: [0, -22] });
+  icon: new ReModaHQIcon(),
+  zIndexOffset: 1500
+})
+.addTo(map)
+.bindPopup(`
+  <div class="popup">
+    <div class="pop-img" style="background-image:url('images/remoda-hq.jpg?v=1')"></div>
+    <div class="pop-body">
+      <h3 class="pop-title">ReModa HQ</h3>
+      <p class="pop-sub">401 S. Sherman Street #217 • Richardson, TX 75081</p>
+      <a class="pop-link" href="https://www.google.com/maps/search/?api=1&query=401+S.+Sherman+Street+%23217%2C+Richardson%2C+TX+75081" target="_blank" rel="noopener">
+        Directions ›
+      </a>
+    </div>
+  </div>
+`, { maxWidth: 300 })
+.bindTooltip('ReModa HQ', { direction: 'top', offset: [0, -22] });
 
     // Allowed service chips
     const ALLOWED_SERVICES = ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"];
