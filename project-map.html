@@ -27,9 +27,11 @@
   .topbar{display:flex;align-items:center;gap:12px;justify-content:space-between;
     padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);
     background:linear-gradient(180deg,var(--navy),#0b1f3f)}
-  .brand{display:flex;align-items:center;gap:10px}
-  .brand img{height:28px}
-  .brand span{font-weight:700;letter-spacing:.2px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{height:40px;width:auto}
+  .brand .title-wrap{display:flex;flex-direction:column;line-height:1.1}
+  .brand .title-wrap span{font-weight:700;letter-spacing:.2px}
+  .map-subtitle{font-size:13px;color:rgba(255,255,255,0.7);margin-top:2px}
   .topbar a{color:#cfe8ff;text-decoration:none;font-size:14px}
   .topbar button{background:transparent;border:1px solid rgba(255,255,255,.3);color:#cfe8ff;border-radius:10px;padding:6px 10px;cursor:pointer}
 
@@ -46,7 +48,7 @@
     color:var(--ink);border:1px solid rgba(0,0,0,.08); border-radius:var(--radius);
     overflow:hidden; box-shadow:0 18px 48px rgba(0,0,0,.35)}
   .ribbon{display:flex;align-items:center;gap:10px;padding:10px 14px;background:linear-gradient(180deg,#133063,#0C1D3A);color:#eaf2ff;border-bottom:1px solid rgba(255,255,255,.08)}
-  .ribbon img{height:20px}
+  .ribbon img{height:32px;width:auto}
   .ribbon strong{font-size:13px;letter-spacing:.3px}
   .controls header{padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center}
   .controls h2{margin:0;font-size:15px;color:var(--navy)}
@@ -80,7 +82,7 @@
   /* HQ pin — navy disk + strong gold glow */
   .rmd-hq{
     width:44px;height:44px;border-radius:50%;
-    background:#0C1D3A url('images/remoda-pin.png?v=3') center/88% no-repeat; /* if you remove the icon, the navy disk remains */
+    background:#0C1D3A url('images/remoda-pin.png?v=3') center/88% no-repeat;
     box-shadow:0 0 0 3px #0c1633,0 0 24px rgba(255,211,110,.95),0 0 70px rgba(255,211,110,.60);
     position:relative;
   }
@@ -92,15 +94,23 @@
   .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(16,46,102,.88);color:#eaf2ff;border:2px solid #9bc9ff;box-shadow:0 6px 18px rgba(0,0,0,.35)}
   .marker-cluster div{background:transparent;color:#eaf2ff;font-weight:800;border:none}
 
-  @media (max-width:720px){.controls{left:50%;right:auto;transform:translateX(-50%);width:min(94vw,420px)}}
+  /* Responsive scaling */
+  @media (max-width:720px){
+    .controls{left:50%;right:auto;transform:translateX(-50%);width:min(94vw,420px)}
+    .brand img{height:32px;}
+    .ribbon img{height:26px;}
+  }
 </style>
 </head>
 <body>
 <div class="page">
   <div class="topbar">
     <div class="brand">
-      <img src="images/remoda-logo.png" alt="ReModa">
-      <span>Project Map</span>
+      <img src="images/remoda-logo.png" alt="ReModa Logo">
+      <div class="title-wrap">
+        <span>Project Map</span>
+        <div class="map-subtitle">Explore completed ReModa™ projects across Dallas–Fort Worth. Filter by service type to see our work near you.</div>
+      </div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <a href="/">Home</a>
@@ -173,25 +183,23 @@
     .bindPopup(`
       <div class="popup">
         <img id="hq-photo" alt="ReModa HQ storefront"
-     src="images/remoda-hq.jpeg?v=3"
-     style="width:100%;height:160px;object-fit:cover;display:block;border-bottom:1px solid rgba(255,255,255,.12)">
+             src="images/remoda-hq.jpeg?v=3"
+             style="width:100%;height:160px;object-fit:cover;display:block;border-bottom:1px solid rgba(255,255,255,.12)">
         <div class="pop-body">
-          <h3 class="pop-title">ReModa HQ</h3>
+          <h3 class="pop-title">ReModa™ HQ</h3>
           <p class="pop-sub">401 S. Sherman Street #217 • Richardson, TX 75081</p>
           <a class="pop-link"
-   href="https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9445931,-96.7387837,17z/data=!4m6!3m5!1s0x864c1d3cc66c761b:0x8493e75d73680e08!8m2!3d32.9453031!4d-96.7356007!16s%2Fg%2F11lf4pjxhs?entry=ttu&g_ep=EgoyMDI1MDgwNi4wIKXMDSoASAFQAw%3D%3D"
-   target="_blank" rel="noopener">
-   Directions ›
-</a>
+             href="https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9445931,-96.7387837,17z/data=!4m6!3m5!1s0x864c1d3cc66c761b:0x8493e75d73680e08!8m2!3d32.9453031!4d-96.7356007!16s%2Fg%2F11lf4pjxhs?entry=ttu&g_ep=EgoyMDI1MDgwNi4wIKXMDSoASAFQAw%3D%3D"
+             target="_blank" rel="noopener">Directions ›</a>
         </div>
       </div>
     `, { maxWidth: 320 })
     .bindTooltip('ReModa HQ', { direction:'top', offset:[0,-22] })
     .on('popupopen', () => {
-      // Smart fallbacks for your storefront file name/extension
+      // Smart fallbacks for your storefront file name/extension (kept just in case)
       const img = document.getElementById('hq-photo');
       const candidates = [
-        'images/remoda-hq.jpg?v=3','images/remoda-hq.jpeg?v=3','images/remoda-hq.webp?v=3','images/remoda-hq.png?v=3',
+        'images/remoda-hq.jpeg?v=3','images/remoda-hq.jpg?v=3','images/remoda-hq.webp?v=3','images/remoda-hq.png?v=3',
         'images/Remoda-HQ.jpg?v=3','images/Remoda-HQ.JPG?v=3'
       ];
       let i=0;
@@ -202,7 +210,7 @@
   // Allowed service chips
   const ALLOWED_SERVICES = ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"];
 
-  // Demo projects
+  // Demo projects (placeholder data)
   const sampleProjects = [
     {id:"rmd-1", title:"5410 Galahad Ln – Full Remodel", city:"Richardson, TX", year:2024, services:["Kitchen","Bathroom","Flooring","Painting","Design Service"], coords:[32.9998,-96.6774], cover:"https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Design-build refresh with new finishes."},
     {id:"rmd-2", title:"Frisco – Pergola & Patio", city:"Frisco, TX", year:2025, services:["Exterior","Custom Builds","Design Service"], coords:[33.1507,-96.8236], cover:"https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop", url:"#", blurb:"Pergola + expanded patio."},
