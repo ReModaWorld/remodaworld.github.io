@@ -7,18 +7,14 @@
   <meta name="description" content="ReModa — premium design-build transformations in Dallas–Fort Worth.">
   <style>
     :root{
-      --navy:#0C1D3A;         /* primary brand */
-      --navy-900:#08142b;     /* deep background */
-      --navy-700:#122a58;     /* accents */
+      --navy:#0C1D3A;
+      --navy-900:#08142b;
       --white:#ffffff;
       --muted:#98a6c7;
-      --accent:#7cc6ff;       /* focus ring/hover hint */
       --radius:18px;
       --shadow-lg: 0 20px 60px rgba(0,0,0,.35);
-      --shadow-md: 0 10px 30px rgba(0,0,0,.25);
     }
 
-    /* Page foundation */
     html,body{height:100%;margin:0}
     body{
       font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
@@ -29,7 +25,6 @@
       display:grid;place-items:center;
     }
 
-    /* Centered hero */
     .hero{
       width:min(1100px, 92vw);
       display:grid;justify-items:center;gap:28px;
@@ -38,13 +33,12 @@
     }
     .logo{
       width:84px;height:84px;border-radius:22px;
-      background:#fff url('images/remoda-logo.png?v=1') center/70% no-repeat;
-      box-shadow: var(--shadow-md);
+      background:#fff url('images/remoda-logo.png?v=1') center/cover no-repeat;
+      box-shadow: var(--shadow-lg);
     }
     h1{margin:0;font-size:28px;letter-spacing:.3px}
     .sub{color:var(--muted);margin-top:4px}
 
-    /* Card grid */
     .grid{
       width:100%;
       display:grid;
@@ -56,48 +50,22 @@
       .grid{grid-template-columns: 1fr}
     }
 
-    /* Cards */
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.92));
-      border: 1px solid rgba(255,255,255,.65);
+      background: var(--white);
       border-radius: var(--radius);
       box-shadow: var(--shadow-lg);
       color:#0f1830;
-      padding:18px;
-      display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
+      padding:24px;
       text-decoration:none;
       transform: translateY(0);
-      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+      transition: transform .25s ease, box-shadow .25s ease;
     }
     .card:hover{
       transform: translateY(-4px);
       box-shadow: 0 26px 70px rgba(0,0,0,.45);
-      border-color: rgba(124,198,255,.65);
     }
-    .chip{
-      font-size:12px;padding:6px 10px;border-radius:999px;
-      background: rgba(18,42,88,.08); color:#0f1830; border:1px solid rgba(18,42,88,.18)
-    }
-    .title{font-weight:800;font-size:18px;margin:0}
-    .desc{margin:2px 0 0;color:#334e7b;font-size:13px}
-    .arrow{
-      width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
-      background: #eef5ff;border:1px solid #cfe6ff;color:#12305c;font-weight:700
-    }
-    .arrow span{transform: translateY(-1px)}
-    .meta{display:flex;gap:8px;flex-wrap:wrap}
-
-    /* Footer note */
-    .note{color:var(--muted);font-size:12px;margin-top:8px}
-    .note a{color:#cfe8ff;text-decoration:none}
-    .note a:hover{text-decoration:underline}
-
-    /* Focus rings for accessibility */
-    a:focus-visible{
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(124,198,255,.25), inset 0 0 0 1px rgba(124,198,255,.7);
-      border-radius: 14px;
-    }
+    .title{font-weight:800;font-size:18px;margin:0 0 6px}
+    .desc{margin:0;color:#334e7b;font-size:14px}
   </style>
 </head>
 <body>
@@ -108,39 +76,19 @@
       <div class="sub">Design&nbsp;|&nbsp;Build</div>
     </div>
 
-    <section class="grid" aria-label="Main navigation cards">
+    <section class="grid">
       <!-- Card 1: Design Services -->
       <a class="card" href="/remoda-design-services.html">
-        <div class="chip">Services</div>
-        <div>
-          <p class="title">Interior Design Services</p>
-          <p class="desc">Full-service design, selections, and high-value transformations.</p>
-          <div class="meta">
-            <span class="chip">Residential</span>
-            <span class="chip">Commercial</span>
-          </div>
-        </div>
-        <div class="arrow"><span>›</span></div>
+        <p class="title">Interior Design Services</p>
+        <p class="desc">Full-service design, selections, and high-value transformations.</p>
       </a>
 
       <!-- Card 2: Project Map -->
       <a class="card" href="/project-map.html">
-        <div class="chip">Portfolio</div>
-        <div>
-          <p class="title">Project Map</p>
-          <p class="desc">Explore completed projects across Dallas–Fort Worth.</p>
-          <div class="meta">
-            <span class="chip">Interactive</span>
-            <span class="chip">Filterable</span>
-          </div>
-        </div>
-        <div class="arrow"><span>›</span></div>
+        <p class="title">Project Map</p>
+        <p class="desc">Explore completed projects across Dallas–Fort Worth.</p>
       </a>
     </section>
-
-    <div class="note">
-      Need another card (e.g., Financing, Showroom, Outdoors)? Tell me and I’ll add it.
-    </div>
   </main>
 </body>
 </html>
