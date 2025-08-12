@@ -77,14 +77,20 @@
   .btn{background:linear-gradient(180deg,#1c3872,#122a58);border:1px solid rgba(0,0,0,.15);padding:10px 12px;border-radius:12px;color:#eaf2ff;font-weight:700;cursor:pointer}
   .btn.secondary{background:#eef2fb;color:var(--ink)}
 
-  /* Popup */
-  .popup{min-width:260px;background:#0c1633;color:#eaf2ff;border-radius:12px;border:1px solid rgba(255,255,255,.14);overflow:hidden}
-  .pop-img{height:140px;background:#111 center/cover}
-  .pop-body{padding:10px 12px}
-  .pop-title{margin:0;font-size:15px;font-weight:800}
-  .pop-sub{margin:4px 0 6px;color:#cfe0ff;font-size:12px}
-  .pop-link{display:inline-block;margin-top:10px;padding:8px 10px;border-radius:10px;background:#1c3872;color:#fff !important;text-decoration:none;border:1px solid rgba(255,255,255,.15)}
-  .pop-link:hover{filter:brightness(1.08);text-decoration:underline}
+  /* Premium project popup card */
+  .pop-card{background:#0c1633;color:#eaf2ff;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.14)}
+  .pop-card .hero{width:100%;height:180px;background:#111 center/cover;border-bottom:1px solid rgba(255,255,255,.12)}
+  .pop-card .inner{padding:12px 14px}
+  .pop-card h3{margin:0 0 4px;font-size:16px;font-weight:800;letter-spacing:.2px}
+  .pop-card .meta{margin:0 0 8px;font-size:12px;color:#cfe0ff}
+  .pop-card p{margin:0;color:#cfe0ff;line-height:1.35}
+  .pop-card .cta{display:inline-block;margin-top:10px;padding:8px 12px;border-radius:10px;
+    background:#1c3872;border:1px solid rgba(255,255,255,.15);color:#fff !important;text-decoration:none;font-weight:700}
+  .pop-card .cta:hover{filter:brightness(1.08);text-decoration:underline}
+  .cta-container{display:flex;gap:10px;margin-top:10px}
+  .cta-container .cta{flex:1;text-align:center}
+
+  /* Leaflet popup layer */
   .leaflet-popup{z-index:1000 !important}
 
   /* Regular project pins: clean white dots */
@@ -125,6 +131,7 @@
     .brand img{height:32px;}
     .ribbon img{height:26px;}
     .privacy-note{font-size:11px; padding:6px 8px; bottom:8px;}
+    .icon-close{ width:32px; height:32px; line-height:30px; }
   }
 </style>
 </head>
@@ -198,7 +205,7 @@
 </div>
 
 <script>
-  /* --------- 2A: point to your JSON file --------- */
+  /* --------- point to your JSON file --------- */
   const DATA_URL = 'data/projects.json?v=1'; // bump ?v= number when you update data
 
   // Map + tiles (navy feel via overlay)
@@ -214,52 +221,42 @@
     showCoverageOnHover:false, maxClusterRadius:50, spiderfyOnMaxZoom:true, disableClusteringAtZoom:15
   }).addTo(map);
 
-  // HQ pin (not clustered)
+  // ======== HQ pin (not clustered) with Directions + Call Now ========
   const HQ_LAT = 32.9453261, HQ_LNG = -96.7355908;
   const ReModaHQIcon = L.DivIcon.extend({
     options:{ className:'rmd-hq', iconSize:[44,44], iconAnchor:[22,40], popupAnchor:[0,-34] }
   });
-  const hq = L.marker([HQ_LAT, HQ_LNG], { icon:new ReModaHQIcon(), zIndexOffset:1500 })
+  L.marker([HQ_LAT, HQ_LNG], { icon:new ReModaHQIcon(), zIndexOffset:1500 })
     .addTo(map)
     .bindPopup(`
-      <div class="popup">
-        <img id="hq-photo" alt="ReModa HQ storefront"
-             src="images/remoda-hq.jpeg?v=3"
-             style="width:100%;height:160px;object-fit:cover;display:block;border-bottom:1px solid rgba(255,255,255,.12)">
-        <div class="pop-body">
-          <h3 class="pop-title">ReModa™ HQ</h3>
-          <p class="pop-sub">401 S. Sherman Street #217 • Richardson, TX 75081</p>
-          <a class="pop-link"
-             href="https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9445931,-96.7387837,17z/data=!4m6!3m5!1s0x864c1d3cc66c761b:0x8493e75d73680e08!8m2!3d32.9453031!4d-96.7356007!16s%2Fg%2F11lf4pjxhs?entry=ttu&g_ep=EgoyMDI1MDgwNi4wIKXMDSoASAFQAw%3D%3D"
-             target="_blank" rel="noopener">Directions ›</a>
+      <div class="pop-card">
+        <div class="hero" style="background-image:url('images/remoda-hq.jpeg?v=3')"></div>
+        <div class="inner">
+          <h3>ReModa™ HQ</h3>
+          <p class="meta">401 S. Sherman Street #217 • Richardson, TX 75081</p>
+          <p>ReModa's Design Build headquarters.</p>
+          <div class="cta-container">
+            <a class="cta" href="https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9453031,-96.7356007,17z"
+               target="_blank" rel="noopener">Get Directions ›</a>
+            <a class="cta" href="tel:14692099288">Call Now ›</a>
+          </div>
         </div>
       </div>
     `, { maxWidth: 320 })
-    .bindTooltip('ReModa HQ', { direction:'top', offset:[0,-22] })
-    .on('popupopen', () => {
-      const img = document.getElementById('hq-photo');
-      const candidates = [
-        'images/remoda-hq.jpeg?v=3','images/remoda-hq.jpg?v=3','images/remoda-hq.webp?v=3','images/remoda-hq.png?v=3',
-        'images/Remoda-HQ.jpg?v=3','images/Remoda-HQ.JPG?v=3'
-      ];
-      let i=0;
-      const tryNext=()=>{ if(i>=candidates.length) return; const test=new Image(); const url=candidates[i++]; test.onload=()=>{img.src=url}; test.onerror=tryNext; test.src=url; };
-      img.onerror=tryNext;
-    });
+    .bindTooltip('ReModa HQ', { direction:'top', offset:[0,-22] });
 
-  // === DATA STATE (now filled by JSON) ===
+  // === DATA STATE (filled by JSON) ===
   let allProjects = [];
   let filtered = [];
   let activeServices = new Set();
 
-  /* --------- 2B: loader that fetches your JSON --------- */
+  // Load projects from JSON
   async function loadData() {
     try {
       const res = await fetch(DATA_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to load projects.json');
       const data = await res.json();
 
-      // Normalize + validate
       allProjects = (Array.isArray(data) ? data : []).map(p => ({
         id: p.id || (crypto && crypto.randomUUID ? crypto.randomUUID() : String(Math.random())),
         title: p.title || 'Untitled Project',
@@ -287,7 +284,26 @@
     }
   }
 
-  // Filter helpers (unchanged)
+  // Build premium popup HTML (projects: NO CTAs)
+  function popupHTML(p){
+    const services = Array.isArray(p.services) && p.services.length
+      ? p.services.join(', ')
+      : '';
+    const meta = [p.city || '', p.year || ''].filter(Boolean).join(' • ');
+    const metaLine = [meta, services].filter(Boolean).join(' • ');
+
+    return `
+      <div class="pop-card">
+        <div class="hero" style="background-image:url('${p.cover || ''}')"></div>
+        <div class="inner">
+          <h3>${p.title || 'Untitled Project'}</h3>
+          ${metaLine ? `<p class="meta">${metaLine}</p>` : ''}
+          ${p.blurb ? `<p>${p.blurb}</p>` : ''}
+        </div>
+      </div>`;
+  }
+
+  // Helpers
   const $city = document.getElementById('city');
   const $year = document.getElementById('year');
   const $services = document.getElementById('services');
@@ -319,19 +335,6 @@
     return (list||[]).map(s=>String(s).toLowerCase()).map(s=>{
       if(map[s]) return map[s]; for(const k in map){ if(s.includes(k)) return map[k]; } return null;
     }).filter(Boolean).reduce((a,v)=>a.includes(v)?a:[...a,v],[]);
-  }
-
-  function popupHTML(p){
-    return `
-      <div class="popup">
-        <div class="pop-img" style="background-image:url('${p.cover||''}')"></div>
-        <div class="pop-body">
-          <h3 class="pop-title">${p.title}</h3>
-          <p class="pop-sub">${p.city} • ${p.year}</p>
-          ${p.blurb?`<p style="margin:6px 0 0;color:#cfe0ff">${p.blurb}</p>`:''}
-          ${p.url && p.url!=='#' ? `<a class="pop-link" href="${p.url}" target="_blank" rel="noopener">View project ›</a>`:''}
-        </div>
-      </div>`;
   }
 
   function draw(){
@@ -378,7 +381,7 @@
   document.getElementById('reset').onclick=()=>{ $q.value=''; $city.value=''; $year.value=''; activeServices.clear(); [...$services.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active')); filtered=allProjects.slice(); draw(); };
   let t=null; $q.oninput=()=>{ clearTimeout(t); t=setTimeout(applyFilters,250); };
 
-  /* --------- 2C: kick things off (load JSON) --------- */
+  // Kick things off (load JSON)
   loadData();
 </script>
 </body>
