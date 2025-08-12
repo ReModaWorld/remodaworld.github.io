@@ -94,18 +94,28 @@
   .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(16,46,102,.88);color:#eaf2ff;border:2px solid #9bc9ff;box-shadow:0 6px 18px rgba(0,0,0,.35)}
   .marker-cluster div{background:transparent;color:#eaf2ff;font-weight:800;border:none}
 
-  /* Privacy note */
+  /* Privacy note (centered; sits UNDER the panel) */
   .privacy-note{
-    position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
-    z-index:600;display:flex;align-items:center;gap:8px;
+    position:absolute; left:50%; bottom:10px; transform:translateX(-50%);
+    z-index:100; /* lower than the filter panel (z 500) */
+    display:flex; align-items:center; gap:8px;
     font-size:12px; color:rgba(255,255,255,.88);
-    padding:6px 10px;border-radius:10px;
-    background:rgba(12,29,58,.45); /* subtle navy glass for legibility */
+    padding:6px 10px; border-radius:10px;
+    background:rgba(12,29,58,.45);
     -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
     border:1px solid rgba(255,255,255,.12);
-    pointer-events:none; /* won’t block map clicks */
+    pointer-events:none; /* never blocks taps */
   }
   .privacy-note svg{width:14px;height:14px;flex:none;opacity:.95}
+
+  /* Close icon style */
+  .icon-close{
+    appearance:none; border:1px solid rgba(0,0,0,.15);
+    background:#eef2fb; color:#0f1830; font-weight:700;
+    width:28px; height:28px; line-height:26px; text-align:center;
+    border-radius:8px; cursor:pointer; padding:0;
+  }
+  .icon-close:hover{ filter:brightness(0.98); }
 
   /* Responsive scaling */
   @media (max-width:720px){
@@ -113,6 +123,7 @@
     .brand img{height:32px;}
     .ribbon img{height:26px;}
     .privacy-note{font-size:11px; padding:6px 8px; bottom:8px;}
+    .icon-close{ width:32px; height:32px; line-height:30px; }
   }
 </style>
 </head>
@@ -128,7 +139,7 @@
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <a href="/">Home</a>
-      <button id="toggleFilters">Filters</button>
+      <button id="toggleFilters" aria-expanded="false">Filters</button>
     </div>
   </div>
 
@@ -138,7 +149,6 @@
 
     <!-- Privacy disclaimer with shield icon -->
     <div class="privacy-note" aria-live="polite">
-      <!-- Inline shield SVG (white) -->
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M12 2.5l7 3v6.3c0 4.2-2.7 8-7 10.2-4.3-2.2-7-6-7-10.2V5.5l7-3z" stroke="white" stroke-width="1.4" fill="rgba(255,255,255,.12)"/>
         <path d="M9.2 12.3l1.8 1.8 3.8-4.1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -153,7 +163,10 @@
       </div>
       <header>
         <h2>Explore Completed Projects</h2>
-        <small style="color:var(--muted)">Dallas–Fort Worth</small>
+        <div style="display:flex;align-items:center;gap:10px">
+          <small style="color:var(--muted)">Dallas–Fort Worth</small>
+          <button id="closeFilters" class="icon-close" aria-label="Close filters">×</button>
+        </div>
       </header>
       <div class="body">
         <div class="row">
@@ -333,13 +346,24 @@
     draw();
   }
 
+  // Filter panel toggle + close button
+  const panel    = document.querySelector('.controls');
+  const toggleBtn= document.getElementById('toggleFilters');
+  const closeBtn = document.getElementById('closeFilters');
+
+  const showPanel   = () => { panel.style.display = '';  toggleBtn.setAttribute('aria-expanded','true');  };
+  const hidePanel   = () => { panel.style.display = 'none'; toggleBtn.setAttribute('aria-expanded','false'); };
+  const togglePanel = () => { (panel.style.display==='none' || !panel.style.display) ? showPanel() : hidePanel(); };
+
+  toggleBtn.onclick = togglePanel;
+  if (closeBtn) closeBtn.onclick = hidePanel;
+
+  // Start closed on small screens
+  if (matchMedia('(max-width:640px)').matches) hidePanel();
+
   document.getElementById('apply').onclick=applyFilters;
   document.getElementById('reset').onclick=()=>{ $q.value=''; $city.value=''; $year.value=''; activeServices.clear(); [...$services.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active')); filtered=allProjects.slice(); draw(); };
   let t=null; $q.oninput=()=>{ clearTimeout(t); t=setTimeout(applyFilters,250); };
-
-  const panel=document.querySelector('.controls');
-  document.getElementById('toggleFilters').onclick=()=>{ panel.style.display = panel.style.display==='none' ? '' : 'none'; };
-  if (matchMedia('(max-width:640px)').matches) panel.style.display='none';
 
   populateFilters(); draw();
 </script>
