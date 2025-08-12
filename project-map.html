@@ -47,7 +47,10 @@
     background:linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,255,255,.94));
     color:var(--ink);border:1px solid rgba(0,0,0,.08); border-radius:var(--radius);
     overflow:hidden; box-shadow:0 18px 48px rgba(0,0,0,.35)}
-  .ribbon{display:flex;align-items:center;gap:10px;padding:10px 14px;background:linear-gradient(180deg,#133063,#0C1D3A);color:#eaf2ff;border-bottom:1px solid rgba(255,255,255,.08)}
+  .ribbon{
+    display:flex;align-items:center;justify-content:space-between; /* so the X sits right */
+    gap:10px;padding:10px 14px;background:linear-gradient(180deg,#133063,#0C1D3A);color:#eaf2ff;border-bottom:1px solid rgba(255,255,255,.08)
+  }
   .ribbon img{height:32px;width:auto}
   .ribbon strong{font-size:13px;letter-spacing:.3px}
   .controls header{padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center}
@@ -94,10 +97,10 @@
   .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(16,46,102,.88);color:#eaf2ff;border:2px solid #9bc9ff;box-shadow:0 6px 18px rgba(0,0,0,.35)}
   .marker-cluster div{background:transparent;color:#eaf2ff;font-weight:800;border:none}
 
-  /* Privacy note (centered; sits UNDER the panel) */
+  /* Privacy note (centered; above map but below panel) */
   .privacy-note{
     position:absolute; left:50%; bottom:10px; transform:translateX(-50%);
-    z-index:100; /* lower than the filter panel (z 500) */
+    z-index:400; /* ABOVE the map/tint (300) and BELOW the filter panel (500) */
     display:flex; align-items:center; gap:8px;
     font-size:12px; color:rgba(255,255,255,.88);
     padding:6px 10px; border-radius:10px;
@@ -108,14 +111,14 @@
   }
   .privacy-note svg{width:14px;height:14px;flex:none;opacity:.95}
 
-  /* Close icon style */
+  /* Close icon style for ribbon (white-on-navy) */
   .icon-close{
-    appearance:none; border:1px solid rgba(0,0,0,.15);
-    background:#eef2fb; color:#0f1830; font-weight:700;
+    appearance:none; border:1px solid rgba(255,255,255,.45);
+    background:transparent; color:#fff; font-weight:700;
     width:28px; height:28px; line-height:26px; text-align:center;
     border-radius:8px; cursor:pointer; padding:0;
   }
-  .icon-close:hover{ filter:brightness(0.98); }
+  .icon-close:hover{ background:rgba(255,255,255,.08); }
 
   /* Responsive scaling */
   @media (max-width:720px){
@@ -158,15 +161,16 @@
 
     <aside class="controls" aria-label="Project filters">
       <div class="ribbon">
-        <img src="images/remoda-logo.png" alt="ReModa">
-        <strong>ReModa™ • Filter Projects</strong>
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="images/remoda-logo.png" alt="ReModa">
+          <strong>ReModa™ • Filter Projects</strong>
+        </div>
+        <!-- Close button moved into the blue ribbon -->
+        <button id="closeFilters" class="icon-close" aria-label="Close filters">×</button>
       </div>
       <header>
         <h2>Explore Completed Projects</h2>
-        <div style="display:flex;align-items:center;gap:10px">
-          <small style="color:var(--muted)">Dallas–Fort Worth</small>
-          <button id="closeFilters" class="icon-close" aria-label="Close filters">×</button>
-        </div>
+        <small style="color:var(--muted)">Dallas–Fort Worth</small>
       </header>
       <div class="body">
         <div class="row">
