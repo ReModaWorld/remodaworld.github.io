@@ -1,0 +1,13 @@
+[
+  {
+    "id": "hq",
+    "title": "ReModa HQ",
+    "city": "Richardson, TX",
+    "year": 2025,
+    "services": ["Design Service"],
+    "coords": [32.9453031, -96.7356007],
+    "cover": "images/remoda-hq.jpeg",
+    "url": "https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9445931,-96.7387837,17z/data=!4m6!3m5!1s0x864c1d3cc66c761b:0x8493e75d73680e08!8m2!3d32.9453031!4d-96.7356007!16s%2Fg%2F11lf4pjxhs",
+    "blurb": "ReModa's Design Build headquarters."
+  }
+]
