@@ -21,8 +21,8 @@
   "blurb": "A high‑end beauty salon transformation with custom millwork, premium finishes, layered lighting, and an efficient floor plan designed for client comfort and staff flow."
 },
   {
-    "id": "Awsome Care",
-    "title": "Clinic Offices",
+    "id": "clinic-offices",
+    "title": "Awsome Care",
     "city": "Richardson, TX",
     "year": 2025,
     "services": ["Full Interior Design & Build", "Custom Reception Desk"],
