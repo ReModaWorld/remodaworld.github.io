@@ -16,7 +16,7 @@
   "title": "Merab Salon",
   "city": "Richardson, TX",
   "year": 2025,
-  "type": "Commercial",  
+  "type": "Residential",  
   "services": ["Design Service", "Custom Builds"],
   "coords": [32.9490, -96.7358],
   "cover": "images/beauty-salon.jpeg",
@@ -39,7 +39,7 @@
   "title": "Pinnacle Montessori",
   "city": "Frisco, TX",
   "year": 2025,
-  "type": "Residential", 
+  "type": "Commercial", 
   "services": [
     "Entire Flooring Replacement",
     "Painting",
