@@ -92,10 +92,33 @@
 
   .leaflet-popup{z-index:1000 !important}
 
-  /* Regular project pins: clean white dots */
+  /* ===== Pins ===== */
+  /* Base pin (legacy / unspecified type) */
   .rmd-pin{width:34px;height:34px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30)}
 
-  /* HQ pin — navy disk + strong gold glow */
+  /* Residential pin: navy circle with white house glyph */
+  .rmd-res{
+    background:#0C1D3A;
+    box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30);
+    background-image:url("data:image/svg+xml;utf8,\
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+        <path fill='white' d='M12 3l9 8h-2v9h-6v-6H11v6H5v-9H3l9-8z'/>\
+      </svg>");
+    background-repeat:no-repeat;background-position:center;background-size:68%;
+  }
+
+  /* Commercial pin: navy circle with white storefront glyph */
+  .rmd-com{
+    background:#0C1D3A;
+    box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30);
+    background-image:url("data:image/svg+xml;utf8,\
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+        <path fill='white' d='M3 10l1-5h16l1 5v9H3v-9zm2 0h14l-.6-3H5.6L5 10zm2 7h2v-5H7v5zm4 0h6v-5h-6v5z'/>\
+      </svg>");
+    background-repeat:no-repeat;background-position:center;background-size:68%;
+  }
+
+  /* HQ pin — navy disk + strong gold glow (unchanged) */
   .rmd-hq{
     width:44px;height:44px;border-radius:50%;
     background:#0C1D3A url('images/remoda-pin.png?v=3') center/88% no-repeat;
@@ -190,6 +213,13 @@
             <select id="year"><option value="">All Years</option></select>
           </div>
         </div>
+
+        <!-- NEW: Project Type chips -->
+        <div class="row">
+          <label>Project Type</label>
+          <div id="ptype" class="chips"></div>
+        </div>
+
         <div class="row">
           <label>Service Type</label>
           <div id="services" class="chips"></div>
@@ -215,7 +245,10 @@
   }).addTo(map);
 
   /* Pins & clustering */
-  const ReModaIcon = L.DivIcon.extend({ options:{ className:'rmd-pin', iconSize:[34,34] } });
+  const ReModaIcon   = L.DivIcon.extend({ options:{ className:'rmd-pin',     iconSize:[34,34] } });
+  const ReModaResIcon= L.DivIcon.extend({ options:{ className:'rmd-pin rmd-res', iconSize:[34,34] } });
+  const ReModaComIcon= L.DivIcon.extend({ options:{ className:'rmd-pin rmd-com', iconSize:[34,34] } });
+
   const clusters = L.markerClusterGroup({
     showCoverageOnHover:false, maxClusterRadius:50, spiderfyOnMaxZoom:true, disableClusteringAtZoom:15
   }).addTo(map);
@@ -248,6 +281,7 @@
   let allProjects = [];
   let filtered = [];
   let activeServices = new Set();
+  let activeTypes = new Set(); // NEW: Residential/Commercial filter
 
   /* Load projects from JSON */
   async function loadData() {
@@ -261,6 +295,7 @@
         title: p.title || 'Untitled Project',
         city: p.city || '',
         year: Number(p.year) || new Date().getFullYear(),
+        type: normalizeType(p.type), // NEW
         services: Array.isArray(p.services) ? p.services : [],
         coords: Array.isArray(p.coords) ? p.coords : null,
         cover: p.cover || '',
@@ -274,6 +309,7 @@
       document.getElementById('city').innerHTML = '<option value="">All Cities</option>';
       document.getElementById('year').innerHTML = '<option value="">All Years</option>';
       document.getElementById('services').innerHTML = '';
+      document.getElementById('ptype').innerHTML = ''; // NEW
       populateFilters();
       draw();
     } catch (e) {
@@ -283,13 +319,24 @@
     }
   }
 
+  /* NEW: type normalizer */
+  function normalizeType(t){
+    if(!t) return null;
+    const s=String(t).toLowerCase().trim();
+    if(s.startsWith('com')) return 'Commercial';
+    if(s.startsWith('res')) return 'Residential';
+    if(s.includes('store')||s.includes('salon')||s.includes('office')) return 'Commercial';
+    return 'Residential';
+  }
+
   /* Premium popup HTML (projects: NO CTAs) */
   function popupHTML(p){
     const services = Array.isArray(p.services) && p.services.length
       ? p.services.join(', ')
       : '';
-    const meta = [p.city || '', p.year || ''].filter(Boolean).join(' • ');
-    const metaLine = [meta, services].filter(Boolean).join(' • ');
+    const metaBits = [p.city || '', p.year || ''];
+    if (p.type) metaBits.push(p.type);
+    const metaLine = [metaBits.filter(Boolean).join(' • '), services].filter(Boolean).join(' • ');
 
     return `
       <div class="pop-card">
@@ -306,6 +353,7 @@
   const $city = document.getElementById('city');
   const $year = document.getElementById('year');
   const $services = document.getElementById('services');
+  const $ptype = document.getElementById('ptype'); // NEW
   const $q = document.getElementById('q');
 
   const unique = (list,key)=>[...new Set(list.map(x=>x[key]))].filter(Boolean).sort();
@@ -314,6 +362,15 @@
   function populateFilters(){
     unique(allProjects,'city').forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; $city.appendChild(o); });
     uniqueYears(allProjects).forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; $year.appendChild(o); });
+
+    // NEW: Project Type chips (Residential, Commercial)
+    ['Residential','Commercial'].forEach(t=>{
+      const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=t; b.dataset.value=t;
+      b.onclick=()=>{ b.classList.toggle('active'); if(activeTypes.has(t)) activeTypes.delete(t); else activeTypes.add(t); };
+      $ptype.appendChild(b);
+    });
+
+    // Existing Service chips
     ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"].forEach(s=>{
       const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=s; b.dataset.value=s;
       b.onclick=()=>{ b.classList.toggle('active'); if(activeServices.has(s)) activeServices.delete(s); else activeServices.add(s); };
@@ -336,11 +393,17 @@
     }).filter(Boolean).reduce((a,v)=>a.includes(v)?a:[...a,v],[]);
   }
 
+  function iconFor(p){
+    if (p.type === 'Residential') return new ReModaResIcon();
+    if (p.type === 'Commercial') return new ReModaComIcon();
+    return new ReModaIcon(); // fallback for legacy items without type
+  }
+
   function draw(){
     clusters.clearLayers();
     const latlngs=[];
     filtered.forEach(p=>{
-      const m=L.marker(p.coords,{icon:new ReModaIcon()}).bindPopup(popupHTML(p),{maxWidth:320});
+      const m=L.marker(p.coords,{icon:iconFor(p)}).bindPopup(popupHTML(p),{maxWidth:320});
       clusters.addLayer(m); latlngs.push(p.coords);
     });
     if(latlngs.length){ map.fitBounds(latlngs,{padding:[40,40]}); } else { map.flyTo([32.7767,-96.7970],11); }
@@ -348,14 +411,25 @@
 
   function applyFilters(){
     const q=($q.value||'').toLowerCase().trim();
-    const city=$city.value; const year=$year.value?+$year.value:null; const hasServices=activeServices.size>0;
+    const city=$city.value; const year=$year.value?+$year.value:null;
+    const hasServices=activeServices.size>0;
+    const hasTypes=activeTypes.size>0;
 
     filtered=allProjects.filter(p=>{
       if(city && p.city!==city) return false;
       if(year && p.year!==year) return false;
+
+      // type filter
+      if(hasTypes && (!p.type || !activeTypes.has(p.type))) return false;
+
+      // services filter (must include all selected)
       const norm=normalizeServices(p.services);
       if(hasServices && ![...activeServices].every(s=>norm.includes(s))) return false;
-      if(q){ const blob=[p.title,p.city,p.year,(p.services||[]).join(' '),p.blurb||''].join(' ').toLowerCase(); if(!blob.includes(q)) return false; }
+
+      if(q){
+        const blob=[p.title,p.city,p.year,(p.services||[]).join(' '),p.type||'',p.blurb||''].join(' ').toLowerCase();
+        if(!blob.includes(q)) return false;
+      }
       return true;
     });
     draw();
@@ -377,7 +451,12 @@
   if (matchMedia('(max-width:640px)').matches) hidePanel();
 
   document.getElementById('apply').onclick=applyFilters;
-  document.getElementById('reset').onclick=()=>{ $q.value=''; $city.value=''; $year.value=''; activeServices.clear(); [...$services.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active')); filtered=allProjects.slice(); draw(); };
+  document.getElementById('reset').onclick=()=>{
+    $q.value=''; $city.value=''; $year.value='';
+    activeServices.clear(); [...document.querySelectorAll('#services .chip')].forEach(c=>c.classList.remove('active'));
+    activeTypes.clear();    [...document.querySelectorAll('#ptype .chip')].forEach(c=>c.classList.remove('active'));
+    filtered=allProjects.slice(); draw();
+  };
   let t=null; $q.oninput=()=>{ clearTimeout(t); t=setTimeout(applyFilters,250); };
 
   /* Kick things off */
