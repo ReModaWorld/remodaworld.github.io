@@ -42,14 +42,14 @@
                linear-gradient(180deg, rgba(12,29,58,.40), rgba(12,29,58,.30));
     mix-blend-mode:multiply;}
 
-  /* Controls (filter panel) — now scrollable */
+  /* Controls (filter panel) — scrollable body */
   .controls{
     position:absolute;top:16px;right:16px;z-index:500;width:min(400px, calc(100vw - 32px));
     background:linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,255,255,.94));
     color:var(--ink);border:1px solid rgba(0,0,0,.08); border-radius:var(--radius);
     overflow:hidden; box-shadow:0 18px 48px rgba(0,0,0,.35);
     display:flex; flex-direction:column;
-    max-height:min(88vh, 760px); /* <- keeps panel from getting too tall */
+    max-height:min(88vh, 760px);
   }
   .ribbon{
     display:flex;align-items:center;justify-content:space-between;
@@ -69,8 +69,7 @@
   .controls h2{margin:0;font-size:15px;color:var(--navy)}
   .controls .body{
     padding:12px 14px;display:grid;gap:10px;
-    overflow:auto; /* <- scrolls if content is long */
-    flex:1;       /* <- takes remaining height so footer stays visible */
+    overflow:auto; flex:1;
   }
   label{font-size:12px;color:var(--navy);font-weight:700}
   input,select,button{width:100%;border-radius:12px;border:1px solid rgba(0,0,0,.15);background:#f5f7fb;color:var(--ink);padding:10px 12px;font-size:14px;outline:none}
@@ -100,36 +99,7 @@
 
   .leaflet-popup{z-index:1000 !important}
 
-  /* ===== Pins (slightly larger for clarity) ===== */
-  .rmd-pin{width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30)}
-
-  /* Residential: house glyph (crisp stroked SVG) */
-  .rmd-res{
-    background:#0C1D3A;
-    box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30);
-    background-image:url("data:image/svg+xml;utf8,\
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
-        <path d='M3 10.5L12 3l9 7.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>\
-        <path d='M6 11v9h12v-9' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>\
-        <path d='M10 20v-6h4v6' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>\
-      </svg>");
-    background-repeat:no-repeat;background-position:center;background-size:76%;
-  }
-
-  /* Commercial: storefront glyph (crisp stroked SVG) */
-  .rmd-com{
-    background:#0C1D3A;
-    box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30);
-    background-image:url("data:image/svg+xml;utf8,\
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
-        <path d='M4 10l1-4h14l1 4v8H4z' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/>\
-        <path d='M5 10h14M7 18v-5h3v5m3 0v-5h4v5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/>\
-        <path d='M6 6h12' stroke='white' stroke-width='2' stroke-linecap='round'/>\
-      </svg>");
-    background-repeat:no-repeat;background-position:center;background-size:76%;
-  }
-
-  /* HQ pin — unchanged (glow + logo) */
+  /* HQ pin — glow + logo (unchanged) */
   .rmd-hq{
     width:44px;height:44px;border-radius:50%;
     background:#0C1D3A url('images/remoda-pin.png?v=3') center/88% no-repeat;
@@ -245,8 +215,13 @@
 </div>
 
 <script>
-  /* Data source */
-  const DATA_URL = 'data/projects.json?v=1';
+  /* ===========================
+     SETTINGS YOU CAN TWEAK LATER
+     =========================== */
+  const DATA_URL   = 'data/projects.json?v=1';
+  const REMODA_NAVY= '#0C1D3A';      // pin glyph + stroke color
+  const ICON_SIZE  = 42;             // pin size in px (try 36–52)
+  const GLYPH_SCALE= 0.58;           // 0.50–0.70 good range
 
   /* Map + tiles */
   const map = L.map('map', { zoomControl:false }).setView([32.7767,-96.7970], 11);
@@ -255,16 +230,69 @@
     attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:20
   }).addTo(map);
 
-  /* Pins & clustering (icon sizes bumped to 40) */
-  const ReModaIcon    = L.DivIcon.extend({ options:{ className:'rmd-pin',           iconSize:[40,40] } });
-  const ReModaResIcon = L.DivIcon.extend({ options:{ className:'rmd-pin rmd-res',   iconSize:[40,40] } });
-  const ReModaComIcon = L.DivIcon.extend({ options:{ className:'rmd-pin rmd-com',   iconSize:[40,40] } });
+  /* ===== SVG ICONS: white circle + navy glyphs ===== */
+  function makeSVGDataURL(innerPath){
+    const radius = ICON_SIZE/2;
+    const stroke = 2;
+    const inset  = (ICON_SIZE - ICON_SIZE*GLYPH_SCALE)/2;
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="0 0 ${ICON_SIZE} ${ICON_SIZE}">
+        <circle cx="${radius}" cy="${radius}" r="${radius-2}" fill="white" stroke="${REMODA_NAVY}" stroke-width="${stroke}"/>
+        <g transform="translate(${inset},${inset}) scale(${GLYPH_SCALE})" fill="${REMODA_NAVY}" stroke="${REMODA_NAVY}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          ${innerPath}
+        </g>
+      </svg>`;
+    return "data:image/svg+xml;base64," + btoa(svg);
+  }
 
+  function iconResidential(){
+    // House glyph (outlined pieces so it reads well at small sizes)
+    const path = `
+      <path d="M12 3 L4 10 L6 10 L6 20 L18 20 L18 10 L20 10 Z" fill="none"/>
+      <path d="M9 20 L9 14 L15 14 L15 20" fill="none"/>
+      <path d="M4 10 L12 3 L20 10" fill="none"/>
+    `;
+    return L.icon({
+      iconUrl: makeSVGDataURL(path),
+      iconSize:[ICON_SIZE, ICON_SIZE],
+      iconAnchor:[ICON_SIZE/2, ICON_SIZE],    // center bottom
+      popupAnchor:[0, -ICON_SIZE+4]
+    });
+  }
+
+  function iconCommercial(){
+    // Storefront glyph
+    const path = `
+      <path d="M5 10 L6 6 L18 6 L19 10 L19 20 L5 20 Z" fill="none"/>
+      <path d="M6 10 L18 10" fill="none"/>
+      <path d="M7 20 L7 15 L11 15 L11 20" fill="none"/>
+      <path d="M13 20 L13 15 L17 15 L17 20" fill="none"/>
+      <path d="M7 6 L17 6" fill="none"/>
+    `;
+    return L.icon({
+      iconUrl: makeSVGDataURL(path),
+      iconSize:[ICON_SIZE, ICON_SIZE],
+      iconAnchor:[ICON_SIZE/2, ICON_SIZE],
+      popupAnchor:[0, -ICON_SIZE+4]
+    });
+  }
+
+  // cache icons so we don’t rebuild for each marker
+  const ICON_RES = iconResidential();
+  const ICON_COM = iconCommercial();
+
+  function iconFor(p){
+    if (p.type === 'Residential') return ICON_RES;
+    if (p.type === 'Commercial')  return ICON_COM;
+    return ICON_RES; // fallback: treat as Residential
+  }
+
+  /* Clustering */
   const clusters = L.markerClusterGroup({
     showCoverageOnHover:false, maxClusterRadius:50, spiderfyOnMaxZoom:true, disableClusteringAtZoom:15
   }).addTo(map);
 
-  /* HQ pin (unchanged) */
+  /* HQ pin (not clustered) with Directions + Call Now — unchanged */
   const HQ_LAT = 32.9453261, HQ_LNG = -96.7355908;
   const ReModaHQIcon = L.DivIcon.extend({
     options:{ className:'rmd-hq', iconSize:[44,44], iconAnchor:[22,40], popupAnchor:[0,-34] }
@@ -279,7 +307,8 @@
           <p class="meta">401 S. Sherman Street #217 • Richardson, TX 75081</p>
           <p>ReModa's Design Build headquarters.</p>
           <div class="cta-container">
-            <a class="cta" href="https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9453031,-96.7356007,17z" target="_blank" rel="noopener">Get Directions ›</a>
+            <a class="cta" href="https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9453031,-96.7356007,17z"
+               target="_blank" rel="noopener">Get Directions ›</a>
             <a class="cta" href="tel:14692099288">Call Now ›</a>
           </div>
         </div>
@@ -293,6 +322,7 @@
   let activeServices = new Set();
   let activeTypes = new Set();
 
+  /* Load projects from JSON */
   async function loadData() {
     try {
       const res = await fetch(DATA_URL, { cache: 'no-store' });
@@ -337,7 +367,7 @@
     return 'Residential';
   }
 
-  /* Popup HTML (projects: no CTAs) */
+  /* Popup HTML (projects: NO CTAs) */
   function popupHTML(p){
     const services = Array.isArray(p.services) && p.services.length ? p.services.join(', ') : '';
     const metaBits = [p.city || '', p.year || ''];
@@ -394,12 +424,6 @@
     return (list||[]).map(s=>String(s).toLowerCase()).map(s=>{
       if(map[s]) return map[s]; for(const k in map){ if(s.includes(k)) return map[k]; } return null;
     }).filter(Boolean).reduce((a,v)=>a.includes(v)?a:[...a,v],[]);
-  }
-
-  function iconFor(p){
-    if (p.type === 'Residential') return new ReModaResIcon();
-    if (p.type === 'Commercial') return new ReModaComIcon();
-    return new ReModaIcon();
   }
 
   function draw(){
