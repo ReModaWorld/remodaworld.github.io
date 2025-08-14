@@ -30,6 +30,22 @@
     "cover": "images/clinic-offices.jpeg",
     "url": "https://www.google.com/maps/place/32.9389458,-96.7336830",
     "blurb": "Modern, clean, healthcare-grade clinic offices featuring a custom reception desk and efficient layout."
-  }
+  },
+  {
+  "id": "school-renovation",
+  "title": "School Renovation",
+  "city": "Frisco, TX",
+  "year": 2025,
+  "services": [
+    "Entire Flooring Replacement",
+    "Painting",
+    "Custom Reception Desk for Staff",
+    "Custom Wall Panels"
+  ],
+  "coords": [33.1743822, -96.7679724],
+  "cover": "images/school-renovation.jpeg",
+  "url": "https://www.google.com/maps/place/33.1743822,-96.7679724",
+  "blurb": "Comprehensive school renovation including full flooring replacement, fresh painting, a custom reception desk for staff, and bespoke wall panels."
+}
 
 ]
