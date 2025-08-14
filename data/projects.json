@@ -19,5 +19,17 @@
   "coords": [32.9490, -96.7358],
   "cover": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1200&auto=format&fit=crop",
   "blurb": "A high‑end beauty salon transformation with custom millwork, premium finishes, layered lighting, and an efficient floor plan designed for client comfort and staff flow."
-}
+},
+  {
+    "id": "clinic-offices",
+    "title": "Clinic Offices",
+    "city": "Richardson, TX",
+    "year": 2025,
+    "services": ["Full Interior Design & Build", "Custom Reception Desk"],
+    "coords": [32.9389458, -96.7336830],
+    "cover": "images/clinic-offices.jpeg",
+    "url": "https://www.google.com/maps/place/32.9389458,-96.7336830",
+    "blurb": "Modern, clean, healthcare-grade clinic offices featuring a custom reception desk and efficient layout."
+  }
+
 ]
