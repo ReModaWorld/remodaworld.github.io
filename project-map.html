@@ -217,8 +217,8 @@
      =========================== */
   const DATA_URL    = 'data/projects.json?v=1';
   const REMODA_NAVY = '#0C1D3A';     // glyph color
-  const ICON_SIZE   = 46;            // px size of the icon canvas
-  const GLYPH_SCALE = 0.90;          // glyph fill inside canvas (0.85–0.95 looks great)
+  const ICON_SIZE   = 58;            // ▲ was 46; ~25% bigger
+  const GLYPH_SCALE = 0.90;          // glyph fill inside canvas (0.85–0.95 good)
   const OUTLINE     = 2.0;           // white outline width for contrast
 
   /* Map + tiles */
@@ -248,11 +248,10 @@
   }
 
   function iconResidential(){
-    // House glyph strokes only (no polygon fill shapes needed; outline provides visibility)
     const path = `
-      <path d="M12 3 L3.5 10.2 M12 3 L20.5 10.2"/>        <!-- roof slopes -->
-      <path d="M5.5 10.2 L5.5 20 L18.5 20 L18.5 10.2"/>   <!-- walls -->
-      <path d="M9 20 L9 14 L15 14 L15 20"/>               <!-- door -->
+      <path d="M12 3 L3.5 10.2 M12 3 L20.5 10.2"/>
+      <path d="M5.5 10.2 L5.5 20 L18.5 20 L18.5 10.2"/>
+      <path d="M9 20 L9 14 L15 14 L15 20"/>
     `;
     return L.icon({
       iconUrl: glyphDataURL(path),
@@ -263,13 +262,12 @@
   }
 
   function iconCommercial(){
-    // Storefront glyph
     const path = `
-      <path d="M6 6 L18 6 L19 10 L19 20 L5 20 L5 10 Z"/>  <!-- body -->
-      <path d="M6 10 L18 10"/>                            <!-- awning line -->
-      <path d="M7.2 20 L7.2 14.8 L11 14.8 L11 20"/>       <!-- left door/window -->
-      <path d="M13 20 L13 14.8 L17 14.8 L17 20"/>         <!-- right door/window -->
-      <path d="M7 6 L17 6"/>                               <!-- top line -->
+      <path d="M6 6 L18 6 L19 10 L19 20 L5 20 L5 10 Z"/>
+      <path d="M6 10 L18 10"/>
+      <path d="M7.2 20 L7.2 14.8 L11 14.8 L11 20"/>
+      <path d="M13 20 L13 14.8 L17 14.8 L17 20"/>
+      <path d="M7 6 L17 6"/>
     `;
     return L.icon({
       iconUrl: glyphDataURL(path),
