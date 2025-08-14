@@ -1,3 +1,5 @@
+Here’s the complete project-map.html (drop-in ready). It loads projects from data/projects.json, keeps HQ with Directions + Call Now, and all other projects show a clean card (no CTAs). The disclaimer sits above the map but under the filter panel.
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -42,7 +44,7 @@
                linear-gradient(180deg, rgba(12,29,58,.40), rgba(12,29,58,.30));
     mix-blend-mode:multiply;}
 
-  /* Controls */
+  /* Controls (filter panel) */
   .controls{position:absolute;top:16px;right:16px;z-index:500;width:min(400px, calc(100vw - 32px));
     background:linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,255,255,.94));
     color:var(--ink);border:1px solid rgba(0,0,0,.08); border-radius:var(--radius);
@@ -90,7 +92,6 @@
   .cta-container{display:flex;gap:10px;margin-top:10px}
   .cta-container .cta{flex:1;text-align:center}
 
-  /* Leaflet popup layer */
   .leaflet-popup{z-index:1000 !important}
 
   /* Regular project pins: clean white dots */
@@ -205,23 +206,23 @@
 </div>
 
 <script>
-  /* --------- point to your JSON file --------- */
-  const DATA_URL = 'data/projects.json?v=1'; // bump ?v= number when you update data
+  /* Data source */
+  const DATA_URL = 'data/projects.json?v=1'; // bump ?v= when you update the JSON
 
-  // Map + tiles (navy feel via overlay)
+  /* Map + tiles */
   const map = L.map('map', { zoomControl:false }).setView([32.7767,-96.7970], 11);
   L.control.zoom({ position:'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:20
   }).addTo(map);
 
-  // Pins & clustering
+  /* Pins & clustering */
   const ReModaIcon = L.DivIcon.extend({ options:{ className:'rmd-pin', iconSize:[34,34] } });
   const clusters = L.markerClusterGroup({
     showCoverageOnHover:false, maxClusterRadius:50, spiderfyOnMaxZoom:true, disableClusteringAtZoom:15
   }).addTo(map);
 
-  // ======== HQ pin (not clustered) with Directions + Call Now ========
+  /* HQ pin (not clustered) with Directions + Call Now */
   const HQ_LAT = 32.9453261, HQ_LNG = -96.7355908;
   const ReModaHQIcon = L.DivIcon.extend({
     options:{ className:'rmd-hq', iconSize:[44,44], iconAnchor:[22,40], popupAnchor:[0,-34] }
@@ -245,12 +246,12 @@
     `, { maxWidth: 320 })
     .bindTooltip('ReModa HQ', { direction:'top', offset:[0,-22] });
 
-  // === DATA STATE (filled by JSON) ===
+  /* Data state (filled by JSON) */
   let allProjects = [];
   let filtered = [];
   let activeServices = new Set();
 
-  // Load projects from JSON
+  /* Load projects from JSON */
   async function loadData() {
     try {
       const res = await fetch(DATA_URL, { cache: 'no-store' });
@@ -284,7 +285,7 @@
     }
   }
 
-  // Build premium popup HTML (projects: NO CTAs)
+  /* Premium popup HTML (projects: NO CTAs) */
   function popupHTML(p){
     const services = Array.isArray(p.services) && p.services.length
       ? p.services.join(', ')
@@ -303,7 +304,7 @@
       </div>`;
   }
 
-  // Helpers
+  /* Filter helpers */
   const $city = document.getElementById('city');
   const $year = document.getElementById('year');
   const $services = document.getElementById('services');
@@ -362,7 +363,7 @@
     draw();
   }
 
-  // Filter panel toggle + close button
+  /* Filter panel toggle + close button */
   const panel    = document.querySelector('.controls');
   const toggleBtn= document.getElementById('toggleFilters');
   const closeBtn = document.getElementById('closeFilters');
@@ -374,14 +375,14 @@
   toggleBtn.onclick = togglePanel;
   if (closeBtn) closeBtn.onclick = hidePanel;
 
-  // Start closed on small screens
+  /* Start closed on small screens */
   if (matchMedia('(max-width:640px)').matches) hidePanel();
 
   document.getElementById('apply').onclick=applyFilters;
   document.getElementById('reset').onclick=()=>{ $q.value=''; $city.value=''; $year.value=''; activeServices.clear(); [...$services.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active')); filtered=allProjects.slice(); draw(); };
   let t=null; $q.oninput=()=>{ clearTimeout(t); t=setTimeout(applyFilters,250); };
 
-  // Kick things off (load JSON)
+  /* Kick things off */
   loadData();
 </script>
 </body>
