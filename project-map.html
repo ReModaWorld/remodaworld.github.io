@@ -42,11 +42,15 @@
                linear-gradient(180deg, rgba(12,29,58,.40), rgba(12,29,58,.30));
     mix-blend-mode:multiply;}
 
-  /* Controls (filter panel) */
-  .controls{position:absolute;top:16px;right:16px;z-index:500;width:min(400px, calc(100vw - 32px));
+  /* Controls (filter panel) — now scrollable */
+  .controls{
+    position:absolute;top:16px;right:16px;z-index:500;width:min(400px, calc(100vw - 32px));
     background:linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,255,255,.94));
     color:var(--ink);border:1px solid rgba(0,0,0,.08); border-radius:var(--radius);
-    overflow:hidden; box-shadow:0 18px 48px rgba(0,0,0,.35)}
+    overflow:hidden; box-shadow:0 18px 48px rgba(0,0,0,.35);
+    display:flex; flex-direction:column;
+    max-height:min(88vh, 760px); /* <- keeps panel from getting too tall */
+  }
   .ribbon{
     display:flex;align-items:center;justify-content:space-between;
     gap:10px;padding:10px 14px;background:linear-gradient(180deg,#133063,#0C1D3A);color:#eaf2ff;border-bottom:1px solid rgba(255,255,255,.08)
@@ -63,7 +67,11 @@
 
   .controls header{padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center}
   .controls h2{margin:0;font-size:15px;color:var(--navy)}
-  .controls .body{padding:12px 14px;display:grid;gap:10px}
+  .controls .body{
+    padding:12px 14px;display:grid;gap:10px;
+    overflow:auto; /* <- scrolls if content is long */
+    flex:1;       /* <- takes remaining height so footer stays visible */
+  }
   label{font-size:12px;color:var(--navy);font-weight:700}
   input,select,button{width:100%;border-radius:12px;border:1px solid rgba(0,0,0,.15);background:#f5f7fb;color:var(--ink);padding:10px 12px;font-size:14px;outline:none}
   input::placeholder{color:#6b7a9b}
@@ -92,33 +100,36 @@
 
   .leaflet-popup{z-index:1000 !important}
 
-  /* ===== Pins ===== */
-  /* Base pin (legacy / unspecified type) */
-  .rmd-pin{width:34px;height:34px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30)}
+  /* ===== Pins (slightly larger for clarity) ===== */
+  .rmd-pin{width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30)}
 
-  /* Residential pin: navy circle with white house glyph */
+  /* Residential: house glyph (crisp stroked SVG) */
   .rmd-res{
     background:#0C1D3A;
     box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30);
     background-image:url("data:image/svg+xml;utf8,\
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
-        <path fill='white' d='M12 3l9 8h-2v9h-6v-6H11v6H5v-9H3l9-8z'/>\
+        <path d='M3 10.5L12 3l9 7.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>\
+        <path d='M6 11v9h12v-9' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>\
+        <path d='M10 20v-6h4v6' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>\
       </svg>");
-    background-repeat:no-repeat;background-position:center;background-size:68%;
+    background-repeat:no-repeat;background-position:center;background-size:76%;
   }
 
-  /* Commercial pin: navy circle with white storefront glyph */
+  /* Commercial: storefront glyph (crisp stroked SVG) */
   .rmd-com{
     background:#0C1D3A;
     box-shadow:0 0 0 2px #0c1633,0 0 16px rgba(124,198,255,.30);
     background-image:url("data:image/svg+xml;utf8,\
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
-        <path fill='white' d='M3 10l1-5h16l1 5v9H3v-9zm2 0h14l-.6-3H5.6L5 10zm2 7h2v-5H7v5zm4 0h6v-5h-6v5z'/>\
+        <path d='M4 10l1-4h14l1 4v8H4z' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/>\
+        <path d='M5 10h14M7 18v-5h3v5m3 0v-5h4v5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/>\
+        <path d='M6 6h12' stroke='white' stroke-width='2' stroke-linecap='round'/>\
       </svg>");
-    background-repeat:no-repeat;background-position:center;background-size:68%;
+    background-repeat:no-repeat;background-position:center;background-size:76%;
   }
 
-  /* HQ pin — navy disk + strong gold glow (unchanged) */
+  /* HQ pin — unchanged (glow + logo) */
   .rmd-hq{
     width:44px;height:44px;border-radius:50%;
     background:#0C1D3A url('images/remoda-pin.png?v=3') center/88% no-repeat;
@@ -214,7 +225,7 @@
           </div>
         </div>
 
-        <!-- NEW: Project Type chips -->
+        <!-- Project Type chips (Residential/Commercial) -->
         <div class="row">
           <label>Project Type</label>
           <div id="ptype" class="chips"></div>
@@ -235,7 +246,7 @@
 
 <script>
   /* Data source */
-  const DATA_URL = 'data/projects.json?v=1'; // bump ?v= when you update the JSON
+  const DATA_URL = 'data/projects.json?v=1';
 
   /* Map + tiles */
   const map = L.map('map', { zoomControl:false }).setView([32.7767,-96.7970], 11);
@@ -244,16 +255,16 @@
     attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:20
   }).addTo(map);
 
-  /* Pins & clustering */
-  const ReModaIcon   = L.DivIcon.extend({ options:{ className:'rmd-pin',     iconSize:[34,34] } });
-  const ReModaResIcon= L.DivIcon.extend({ options:{ className:'rmd-pin rmd-res', iconSize:[34,34] } });
-  const ReModaComIcon= L.DivIcon.extend({ options:{ className:'rmd-pin rmd-com', iconSize:[34,34] } });
+  /* Pins & clustering (icon sizes bumped to 40) */
+  const ReModaIcon    = L.DivIcon.extend({ options:{ className:'rmd-pin',           iconSize:[40,40] } });
+  const ReModaResIcon = L.DivIcon.extend({ options:{ className:'rmd-pin rmd-res',   iconSize:[40,40] } });
+  const ReModaComIcon = L.DivIcon.extend({ options:{ className:'rmd-pin rmd-com',   iconSize:[40,40] } });
 
   const clusters = L.markerClusterGroup({
     showCoverageOnHover:false, maxClusterRadius:50, spiderfyOnMaxZoom:true, disableClusteringAtZoom:15
   }).addTo(map);
 
-  /* HQ pin (not clustered) with Directions + Call Now */
+  /* HQ pin (unchanged) */
   const HQ_LAT = 32.9453261, HQ_LNG = -96.7355908;
   const ReModaHQIcon = L.DivIcon.extend({
     options:{ className:'rmd-hq', iconSize:[44,44], iconAnchor:[22,40], popupAnchor:[0,-34] }
@@ -268,8 +279,7 @@
           <p class="meta">401 S. Sherman Street #217 • Richardson, TX 75081</p>
           <p>ReModa's Design Build headquarters.</p>
           <div class="cta-container">
-            <a class="cta" href="https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9453031,-96.7356007,17z"
-               target="_blank" rel="noopener">Get Directions ›</a>
+            <a class="cta" href="https://www.google.com/maps/place/ReModa+%7C+Design+Build/@32.9453031,-96.7356007,17z" target="_blank" rel="noopener">Get Directions ›</a>
             <a class="cta" href="tel:14692099288">Call Now ›</a>
           </div>
         </div>
@@ -277,13 +287,12 @@
     `, { maxWidth: 320 })
     .bindTooltip('ReModa HQ', { direction:'top', offset:[0,-22] });
 
-  /* Data state (filled by JSON) */
+  /* Data state */
   let allProjects = [];
   let filtered = [];
   let activeServices = new Set();
-  let activeTypes = new Set(); // NEW: Residential/Commercial filter
+  let activeTypes = new Set();
 
-  /* Load projects from JSON */
   async function loadData() {
     try {
       const res = await fetch(DATA_URL, { cache: 'no-store' });
@@ -295,7 +304,7 @@
         title: p.title || 'Untitled Project',
         city: p.city || '',
         year: Number(p.year) || new Date().getFullYear(),
-        type: normalizeType(p.type), // NEW
+        type: normalizeType(p.type),
         services: Array.isArray(p.services) ? p.services : [],
         coords: Array.isArray(p.coords) ? p.coords : null,
         cover: p.cover || '',
@@ -309,7 +318,7 @@
       document.getElementById('city').innerHTML = '<option value="">All Cities</option>';
       document.getElementById('year').innerHTML = '<option value="">All Years</option>';
       document.getElementById('services').innerHTML = '';
-      document.getElementById('ptype').innerHTML = ''; // NEW
+      document.getElementById('ptype').innerHTML = '';
       populateFilters();
       draw();
     } catch (e) {
@@ -319,7 +328,6 @@
     }
   }
 
-  /* NEW: type normalizer */
   function normalizeType(t){
     if(!t) return null;
     const s=String(t).toLowerCase().trim();
@@ -329,15 +337,12 @@
     return 'Residential';
   }
 
-  /* Premium popup HTML (projects: NO CTAs) */
+  /* Popup HTML (projects: no CTAs) */
   function popupHTML(p){
-    const services = Array.isArray(p.services) && p.services.length
-      ? p.services.join(', ')
-      : '';
+    const services = Array.isArray(p.services) && p.services.length ? p.services.join(', ') : '';
     const metaBits = [p.city || '', p.year || ''];
     if (p.type) metaBits.push(p.type);
     const metaLine = [metaBits.filter(Boolean).join(' • '), services].filter(Boolean).join(' • ');
-
     return `
       <div class="pop-card">
         <div class="hero" style="background-image:url('${p.cover || ''}')"></div>
@@ -349,11 +354,11 @@
       </div>`;
   }
 
-  /* Filter helpers */
+  /* Filters */
   const $city = document.getElementById('city');
   const $year = document.getElementById('year');
   const $services = document.getElementById('services');
-  const $ptype = document.getElementById('ptype'); // NEW
+  const $ptype = document.getElementById('ptype');
   const $q = document.getElementById('q');
 
   const unique = (list,key)=>[...new Set(list.map(x=>x[key]))].filter(Boolean).sort();
@@ -363,14 +368,12 @@
     unique(allProjects,'city').forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; $city.appendChild(o); });
     uniqueYears(allProjects).forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; $year.appendChild(o); });
 
-    // NEW: Project Type chips (Residential, Commercial)
     ['Residential','Commercial'].forEach(t=>{
       const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=t; b.dataset.value=t;
       b.onclick=()=>{ b.classList.toggle('active'); if(activeTypes.has(t)) activeTypes.delete(t); else activeTypes.add(t); };
       $ptype.appendChild(b);
     });
 
-    // Existing Service chips
     ["Kitchen","Bathroom","Flooring","Painting","Exterior","Design Service","Custom Builds"].forEach(s=>{
       const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=s; b.dataset.value=s;
       b.onclick=()=>{ b.classList.toggle('active'); if(activeServices.has(s)) activeServices.delete(s); else activeServices.add(s); };
@@ -396,7 +399,7 @@
   function iconFor(p){
     if (p.type === 'Residential') return new ReModaResIcon();
     if (p.type === 'Commercial') return new ReModaComIcon();
-    return new ReModaIcon(); // fallback for legacy items without type
+    return new ReModaIcon();
   }
 
   function draw(){
@@ -418,11 +421,8 @@
     filtered=allProjects.filter(p=>{
       if(city && p.city!==city) return false;
       if(year && p.year!==year) return false;
-
-      // type filter
       if(hasTypes && (!p.type || !activeTypes.has(p.type))) return false;
 
-      // services filter (must include all selected)
       const norm=normalizeServices(p.services);
       if(hasServices && ![...activeServices].every(s=>norm.includes(s))) return false;
 
@@ -435,7 +435,7 @@
     draw();
   }
 
-  /* Filter panel toggle + close button */
+  /* Panel toggle */
   const panel    = document.querySelector('.controls');
   const toggleBtn= document.getElementById('toggleFilters');
   const closeBtn = document.getElementById('closeFilters');
