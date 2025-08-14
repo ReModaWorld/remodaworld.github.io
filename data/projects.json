@@ -12,7 +12,7 @@
   },
   {
   "id": "beauty-salon",
-  "title": "Beauty Salon",
+  "title": "Merab Salon",
   "city": "Richardson, TX",
   "year": 2025,
   "services": ["Design Service", "Custom Builds"],
@@ -21,7 +21,7 @@
   "blurb": "A high‑end beauty salon transformation with custom millwork, premium finishes, layered lighting, and an efficient floor plan designed for client comfort and staff flow."
 },
   {
-    "id": "clinic-offices",
+    "id": "Awsome Care",
     "title": "Clinic Offices",
     "city": "Richardson, TX",
     "year": 2025,
@@ -33,7 +33,7 @@
   },
   {
   "id": "school-renovation",
-  "title": "School Renovation",
+  "title": "Pinnacle Montessori",
   "city": "Frisco, TX",
   "year": 2025,
   "services": [
