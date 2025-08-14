@@ -84,7 +84,7 @@
   .btn{background:linear-gradient(180deg,#1c3872,#122a58);border:1px solid rgba(0,0,0,.15);padding:10px 12px;border-radius:12px;color:#eaf2ff;font-weight:700;cursor:pointer}
   .btn.secondary{background:#eef2fb;color:var(--ink)}
 
-  /* Premium project popup card */
+  /* Premium popup card */
   .pop-card{background:#0c1633;color:#eaf2ff;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.14)}
   .pop-card .hero{width:100%;height:180px;background:#111 center/cover;border-bottom:1px solid rgba(255,255,255,.12)}
   .pop-card .inner{padding:12px 14px}
@@ -96,10 +96,9 @@
   .pop-card .cta:hover{filter:brightness(1.08);text-decoration:underline}
   .cta-container{display:flex;gap:10px;margin-top:10px}
   .cta-container .cta{flex:1;text-align:center}
-
   .leaflet-popup{z-index:1000 !important}
 
-  /* HQ pin — glow + logo (unchanged) */
+  /* HQ pin — glow + logo */
   .rmd-hq{
     width:44px;height:44px;border-radius:50%;
     background:#0C1D3A url('images/remoda-pin.png?v=3') center/88% no-repeat;
@@ -110,15 +109,14 @@
   .rmd-hq::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 0 rgba(255,211,110,.7);animation:rmdPulse 2.2s ease-out infinite}
   @keyframes rmdPulse{0%{box-shadow:0 0 0 0 rgba(255,211,110,.7)}60%{box-shadow:0 0 0 28px rgba(255,211,110,0)}100%{box-shadow:0 0 0 0 rgba(255,211,110,0)}}
 
-  /* Cluster look */
+  /* Clusters */
   .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(16,46,102,.88);color:#eaf2ff;border:2px solid #9bc9ff;box-shadow:0 6px 18px rgba(0,0,0,.35)}
   .marker-cluster div{background:transparent;color:#eaf2ff;font-weight:800;border:none}
 
-  /* Privacy note (centered; above map but below panel) */
+  /* Privacy note (above map, under panel) */
   .privacy-note{
     position:absolute; left:50%; bottom:10px; transform:translateX(-50%);
-    z-index:400; /* ABOVE map/tint (300), BELOW filter panel (500) */
-    display:flex; align-items:center; gap:8px;
+    z-index:400; display:flex; align-items:center; gap:8px;
     font-size:12px; color:rgba(255,255,255,.88);
     padding:6px 10px; border-radius:10px;
     background:rgba(12,29,58,.45);
@@ -128,7 +126,6 @@
   }
   .privacy-note svg{width:14px;height:14px;flex:none;opacity:.95}
 
-  /* Responsive scaling */
   @media (max-width:720px){
     .controls{left:50%;right:auto;transform:translateX(-50%);width:min(94vw,420px)}
     .brand img{height:32px;}
@@ -216,12 +213,12 @@
 
 <script>
   /* ===========================
-     SETTINGS YOU CAN TWEAK LATER
+     SETTINGS YOU CAN TWEAK
      =========================== */
   const DATA_URL   = 'data/projects.json?v=1';
-  const REMODA_NAVY= '#0C1D3A';      // pin glyph + stroke color
-  const ICON_SIZE  = 42;             // pin size in px (try 36–52)
-  const GLYPH_SCALE= 0.58;           // 0.50–0.70 good range
+  const REMODA_NAVY= '#0C1D3A';      // glyph + circle stroke
+  const ICON_SIZE  = 44;             // whole pin size (px)
+  const GLYPH_SCALE= 0.72;           // 0.65–0.78 fills circle well
 
   /* Map + tiles */
   const map = L.map('map', { zoomControl:false }).setView([32.7767,-96.7970], 11);
@@ -230,7 +227,7 @@
     attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:20
   }).addTo(map);
 
-  /* ===== SVG ICONS: white circle + navy glyphs ===== */
+  /* ===== SVG ICONS: white circle + navy glyphs (fills circle) ===== */
   function makeSVGDataURL(innerPath){
     const radius = ICON_SIZE/2;
     const stroke = 2;
@@ -246,16 +243,16 @@
   }
 
   function iconResidential(){
-    // House glyph (outlined pieces so it reads well at small sizes)
+    // House glyph
     const path = `
       <path d="M12 3 L4 10 L6 10 L6 20 L18 20 L18 10 L20 10 Z" fill="none"/>
-      <path d="M9 20 L9 14 L15 14 L15 20" fill="none"/>
-      <path d="M4 10 L12 3 L20 10" fill="none"/>
     `;
+    const door = `<path d="M9 20 L9 14 L15 14 L15 20" fill="none"/>`;
+    const ridge= `<path d="M4 10 L12 3 L20 10" fill="none"/>`;
     return L.icon({
-      iconUrl: makeSVGDataURL(path),
+      iconUrl: makeSVGDataURL(path + door + ridge),
       iconSize:[ICON_SIZE, ICON_SIZE],
-      iconAnchor:[ICON_SIZE/2, ICON_SIZE],    // center bottom
+      iconAnchor:[ICON_SIZE/2, ICON_SIZE],
       popupAnchor:[0, -ICON_SIZE+4]
     });
   }
@@ -284,7 +281,7 @@
   function iconFor(p){
     if (p.type === 'Residential') return ICON_RES;
     if (p.type === 'Commercial')  return ICON_COM;
-    return ICON_RES; // fallback: treat as Residential
+    return ICON_RES; // fallback
   }
 
   /* Clustering */
@@ -292,7 +289,7 @@
     showCoverageOnHover:false, maxClusterRadius:50, spiderfyOnMaxZoom:true, disableClusteringAtZoom:15
   }).addTo(map);
 
-  /* HQ pin (not clustered) with Directions + Call Now — unchanged */
+  /* HQ pin (not clustered) with Directions + Call Now */
   const HQ_LAT = 32.9453261, HQ_LNG = -96.7355908;
   const ReModaHQIcon = L.DivIcon.extend({
     options:{ className:'rmd-hq', iconSize:[44,44], iconAnchor:[22,40], popupAnchor:[0,-34] }
