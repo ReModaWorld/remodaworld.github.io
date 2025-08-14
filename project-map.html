@@ -98,7 +98,7 @@
   .cta-container .cta{flex:1;text-align:center}
   .leaflet-popup{z-index:1000 !important}
 
-  /* HQ pin — glow + logo */
+  /* HQ pin — glow + logo (UNCHANGED) */
   .rmd-hq{
     width:44px;height:44px;border-radius:50%;
     background:#0C1D3A url('images/remoda-pin.png?v=3') center/88% no-repeat;
@@ -216,10 +216,10 @@
      SETTINGS YOU CAN TWEAK
      =========================== */
   const DATA_URL    = 'data/projects.json?v=1';
-  const REMODA_NAVY = '#0C1D3A';     // glyph color
-  const ICON_SIZE   = 58;            // ▲ was 46; ~25% bigger
-  const GLYPH_SCALE = 0.90;          // glyph fill inside canvas (0.85–0.95 good)
-  const OUTLINE     = 2.0;           // white outline width for contrast
+  const REMODA_NAVY = '#0C1D3A';     // circle color
+  const ICON_SIZE   = 92;            // pin size in px (doubled from earlier circle style)
+  const GLYPH_SCALE = 0.78;          // icon fill inside circle (0.74–0.82 sweet spot)
+  const OUTLINE     = 0;             // no outline (white icon already on navy)
 
   /* Map + tiles */
   const map = L.map('map', { zoomControl:false }).setView([32.7767,-96.7970], 11);
@@ -228,19 +228,22 @@
     attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:20
   }).addTo(map);
 
-  /* ===== SVG GLYPH ICONS (no circle) with outline + soft shadow ===== */
-  function glyphDataURL(innerPath){
-    const inset = (ICON_SIZE - ICON_SIZE*GLYPH_SCALE)/2;
+  /* ===== SVG ICONS: NAVY CIRCLE + WHITE GLYPH ===== */
+  function makeCircleGlyphURL(innerPath){
+    const radius = ICON_SIZE/2;
+    const stroke = 2;
+    const inset  = (ICON_SIZE - ICON_SIZE*GLYPH_SCALE)/2;
     const svg =
 `<svg xmlns="http://www.w3.org/2000/svg" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="0 0 ${ICON_SIZE} ${ICON_SIZE}">
   <defs>
     <filter id="ds" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="1.2" stdDeviation="1.2" flood-color="black" flood-opacity="0.45"/>
+      <feDropShadow dx="0" dy="1.4" stdDeviation="1.6" flood-color="black" flood-opacity="0.38"/>
     </filter>
   </defs>
+  <circle cx="${radius}" cy="${radius}" r="${radius-2}" fill="${REMODA_NAVY}" stroke="${REMODA_NAVY}" stroke-width="${stroke}" filter="url(#ds)"/>
   <g transform="translate(${inset},${inset}) scale(${GLYPH_SCALE})"
-     fill="${REMODA_NAVY}" stroke="white" stroke-width="${OUTLINE}"
-     stroke-linecap="round" stroke-linejoin="round" filter="url(#ds)">
+     fill="white" stroke="white" stroke-width="${OUTLINE}"
+     stroke-linecap="round" stroke-linejoin="round">
     ${innerPath}
   </g>
 </svg>`;
@@ -248,32 +251,34 @@
   }
 
   function iconResidential(){
+    // White house glyph
     const path = `
-      <path d="M12 3 L3.5 10.2 M12 3 L20.5 10.2"/>
-      <path d="M5.5 10.2 L5.5 20 L18.5 20 L18.5 10.2"/>
-      <path d="M9 20 L9 14 L15 14 L15 20"/>
+      <path d="M12 3 L3.8 10.2 L6 10.2 L6 20 L18 20 L18 10.2 L20.2 10.2 Z" fill="none"/>
+      <path d="M9 20 L9 14 L15 14 L15 20" fill="none"/>
+      <path d="M4.6 9.9 L12 3 L19.4 9.9" fill="none"/>
     `;
     return L.icon({
-      iconUrl: glyphDataURL(path),
+      iconUrl: makeCircleGlyphURL(path),
       iconSize:[ICON_SIZE, ICON_SIZE],
       iconAnchor:[ICON_SIZE/2, ICON_SIZE],
-      popupAnchor:[0, -ICON_SIZE+4]
+      popupAnchor:[0, -ICON_SIZE+6]
     });
   }
 
   function iconCommercial(){
+    // White storefront glyph
     const path = `
-      <path d="M6 6 L18 6 L19 10 L19 20 L5 20 L5 10 Z"/>
-      <path d="M6 10 L18 10"/>
-      <path d="M7.2 20 L7.2 14.8 L11 14.8 L11 20"/>
-      <path d="M13 20 L13 14.8 L17 14.8 L17 20"/>
-      <path d="M7 6 L17 6"/>
+      <path d="M6 6 L18 6 L19 10 L19 20 L5 20 L5 10 Z" fill="none"/>
+      <path d="M6 10 L18 10" fill="none"/>
+      <path d="M7.2 20 L7.2 14.6 L11 14.6 L11 20" fill="none"/>
+      <path d="M13 20 L13 14.6 L16.8 14.6 L16.8 20" fill="none"/>
+      <path d="M7 6 L17 6" fill="none"/>
     `;
     return L.icon({
-      iconUrl: glyphDataURL(path),
+      iconUrl: makeCircleGlyphURL(path),
       iconSize:[ICON_SIZE, ICON_SIZE],
       iconAnchor:[ICON_SIZE/2, ICON_SIZE],
-      popupAnchor:[0, -ICON_SIZE+4]
+      popupAnchor:[0, -ICON_SIZE+6]
     });
   }
 
@@ -292,7 +297,7 @@
     showCoverageOnHover:false, maxClusterRadius:50, spiderfyOnMaxZoom:true, disableClusteringAtZoom:15
   }).addTo(map);
 
-  /* HQ pin (not clustered) with Directions + Call Now */
+  /* HQ pin (UNCHANGED) */
   const HQ_LAT = 32.9453261, HQ_LNG = -96.7355908;
   const ReModaHQIcon = L.DivIcon.extend({
     options:{ className:'rmd-hq', iconSize:[44,44], iconAnchor:[22,40], popupAnchor:[0,-34] }
