@@ -217,8 +217,8 @@
      =========================== */
   const DATA_URL   = 'data/projects.json?v=1';
   const REMODA_NAVY= '#0C1D3A';      // glyph + circle stroke
-  const ICON_SIZE  = 44;             // whole pin size (px)
-  const GLYPH_SCALE= 0.72;           // 0.65–0.78 fills circle well
+  const ICON_SIZE  = 46;             // whole pin size (px)
+  const GLYPH_SCALE= 0.78;           // fills circle 70–80%
 
   /* Map + tiles */
   const map = L.map('map', { zoomControl:false }).setView([32.7767,-96.7970], 11);
@@ -235,7 +235,7 @@
     const svg =
       `<svg xmlns="http://www.w3.org/2000/svg" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="0 0 ${ICON_SIZE} ${ICON_SIZE}">
         <circle cx="${radius}" cy="${radius}" r="${radius-2}" fill="white" stroke="${REMODA_NAVY}" stroke-width="${stroke}"/>
-        <g transform="translate(${inset},${inset}) scale(${GLYPH_SCALE})" fill="${REMODA_NAVY}" stroke="${REMODA_NAVY}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <g transform="translate(${inset},${inset}) scale(${GLYPH_SCALE})" fill="${REMODA_NAVY}" stroke="${REMODA_NAVY}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           ${innerPath}
         </g>
       </svg>`;
@@ -243,14 +243,14 @@
   }
 
   function iconResidential(){
-    // House glyph
+    // House glyph (outlined to read well)
     const path = `
       <path d="M12 3 L4 10 L6 10 L6 20 L18 20 L18 10 L20 10 Z" fill="none"/>
+      <path d="M9 20 L9 14 L15 14 L15 20" fill="none"/>
+      <path d="M4 10 L12 3 L20 10" fill="none"/>
     `;
-    const door = `<path d="M9 20 L9 14 L15 14 L15 20" fill="none"/>`;
-    const ridge= `<path d="M4 10 L12 3 L20 10" fill="none"/>`;
     return L.icon({
-      iconUrl: makeSVGDataURL(path + door + ridge),
+      iconUrl: makeSVGDataURL(path),
       iconSize:[ICON_SIZE, ICON_SIZE],
       iconAnchor:[ICON_SIZE/2, ICON_SIZE],
       popupAnchor:[0, -ICON_SIZE+4]
