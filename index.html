@@ -10,18 +10,20 @@
 
 <style>
   :root{
-    --bg:#0b1a2a;
-    --ink:#ffffff;
-    --muted:#b9c7d8;
+    /* Brand palette (matches your services page) */
+    --bg:#0b1a2a;        /* deep navy */
+    --ink:#ffffff;       /* main text */
+    --muted:#b9c7d8;     /* secondary text */
 
-    --glass-fill: rgba(255,255,255,.06);
-    --glass-blur: 28px;
+    /* Glass card tuning */
+    --glass-fill: rgba(255,255,255,.06);   /* see-through amount */
+    --glass-blur: 28px;                    /* frost blur */
     --glass-sat: 180%;
     --glass-bright: 1.08;
 
-    --edge-soft: rgba(255,255,255,.16);
-    --edge-inner: rgba(255,255,255,.62);
-    --hover-glow: rgba(255,255,255,.28);
+    --edge-soft: rgba(255,255,255,.16);    /* faint outer edge */
+    --edge-inner: rgba(255,255,255,.62);   /* crisp inner bevel */
+    --hover-glow: rgba(255,255,255,.28);   /* white glow on hover */
 
     --radius:16px;
     --shadow:0 22px 60px rgba(0,0,0,.45);
@@ -29,6 +31,7 @@
   }
 
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
   body{
     margin:0;
     font-family: Inter, system-ui, Arial;
@@ -42,14 +45,24 @@
   }
 
   .wrap{max-width:var(--max); width:100%; margin:0 auto; display:flex; flex-direction:column; align-items:center}
-  .logo{max-width:180px; margin-bottom:16px}
-  h1{margin:6px 0 28px;text-align:center;font-size:clamp(22px,2.5vw,28px);font-weight:800;}
+  .logo{max-width:180px; height:auto; margin-bottom:16px}
+  h1{
+    margin:6px 0 28px;
+    text-align:center;
+    font-size:clamp(22px,2.5vw,28px);
+    font-weight:800;
+    letter-spacing:.2px;
+  }
 
-  .cards{display:grid;gap:18px;width:100%;grid-template-columns:repeat(3,minmax(0,1fr))}
-  @media (max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width:640px){.cards{grid-template-columns:1fr}}
+  /* CARD GRID */
+  .cards{
+    display:grid; gap:18px; width:100%;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  @media (max-width:980px){ .cards{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .cards{grid-template-columns:1fr} }
 
-  /* ===== GLASS CARD ===== */
+  /* ===== GLASS CARD (no motion border) ===== */
   .card{
     position:relative;
     display:flex; flex-direction:column; overflow:hidden;
@@ -58,70 +71,116 @@
     box-shadow: var(--shadow);
     border:1px solid var(--edge-soft);
     background: var(--glass-fill);
+    background-clip: padding-box;
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
     transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
   }
+
+  /* inner bevel (etched edge) */
   .card::before{
     content:"";
     position:absolute; inset:0; border-radius:inherit; padding:1px;
-    background:linear-gradient(180deg,var(--edge-inner),rgba(255,255,255,.22));
-    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor;mask-composite:exclude;
-    pointer-events:none;opacity:.95;
-  }
-  .card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 28px 80px rgba(0,0,0,.6);
-    border-color:rgba(255,255,255,.22);
-    filter:saturate(108%);
+    background: linear-gradient(180deg, var(--edge-inner), rgba(255,255,255,.22));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events:none; opacity:.95;
   }
 
-  /* ===== IMAGE AREA WITH FADE ===== */
+  /* glossy static highlights (no animation) */
+  .card::after{
+    content:"";
+    position:absolute; inset:-1px; border-radius:inherit;
+    background:
+      radial-gradient(110% 60% at 0% 0%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(110% 50% at 100% 0%, rgba(255,255,255,.12), transparent 60%);
+    mix-blend-mode:screen;
+    pointer-events:none; opacity:.5;
+  }
+
+  .card:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 28px 80px rgba(0,0,0,.6);
+    border-color: rgba(255,255,255,.22);
+    filter: saturate(108%);
+  }
+
+  /* ===== IMAGE AREA WITH TOP + BOTTOM FADES ===== */
   .card-media{
     position:relative;
     height:160px;
     overflow:hidden;
   }
   .card-media img{
-    width:100%;height:100%;object-fit:cover;display:block;
-    transform:scale(1.03);
-    transition:transform .45s cubic-bezier(.2,.8,.2,1);
+    width:100%; height:100%; object-fit:cover; display:block;
+    transform: scale(1.03);
+    transition: transform .45s cubic-bezier(.2,.8,.2,1);
+    filter: saturate(115%) contrast(1.02);
   }
-  .card:hover .card-media img{transform:scale(1.07)}
+  .card:hover .card-media img{ transform: scale(1.07) }
 
-  /* fade mask: white -> transparent downwards */
+  /* Top fade: blend the photo into the page’s navy background */
+  .card-media::before{
+    content:"";
+    position:absolute; left:0; right:0; top:0; height:70px;
+    background:linear-gradient(to top, rgba(0,0,0,0) 0%, var(--bg) 100%);
+    pointer-events:none;
+  }
+  /* Bottom fade: blend the photo into the glass body (no hard divider) */
   .card-media::after{
     content:"";
-    position:absolute; left:0; right:0; bottom:0; height:60px;
-    background:linear-gradient(to bottom, rgba(0,0,0,0) 0%, var(--card-bg, var(--bg)) 100%);
+    position:absolute; left:0; right:0; bottom:0; height:70px;
+    background:linear-gradient(to bottom, rgba(0,0,0,0) 0%, var(--glass-fill) 100%);
+    pointer-events:none;
   }
 
-  .card-body{padding:16px}
-  .card-title{margin:0 0 6px;font-weight:800;font-size:18px}
-  .card-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.45}
+  /* text area */
+  .card-body{ padding:16px 16px 18px }
+  .card-title{ margin:0 0 6px; font-weight:800; font-size:18px; letter-spacing:.2px }
+  .card-desc{ margin:0; color:var(--muted); font-size:14px; line-height:1.45 }
 
-  footer{margin-top:32px;color:var(--muted);font-size:13px;text-align:center}
+  /* tasteful white glow ring on hover (static, no motion) */
+  .card:focus-visible,
+  .card:hover{
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.18),
+      0 0 18px 4px var(--hover-glow),
+      0 28px 80px rgba(0,0,0,.6);
+    outline:none;
+  }
+
+  footer{
+    margin-top:32px; color:var(--muted); font-size:13px; text-align:center;
+  }
+
+  /* Optional: reduce motion respect */
+  @media (prefers-reduced-motion: reduce){
+    .card, .card-media img{ transition:none !important }
+  }
 </style>
 </head>
 <body>
   <div class="wrap">
+    <!-- Brand -->
     <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo" />
     <h1>ReModa | Design Build</h1>
 
-    <div class="cards">
+    <!-- GLASS CARDS -->
+    <div class="cards" role="list">
 
-      <a href="remoda-design-services.html" class="card">
+      <!-- Interior Design Services -->
+      <a href="remoda-design-services.html" class="card" role="listitem" aria-label="Interior Design Services">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1200&auto=format&fit=crop" alt="Interior design finishes and palette">
         </div>
         <div class="card-body">
           <h3 class="card-title">Interior Design Services</h3>
-          <p class="card-desc">Full-service design, selections, and high-value transformations.</p>
+          <p class="card-desc">Full‑service design, selections, and high‑value transformations.</p>
         </div>
       </a>
 
-      <a href="project-map.html" class="card">
+      <!-- Project Map -->
+      <a href="project-map.html" class="card" role="listitem" aria-label="Project Map">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1200&auto=format&fit=crop" alt="City map with pins">
         </div>
@@ -131,7 +190,8 @@
         </div>
       </a>
 
-      <a href="financing.html" class="card">
+      <!-- Financing (now uses a photo header, NO text overlay on image) -->
+      <a href="financing.html" class="card" role="listitem" aria-label="Financing">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1605902711834-8b11c3cd99d7?q=80&w=1200&auto=format&fit=crop" alt="Elegant credit card and soft light">
         </div>
@@ -141,7 +201,8 @@
         </div>
       </a>
 
-      <a href="showroom.html" class="card">
+      <!-- Showroom -->
+      <a href="showroom.html" class="card" role="listitem" aria-label="Design Center & Showroom">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1200&auto=format&fit=crop" alt="Material samples wall in a showroom">
         </div>
@@ -151,17 +212,19 @@
         </div>
       </a>
 
-      <a href="contact.html" class="card">
+      <!-- Contact -->
+      <a href="contact.html" class="card" role="listitem" aria-label="Contact">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1200&auto=format&fit=crop" alt="Phone on stone counter with soft lighting">
         </div>
         <div class="card-body">
           <h3 class="card-title">Contact</h3>
-          <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209-9288</p>
+          <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209‑9288</p>
         </div>
       </a>
 
-      <a href="partners.html" class="card">
+      <!-- Partners -->
+      <a href="partners.html" class="card" role="listitem" aria-label="Partners">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop" alt="Material boards and brand swatches">
         </div>
