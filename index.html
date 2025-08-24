@@ -7,13 +7,16 @@
   <meta name="description" content="Design-first transformations across DFW. Kitchens, baths, flooring, patios & more."/>
   <style>
     :root{
-      --navy-900:#0D2240;       /* deep */
-      --navy-800:#122957;       /* ReModa navy */
+      --navy-900:#0D2240;
+      --navy-800:#122957;   /* ReModa navy */
       --white:#ffffff;
-      --glass:#ffffff;
-      --accent:#9FB3FF;         /* subtle blue light */
-      --radius:16px;
-      --shadow:0 18px 45px rgba(0,0,0,.28);
+      --glass-bg:rgba(255,255,255,.10);   /* frosted glass */
+      --stroke:rgba(255,255,255,.45);     /* crisp inner stroke */
+      --ring:rgba(159,179,255,.55);       /* faint outer glow */
+      --chip-bg:rgba(255,255,255,.22);
+      --chip-stroke:rgba(255,255,255,.35);
+      --radius:18px;
+      --shadow:0 20px 60px rgba(5,10,30,.45);
       --max:1140px;
     }
 
@@ -21,98 +24,111 @@
     html,body{height:100%}
     body{
       margin:0;
-      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Noto Sans";
+      font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, Arial;
       color:var(--white);
       background:
-        radial-gradient(1200px 600px at 80% -10%, rgba(159,179,255,.22), transparent 60%),
-        radial-gradient(1000px 500px at -10% 10%, rgba(30,64,175,.22), transparent 40%),
+        radial-gradient(1200px 600px at 80% -10%, rgba(159,179,255,.20), transparent 60%),
+        radial-gradient(1000px 500px at -10% 10%, rgba(30,64,175,.20), transparent 40%),
         linear-gradient(180deg, var(--navy-900), var(--navy-800));
       display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:40px 20px;
     }
 
     .wrap{width:100%; max-width:var(--max); display:flex; flex-direction:column; align-items:center}
-    .logo{max-width:180px; margin-bottom:22px}
+    .logo{max-width:180px; margin-bottom:18px}
     .title{margin:6px 0 8px 0; text-align:center; opacity:.95; font-weight:800; letter-spacing:.3px}
     .subtitle{margin:0 0 30px 0; text-align:center; color:#dbe2ff; max-width:760px; line-height:1.55}
 
-    /* GRID */
     .cards{
-      display:grid; gap:28px;
+      display:grid; gap:28px; width:100%;
       grid-template-columns: repeat(3, minmax(0,1fr));
-      width:100%;
     }
     @media (max-width:980px){ .cards{grid-template-columns:repeat(2,1fr)} }
     @media (max-width:640px){ .cards{grid-template-columns:1fr} }
 
-    /* LIQUID GLASS CARD */
+    /* ===== Apple‑like Liquid Glass Card ===== */
     .card{
-      position:relative;
-      text-decoration:none;
-      color:var(--white);
-      display:flex; flex-direction:column;
-      min-height:200px; overflow:hidden; border-radius:var(--radius);
+      position:relative; display:flex; flex-direction:column;
+      min-height:220px; border-radius:var(--radius); overflow:hidden;
+      text-decoration:none; color:var(--white); outline:none;
 
-      /* glass panel */
-      background: rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.18);
-      backdrop-filter: blur(16px) saturate(170%);
-      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      /* real glass: translucent bg + heavy blur + slight brighten */
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px) saturate(180%) brightness(1.08);
+      -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.08);
+
+      /* subtle depth */
       box-shadow: var(--shadow);
 
-      transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
-      outline:none;
+      /* base stroke is very soft; a crisp inner stroke comes via ::before */
+      border:1px solid rgba(255,255,255,.12);
+
+      transition: transform .35s cubic-bezier(.2,.8,.2,1),
+                 box-shadow .35s cubic-bezier(.2,.8,.2,1),
+                 filter .35s cubic-bezier(.2,.8,.2,1);
     }
 
-    /* glowing 1px gradient border using mask trick */
+    /* Crispy inner stroke */
     .card::before{
       content:"";
-      position:absolute; inset:0;
-      border-radius:var(--radius);
-      padding:1px; /* border thickness */
-      background: linear-gradient(135deg, rgba(159,179,255,.85), rgba(255,255,255,.35));
+      position:absolute; inset:0; border-radius:calc(var(--radius) + 0px);
+      padding:1px;
+      background: linear-gradient(180deg, var(--stroke), rgba(255,255,255,.18));
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
       -webkit-mask-composite: xor; mask-composite: exclude;
-      pointer-events:none;
-      opacity:.9;
-      transition:opacity .28s ease, filter .28s ease;
-      filter: drop-shadow(0 0 10px rgba(159,179,255,.25));
+      pointer-events:none; opacity:.9;
+    }
+
+    /* Specular highlight (top-left) + faint outer glow ring */
+    .card::after{
+      content:"";
+      position:absolute; inset:-1px; border-radius:calc(var(--radius) + 1px);
+      background:
+        radial-gradient(120% 60% at 0% 0%, rgba(255,255,255,.35), transparent 60%),
+        radial-gradient(120% 50% at 100% 0%, rgba(255,255,255,.10), transparent 60%);
+      box-shadow: 0 0 0 0 var(--ring); /* updated on hover */
+      pointer-events:none; opacity:.55; mix-blend-mode:screen;
+      transition: box-shadow .35s cubic-bezier(.2,.8,.2,1), opacity .35s;
     }
 
     .card:hover{
-      transform: translateY(-6px) scale(1.015);
-      box-shadow: 0 22px 55px rgba(0,0,0,.42);
-      border-color: rgba(159,179,255,.50);
+      transform: translateY(-8px);
+      box-shadow: 0 28px 80px rgba(5,10,30,.55);
+      filter: saturate(110%);
     }
-    .card:hover::before{
-      background: linear-gradient(135deg, rgba(159,179,255,1), rgba(255,255,255,.65));
-      filter: drop-shadow(0 0 16px rgba(159,179,255,.45));
-    }
+    .card:hover::after{ box-shadow: 0 0 0 2px var(--ring); opacity:.75; }
     .card:focus-visible{
-      box-shadow: 0 0 0 3px rgba(159,179,255,.75), 0 18px 45px rgba(0,0,0,.35);
+      transform: translateY(-4px);
+      box-shadow: 0 0 0 3px rgba(159,179,255,.75), 0 26px 70px rgba(5,10,30,.5);
     }
 
-    /* CARD CONTENT */
-    .card-img{
-      height:160px;
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-      display:flex; align-items:center; justify-content:center;
-      border-bottom:1px solid rgba(255,255,255,.16);
+    /* Media */
+    .card-media{
+      height:160px; position:relative; overflow:hidden;
+      border-bottom:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
     }
-    .card-img img{width:100%; height:100%; object-fit:cover}
+    .card-media img{
+      width:100%; height:100%; object-fit:cover; display:block;
+      transform: scale(1.02);
+      transition: transform .6s cubic-bezier(.2,.8,.2,1);
+      filter: saturate(115%) contrast(1.02);
+    }
+    .card:hover .card-media img{ transform: scale(1.06); }
+
+    /* Content */
     .card-body{padding:18px 18px 20px}
     .card-title{font-size:1.18rem; font-weight:900; margin:0 0 7px}
-    .card-desc{font-size:1rem; color:#e8eeff; opacity:.92; margin:0}
+    .card-desc{font-size:1rem; color:#f3f6ff; opacity:.92; margin:0}
     .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
     .chip{
       font-size:.72rem; letter-spacing:.2px;
-      background: rgba(255,255,255,.18);
-      color:#f6f8ff;
+      background: var(--chip-bg); color:#f6f8ff;
       padding:6px 9px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.28);
-      backdrop-filter: blur(6px);
+      border:1px solid var(--chip-stroke);
+      backdrop-filter: blur(8px) saturate(160%);
     }
 
-    /* FOOTER (tiny) */
+    /* Footer */
     .foot{
       width:100%; max-width:var(--max); margin-top:28px;
       display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
@@ -120,6 +136,11 @@
     }
     .foot a{color:#dbe2ff; text-decoration:none}
     .foot a:hover{text-decoration:underline}
+
+    /* Motion preference */
+    @media (prefers-reduced-motion: reduce){
+      .card, .card::after, .card-media img{ transition:none !important }
+    }
   </style>
 </head>
 <body>
@@ -127,18 +148,15 @@
     <!-- Brand -->
     <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo"/>
     <div class="title">ReModa | Design Build</div>
-    <div class="subtitle">Card‑style navigation so visitors can choose their path fast — distinct, modern, and effortless.</div>
+    <div class="subtitle">Choose your path — a clean, card‑first experience with true liquid glass panels.</div>
 
     <!-- CARD NAVIGATION -->
     <div class="cards" role="list">
 
       <!-- Interior Design Services -->
       <a class="card" role="listitem" href="remoda-design-services.html" aria-label="Interior Design Services">
-        <div class="card-img">
-          <!-- Replace with image if you prefer -->
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M20 7H4m16 5H4m16 5H4" stroke="#CFE0FF" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
+        <div class="card-media">
+          <img src="images/cards/interior-design.jpg" alt="Interior design moodboard and finishes"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Interior Design Services</h3>
@@ -151,10 +169,8 @@
 
       <!-- Project Map -->
       <a class="card" role="listitem" href="project-map.html" aria-label="Project Map">
-        <div class="card-img">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 2C8.1 2 5 5.1 5 9c0 5 7 13 7 13s7-8 7-13c0-3.9-3.1-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" stroke="#CFE0FF" stroke-width="1.2"/>
-          </svg>
+        <div class="card-media">
+          <img src="images/cards/project-map.jpg" alt="DFW area map with project pins"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Project Map</h3>
@@ -167,11 +183,8 @@
 
       <!-- Financing -->
       <a class="card" role="listitem" href="financing.html" aria-label="Financing by Synchrony">
-        <div class="card-img">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="3" y="6" width="18" height="12" rx="2" stroke="#CFE0FF" stroke-width="1.2"/>
-            <path d="M3 10h18" stroke="#CFE0FF" stroke-width="1.2"/>
-          </svg>
+        <div class="card-media">
+          <img src="images/cards/financing.jpg" alt="Abstract credit card and soft light"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Financing by Synchrony</h3>
@@ -182,11 +195,8 @@
 
       <!-- Showroom -->
       <a class="card" role="listitem" href="showroom.html" aria-label="Design Center & Showroom">
-        <div class="card-img">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 10l8-6 8 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8Z" stroke="#CFE0FF" stroke-width="1.2"/>
-            <path d="M9 20v-6h6v6" stroke="#CFE0FF" stroke-width="1.2"/>
-          </svg>
+        <div class="card-media">
+          <img src="images/cards/showroom.jpg" alt="Showroom materials wall and lighting"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Design Center & Showroom</h3>
@@ -197,11 +207,8 @@
 
       <!-- Contact -->
       <a class="card" role="listitem" href="contact.html" aria-label="Contact ReModa">
-        <div class="card-img">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M21 8v8a2 2 0 0 1-2 2H5l-2 2V6a2 2 0 0 1 2-2h10" stroke="#CFE0FF" stroke-width="1.2"/>
-            <path d="M8 10h5M8 14h8" stroke="#CFE0FF" stroke-width="1.2"/>
-          </svg>
+        <div class="card-media">
+          <img src="images/cards/contact.jpg" alt="Phone on stone counter with soft lighting"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Contact</h3>
@@ -212,11 +219,8 @@
 
       <!-- Partners -->
       <a class="card" role="listitem" href="partners.html" aria-label="Partners">
-        <div class="card-img">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M8 7a4 4 0 1 0 0 8m8-8a4 4 0 1 0 0 8" stroke="#CFE0FF" stroke-width="1.2"/>
-            <path d="M2 20c1.5-3 4.5-4 6-4s4.5 1 6 4M10 20c1.5-3 4.5-4 6-4 1.4 0 3.9.7 6 4" stroke="#CFE0FF" stroke-width="1.2"/>
-          </svg>
+        <div class="card-media">
+          <img src="images/cards/partners.jpg" alt="Partner logos and material samples"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Partners</h3>
@@ -241,15 +245,15 @@
     // year
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // keyboard nav for cards
+    // Keyboard nav for cards (arrow left/right, Enter/Space)
     const cards = Array.from(document.querySelectorAll('.card'));
     cards.forEach(c=>{
       c.tabIndex = 0;
-      c.addEventListener('keydown', (e)=>{
+      c.addEventListener('keydown',(e)=>{
         const i = cards.indexOf(c);
         if(e.key==='ArrowRight'){ (cards[i+1]||cards[0]).focus(); }
         if(e.key==='ArrowLeft'){ (cards[i-1]||cards[cards.length-1]).focus(); }
-        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); c.click(); }
+        if(e.key==='Enter'||e.key===' '){ e.preventDefault(); c.click(); }
       });
     });
   </script>
