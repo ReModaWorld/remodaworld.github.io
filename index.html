@@ -2,166 +2,234 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <title>ReModa | Design Build</title>
 <meta name="description" content="ReModa Design | Build — Interior & exterior transformations in Dallas–Fort Worth." />
 <meta name="theme-color" content="#0b1a2a" />
 
 <style>
-  :root {
-    --bg:#0b1a2a;        /* page background (deep navy) */
-    --card:#0f2034;      /* card background */
-    --line:#2b4666;      /* border */
+  :root{
+    /* Brand palette (matches your services page) */
+    --bg:#0b1a2a;        /* deep navy base */
     --ink:#ffffff;       /* main text */
     --muted:#b9c7d8;     /* secondary text */
+
+    /* Glass card tuning */
+    --glass-fill: rgba(255,255,255,.06);   /* see-through amount */
+    --glass-blur: 28px;                    /* frost blur */
+    --glass-sat: 180%;                     /* color pop behind glass */
+    --glass-bright: 1.08;                  /* tiny lift for glass */
+
+    --edge-soft: rgba(255,255,255,.16);    /* faint outer edge */
+    --edge-inner: rgba(255,255,255,.62);   /* crisp inner bevel */
+    --hover-glow: rgba(255,255,255,.28);   /* white glow on hover */
+
+    --radius:16px;
+    --shadow:0 22px 60px rgba(0,0,0,.45);
+    --max:1100px;
   }
 
-  * { box-sizing:border-box }
-  body {
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
     margin:0;
     font-family: Inter, system-ui, Arial;
-    background: var(--bg);
-    color: var(--ink);
+    color:var(--ink);
+
+    /* Keep your deep navy, but add ultra‑subtle texture so blur reads.
+       This still *looks* like the same color, just not a flat plate. */
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(255,255,255,.05), transparent 60%),
+      radial-gradient(900px 500px at 0% 10%, rgba(0,0,0,.18), transparent 55%),
+      var(--bg);
+    min-height:100vh;
     display:flex;
     flex-direction:column;
     align-items:center;
-    min-height:100vh;
     padding:40px 20px;
   }
 
-  .logo {
-    max-width:180px;
-    margin-bottom:20px;
-  }
-
-  h1 {
-    margin:10px 0 30px;
+  .wrap{max-width:var(--max); width:100%; margin:0 auto; display:flex; flex-direction:column; align-items:center}
+  .logo{max-width:180px; height:auto; margin-bottom:16px}
+  h1{
+    margin:6px 0 28px;
     text-align:center;
     font-size:clamp(22px,2.5vw,28px);
+    font-weight:800;
+    letter-spacing:.2px;
   }
 
-  .cards-container {
-    display:flex;
-    gap:24px;
-    flex-wrap:wrap;
-    justify-content:center;
-    max-width:1100px;
-    width:100%;
+  /* CARD GRID */
+  .cards{
+    display:grid; gap:18px; width:100%;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  @media (max-width:980px){ .cards{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .cards{grid-template-columns:1fr} }
+
+  /* ===== GLASS CARD (no motion border) ===== */
+  .card{
+    position:relative;
+    display:flex; flex-direction:column; overflow:hidden;
+    border-radius:var(--radius);
+    text-decoration:none; color:var(--ink);
+    box-shadow: var(--shadow);
+    border:1px solid var(--edge-soft);
+    background: var(--glass-fill);
+    background-clip: padding-box;
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+    transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
   }
 
-  .card {
-    background: var(--card);
-    border:1px solid var(--line);
-    border-radius:14px;
-    overflow:hidden;
-    width:300px;
-    display:flex;
-    flex-direction:column;
-    text-decoration:none;
-    color:var(--ink);
-    transition: transform .25s ease, box-shadow .25s ease;
+  /* inner bevel (etched edge) */
+  .card::before{
+    content:"";
+    position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background: linear-gradient(180deg, var(--edge-inner), rgba(255,255,255,.22));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events:none; opacity:.95;
   }
 
-  .card:hover {
+  /* glossy static highlights (no animation) */
+  .card::after{
+    content:"";
+    position:absolute; inset:-1px; border-radius:inherit;
+    background:
+      radial-gradient(110% 60% at 0% 0%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(110% 50% at 100% 0%, rgba(255,255,255,.12), transparent 60%);
+    mix-blend-mode:screen;
+    pointer-events:none; opacity:.5;
+  }
+
+  .card:hover{
     transform: translateY(-6px);
-    box-shadow:0 0 14px rgba(255,255,255,.15), 0 6px 20px rgba(0,0,0,.45);
-    border-color:#ffffff33;
+    box-shadow: 0 28px 80px rgba(0,0,0,.6);
+    border-color: rgba(255,255,255,.22);
+    filter: saturate(108%);
   }
 
-  .card img {
-    width:100%;
+  /* media area */
+  .card-media{
     height:160px;
-    object-fit:cover;
+    overflow:hidden;
+    border-bottom:1px solid rgba(255,255,255,.15);
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  }
+  .card-media img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    transform: scale(1.03);
+    transition: transform .45s cubic-bezier(.2,.8,.2,1);
+    filter: saturate(115%) contrast(1.02);
+  }
+  .card:hover .card-media img{ transform: scale(1.07) }
+
+  /* text area */
+  .card-body{ padding:16px 16px 18px }
+  .card-title{ margin:0 0 6px; font-weight:800; font-size:18px; letter-spacing:.2px }
+  .card-desc{ margin:0; color:var(--muted); font-size:14px; line-height:1.45 }
+
+  /* tasteful white glow ring on hover (static, no motion) */
+  .card:focus-visible,
+  .card:hover{
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.18),
+      0 0 18px 4px var(--hover-glow),
+      0 28px 80px rgba(0,0,0,.6);
+    outline:none;
   }
 
-  .card-content {
-    padding:18px;
+  footer{
+    margin-top:32px; color:var(--muted); font-size:13px; text-align:center;
   }
 
-  .card-title {
-    font-weight:700;
-    font-size:18px;
-    margin:0 0 8px;
-  }
-
-  .card-description {
-    font-size:14px;
-    color:var(--muted);
-    line-height:1.4;
-  }
-
-  footer {
-    margin-top:40px;
-    color:var(--muted);
-    font-size:13px;
-    text-align:center;
+  /* Optional: reduce motion respect */
+  @media (prefers-reduced-motion: reduce){
+    .card, .card-media img{ transition:none !important }
   }
 </style>
 </head>
 <body>
+  <div class="wrap">
+    <!-- Brand -->
+    <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo" />
+    <h1>ReModa | Design Build</h1>
 
-  <!-- Logo -->
-  <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo" />
+    <!-- GLASS CARDS -->
+    <div class="cards" role="list">
 
-  <h1>ReModa | Design Build</h1>
+      <!-- Interior Design Services -->
+      <a href="remoda-design-services.html" class="card" role="listitem" aria-label="Interior Design Services">
+        <div class="card-media">
+          <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1200&auto=format&fit=crop" alt="Interior design finishes and palette">
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Interior Design Services</h3>
+          <p class="card-desc">Full‑service design, selections, and high‑value transformations.</p>
+        </div>
+      </a>
 
-  <!-- Cards -->
-  <div class="cards-container">
+      <!-- Project Map -->
+      <a href="project-map.html" class="card" role="listitem" aria-label="Project Map">
+        <div class="card-media">
+          <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1200&auto=format&fit=crop" alt="City map with pins">
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Project Map</h3>
+          <p class="card-desc">Explore completed projects across Dallas–Fort Worth.</p>
+        </div>
+      </a>
 
-    <a href="remoda-design-services.html" class="card">
-      <img src="https://source.unsplash.com/600x400/?interior,design" alt="Interior Design">
-      <div class="card-content">
-        <div class="card-title">Interior Design Services</div>
-        <div class="card-description">Full-service design, selections, and high-value transformations.</div>
-      </div>
-    </a>
+      <!-- Financing -->
+      <a href="financing.html" class="card" role="listitem" aria-label="Financing">
+        <div class="card-media">
+          <img src="https://images.unsplash.com/photo-1605902711834-8b11c3cd99d7?q=80&w=1200&auto=format&fit=crop" alt="Elegant credit card and soft light">
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Financing</h3>
+          <p class="card-desc">Start your project now with flexible monthly payments via Synchrony.</p>
+        </div>
+      </a>
 
-    <a href="project-map.html" class="card">
-      <img src="https://source.unsplash.com/600x400/?architecture,map" alt="Project Map">
-      <div class="card-content">
-        <div class="card-title">Project Map</div>
-        <div class="card-description">Explore our completed projects across Dallas–Fort Worth.</div>
-      </div>
-    </a>
+      <!-- Showroom -->
+      <a href="showroom.html" class="card" role="listitem" aria-label="Design Center & Showroom">
+        <div class="card-media">
+          <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1200&auto=format&fit=crop" alt="Material samples wall in a showroom">
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Design Center & Showroom</h3>
+          <p class="card-desc">Visit our design center for materials, finishes, and expert guidance.</p>
+        </div>
+      </a>
 
-    <a href="financing.html" class="card">
-      <img src="https://source.unsplash.com/600x400/?finance,credit" alt="Financing">
-      <div class="card-content">
-        <div class="card-title">Financing</div>
-        <div class="card-description">Start your project now with flexible monthly payments via Synchrony.</div>
-      </div>
-    </a>
+      <!-- Contact -->
+      <a href="contact.html" class="card" role="listitem" aria-label="Contact">
+        <div class="card-media">
+          <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1200&auto=format&fit=crop" alt="Phone on stone counter with soft lighting">
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Contact</h3>
+          <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209‑9288</p>
+        </div>
+      </a>
 
-    <a href="showroom.html" class="card">
-      <img src="https://source.unsplash.com/600x400/?showroom,materials" alt="Showroom">
-      <div class="card-content">
-        <div class="card-title">Design Center & Showroom</div>
-        <div class="card-description">Visit our design center for materials, finishes, and expert guidance.</div>
-      </div>
-    </a>
+      <!-- Partners -->
+      <a href="partners.html" class="card" role="listitem" aria-label="Partners">
+        <div class="card-media">
+          <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop" alt="Material boards and brand swatches">
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Partners</h3>
+          <p class="card-desc">Cambria • TileBar • Mohawk • Visual Comfort</p>
+        </div>
+      </a>
 
-    <a href="contact.html" class="card">
-      <img src="https://source.unsplash.com/600x400/?team,office" alt="Contact">
-      <div class="card-content">
-        <div class="card-title">Contact</div>
-        <div class="card-description">401 S. Sherman St #217, Richardson • (469) 209-9288</div>
-      </div>
-    </a>
+    </div>
 
-    <a href="partners.html" class="card">
-      <img src="https://source.unsplash.com/600x400/?partnership,business" alt="Partners">
-      <div class="card-content">
-        <div class="card-title">Partners</div>
-        <div class="card-description">Cambria • TileBar • Mohawk • Visual Comfort</div>
-      </div>
-    </a>
-
+    <footer>© <span id="y"></span> ReModa | Design Build</footer>
   </div>
-
-  <footer>
-    © <span id="y"></span> ReModa | Design Build
-  </footer>
 
 <script>
   document.getElementById('y').textContent = new Date().getFullYear();
