@@ -4,43 +4,46 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ReModa | Design Build</title>
-<meta name="description" content="Design-first transformations across DFW."/>
+<meta name="description" content="Design-first transformations across DFW. Kitchens, baths, flooring, patios & more."/>
+
 <style>
   :root{
-    /* BRAND (unchanged) */
+    /* BRAND — unchanged */
     --brand-1:#001f3f;  /* top */
     --brand-2:#003366;  /* bottom */
 
-    /* GLASS */
-    --glass-fill: rgba(255,255,255,.035);   /* ultra transparent */
-    --glass-blur: 42px;                     /* stronger blur so the gradient shows through */
+    /* GLASS tuning (highly see-through) */
+    --glass-fill: rgba(255,255,255,.035);
+    --glass-blur: 42px;
     --glass-sat: 170%;
     --glass-bright: 1.10;
 
-    /* STROKES & LED BORDER */
-    --edge-soft: rgba(255,255,255,.16);     /* faint outer edge */
-    --edge-inner: rgba(255,255,255,.65);    /* crisp inner bevel */
-    --led: rgba(255,255,255,1);             /* LED white */
-    --led-dim: rgba(255,255,255,.18);       /* ambient glow */
+    /* BORDERS & EFFECTS (neutral white only) */
+    --edge-soft: rgba(255,255,255,.16);    /* faint outer edge */
+    --edge-inner: rgba(255,255,255,.68);   /* crisp inner bevel */
+    --led: rgba(255,255,255,1);            /* LED white */
+    --led-halo: rgba(255,255,255,.22);     /* ambient halo */
+    --ink:#ffffff;
+    --ink-dim:#eaf0ff;
 
-    --radius: 22px;
-    --shadow: 0 30px 90px rgba(0,0,0,.55);
-    --max: 1140px;
+    --radius:22px;
+    --shadow:0 30px 90px rgba(0,0,0,.55);
+    --max:1140px;
   }
 
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;
-    font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, Arial;
-    color:#fff;
+    font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, Arial, "Noto Sans";
+    color:var(--ink);
     background: linear-gradient(180deg, var(--brand-1), var(--brand-2));
     display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:42px 20px;
   }
 
   .wrap{width:100%; max-width:var(--max); display:flex; flex-direction:column; align-items:center}
-  .logo{max-width:180px; margin-bottom:10px}
-  .title{margin:4px 0 8px; text-align:center; opacity:.96; font-weight:800; letter-spacing:.3px}
+  .logo{max-width:180px; margin-bottom:14px}
+  .title{margin:4px 0 6px; text-align:center; opacity:.96; font-weight:800; letter-spacing:.3px}
   .subtitle{margin:0 0 28px; text-align:center; color:#dbe2ff; max-width:760px; line-height:1.55}
 
   /* GRID */
@@ -48,13 +51,13 @@
   @media (max-width:980px){ .cards{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .cards{grid-template-columns:1fr} }
 
-  /* ===== LIQUID GLASS TILE w/ LED BORDER ===== */
+  /* ===== LIQUID-GLASS TILE + LED BORDER ===== */
   .card{
     position:relative; display:flex; flex-direction:column; justify-content:flex-end;
     height:220px; border-radius:var(--radius); overflow:hidden;
-    text-decoration:none; color:#fff; outline:none; padding:16px 16px 18px;
+    text-decoration:none; color:var(--ink); outline:none; padding:16px 16px 18px;
 
-    /* true glass over the gradient */
+    /* true glass over your gradient */
     background: var(--glass-fill);
     background-clip: padding-box;
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
@@ -62,10 +65,12 @@
 
     border:1px solid var(--edge-soft);
     box-shadow: var(--shadow);
-    transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .45s cubic-bezier(.2,.8,.2,1), filter .45s cubic-bezier(.2,.8,.2,1);
+    transition: transform .45s cubic-bezier(.2,.8,.2,1),
+               box-shadow .45s cubic-bezier(.2,.8,.2,1),
+               filter .45s cubic-bezier(.2,.8,.2,1);
   }
 
-  /* crisp inner bevel */
+  /* inner bevel (etched edge) */
   .card::before{
     content:"";
     position:absolute; inset:0; border-radius:inherit; padding:1px;
@@ -75,31 +80,29 @@
     pointer-events:none; opacity:.95;
   }
 
-  /* LED motion border: conic gradient ring that rotates */
+  /* LED white motion border (thin ring that rotates) */
   .card::after{
     content:"";
     position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-
-    /* conic gradient “LED” arc */
+    /* rotating LED arc; the rest of the ring is invisible */
     background:
       conic-gradient(from 0deg,
         rgba(255,255,255,0) 0deg,
-        rgba(255,255,255,.0) 300deg,
+        rgba(255,255,255,0) 300deg,
         var(--led) 330deg,
-        rgba(255,255,255,.0) 360deg);
+        rgba(255,255,255,0) 360deg);
 
-    /* show only a thin ring using the mask trick */
-    padding:2px;
+    padding:2px; /* ring thickness */
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor; mask-composite: exclude;
 
-    /* ambient halo */
-    box-shadow: 0 0 18px 2px var(--led-dim);
-    animation: spin 3.5s linear infinite;
-    opacity:.9;
+    box-shadow: 0 0 22px 4px var(--led-halo);
+    animation: spin 3.75s linear infinite;
+    opacity:.92;
   }
 
-  /* hover lift */
+  @keyframes spin{ to { transform: rotate(360deg); } }
+
   .card:hover{
     transform: translateY(-10px);
     box-shadow: 0 42px 130px rgba(0,0,0,.62);
@@ -110,14 +113,10 @@
     box-shadow: 0 0 0 3px rgba(255,255,255,.75), 0 34px 110px rgba(0,0,0,.60);
   }
 
-  @keyframes spin{
-    to { transform: rotate(360deg); }
-  }
-
-  /* CONTENT INSIDE TILE */
+  /* CONTENT inside tile (compact Apple-like) */
   .kicker{
     font-size:.74rem; letter-spacing:.18em; text-transform:uppercase;
-    color:#ffffff; opacity:.95; margin:0 0 8px;
+    color:var(--ink); opacity:.95; margin:0 0 8px;
     text-shadow:0 1px 2px rgba(0,0,0,.25);
   }
   .row{display:flex; align-items:center; gap:10px}
@@ -131,20 +130,9 @@
   }
   .icon svg path, .icon svg rect{ stroke:#ffffff }
   .title-in{ font-weight:800; letter-spacing:.2px; margin:0; text-shadow:0 1px 2px rgba(0,0,0,.25) }
-  .desc{ margin:6px 0 0; font-size:.95rem; color:#eef3ff; opacity:.96; text-shadow:0 1px 2px rgba(0,0,0,.25) }
+  .desc{ margin:6px 0 0; font-size:.95rem; color:var(--ink-dim); opacity:.96; text-shadow:0 1px 2px rgba(0,0,0,.25) }
 
-  /* subtle global noise improves perceived glass (neutral white only) */
-  .noise{
-    position:fixed; inset:0; pointer-events:none; z-index:-1;
-    background-image:url("data:image/svg+xml;utf8,\
-      <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>\
-        <filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 0 0 0 0'/></feComponentTransfer></filter>\
-        <rect width='100%' height='100%' filter='url(%23n)' fill='white' />\
-      </svg>");
-    opacity:.14; mix-blend-mode:overlay;
-  }
-
-  /* Footer */
+  /* Tiny footer */
   .foot{
     width:100%; max-width:var(--max); margin-top:30px;
     display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
@@ -153,21 +141,22 @@
   .foot a{color:#e4ecff; text-decoration:none}
   .foot a:hover{text-decoration:underline}
 
+  /* Motion preference */
   @media (prefers-reduced-motion: reduce){
     .card, .card::after{ transition:none !important; animation:none !important }
   }
 </style>
 </head>
 <body>
-  <!-- subtle texture so blur is visible even over a smooth gradient -->
-  <div class="noise"></div>
-
   <div class="wrap">
+    <!-- Brand -->
     <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo"/>
     <div class="title">ReModa | Design Build</div>
-    <div class="subtitle">Ultra‑transparent glass tiles with a white, LED‑style motion border.</div>
+    <div class="subtitle">Card‑first navigation with **see‑through liquid glass** and a subtle white LED border.</div>
 
+    <!-- CARD GRID -->
     <div class="cards" role="list">
+
       <!-- Interior Design Services -->
       <a class="card" href="remoda-design-services.html" role="listitem" aria-label="Interior Design Services">
         <div class="kicker">Design</div>
@@ -254,6 +243,7 @@
       </a>
     </div>
 
+    <!-- Footer -->
     <div class="foot">
       <span>© <span id="y"></span> ReModa | Design Build</span>
       <span>•</span><a href="about.html">About</a>
@@ -262,6 +252,7 @@
   </div>
 
 <script>
+  // year
   document.getElementById('y').textContent = new Date().getFullYear();
 </script>
 </body>
