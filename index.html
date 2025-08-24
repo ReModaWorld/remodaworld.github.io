@@ -8,11 +8,11 @@
   <style>
     :root{
       --navy-900:#0D2240;
-      --navy-800:#122957;   /* ReModa navy */
+      --navy-800:#122957;
       --white:#ffffff;
-      --glass-bg:rgba(255,255,255,.10);   /* frosted glass */
-      --stroke:rgba(255,255,255,.45);     /* crisp inner stroke */
-      --ring:rgba(159,179,255,.55);       /* faint outer glow */
+      --glass-bg:rgba(255,255,255,.10);
+      --stroke:rgba(255,255,255,.45);
+      --ring:rgba(159,179,255,.55);
       --chip-bg:rgba(255,255,255,.22);
       --chip-stroke:rgba(255,255,255,.35);
       --radius:18px;
@@ -45,21 +45,17 @@
     @media (max-width:980px){ .cards{grid-template-columns:repeat(2,1fr)} }
     @media (max-width:640px){ .cards{grid-template-columns:1fr} }
 
-    /* ===== Apple‑like Liquid Glass Card ===== */
+    /* ===== Glass Card ===== */
     .card{
       position:relative; display:flex; flex-direction:column;
       min-height:220px; border-radius:var(--radius); overflow:hidden;
       text-decoration:none; color:var(--white); outline:none;
 
-      /* real glass: translucent bg + heavy blur + slight brighten */
       background: var(--glass-bg);
       backdrop-filter: blur(24px) saturate(180%) brightness(1.08);
       -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.08);
 
-      /* subtle depth */
       box-shadow: var(--shadow);
-
-      /* base stroke is very soft; a crisp inner stroke comes via ::before */
       border:1px solid rgba(255,255,255,.12);
 
       transition: transform .35s cubic-bezier(.2,.8,.2,1),
@@ -67,7 +63,7 @@
                  filter .35s cubic-bezier(.2,.8,.2,1);
     }
 
-    /* Crispy inner stroke */
+    /* Inner stroke */
     .card::before{
       content:"";
       position:absolute; inset:0; border-radius:calc(var(--radius) + 0px);
@@ -78,16 +74,15 @@
       pointer-events:none; opacity:.9;
     }
 
-    /* Specular highlight (top-left) + faint outer glow ring */
+    /* Highlight + sheen */
     .card::after{
       content:"";
       position:absolute; inset:-1px; border-radius:calc(var(--radius) + 1px);
-      background:
-        radial-gradient(120% 60% at 0% 0%, rgba(255,255,255,.35), transparent 60%),
-        radial-gradient(120% 50% at 100% 0%, rgba(255,255,255,.10), transparent 60%);
-      box-shadow: 0 0 0 0 var(--ring); /* updated on hover */
-      pointer-events:none; opacity:.55; mix-blend-mode:screen;
-      transition: box-shadow .35s cubic-bezier(.2,.8,.2,1), opacity .35s;
+      background: linear-gradient(120deg, rgba(255,255,255,.3) 0%, transparent 60%);
+      background-size:200% 200%;
+      background-position:-100% 0;
+      opacity:.0;
+      transition: opacity .35s, background-position 1s;
     }
 
     .card:hover{
@@ -95,7 +90,10 @@
       box-shadow: 0 28px 80px rgba(5,10,30,.55);
       filter: saturate(110%);
     }
-    .card:hover::after{ box-shadow: 0 0 0 2px var(--ring); opacity:.75; }
+    .card:hover::after{
+      opacity:.6;
+      background-position:100% 0; /* sweep effect */
+    }
     .card:focus-visible{
       transform: translateY(-4px);
       box-shadow: 0 0 0 3px rgba(159,179,255,.75), 0 26px 70px rgba(5,10,30,.5);
@@ -105,7 +103,6 @@
     .card-media{
       height:160px; position:relative; overflow:hidden;
       border-bottom:1px solid rgba(255,255,255,.18);
-      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
     }
     .card-media img{
       width:100%; height:100%; object-fit:cover; display:block;
@@ -128,7 +125,6 @@
       backdrop-filter: blur(8px) saturate(160%);
     }
 
-    /* Footer */
     .foot{
       width:100%; max-width:var(--max); margin-top:28px;
       display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
@@ -136,11 +132,6 @@
     }
     .foot a{color:#dbe2ff; text-decoration:none}
     .foot a:hover{text-decoration:underline}
-
-    /* Motion preference */
-    @media (prefers-reduced-motion: reduce){
-      .card, .card::after, .card-media img{ transition:none !important }
-    }
   </style>
 </head>
 <body>
@@ -148,43 +139,36 @@
     <!-- Brand -->
     <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo"/>
     <div class="title">ReModa | Design Build</div>
-    <div class="subtitle">Choose your path — a clean, card‑first experience with true liquid glass panels.</div>
+    <div class="subtitle">A clean, card-first experience with polished liquid glass navigation.</div>
 
-    <!-- CARD NAVIGATION -->
+    <!-- Cards -->
     <div class="cards" role="list">
 
-      <!-- Interior Design Services -->
-      <a class="card" role="listitem" href="remoda-design-services.html" aria-label="Interior Design Services">
+      <a class="card" role="listitem" href="remoda-design-services.html">
         <div class="card-media">
-          <img src="images/cards/interior-design.jpg" alt="Interior design moodboard and finishes"/>
+          <img src="https://source.unsplash.com/800x600/?interior,design" alt="Interior design"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Interior Design Services</h3>
-          <p class="card-desc">Full‑service design, selections, and high‑value transformations.</p>
-          <div class="chipbar">
-            <span class="chip">Renderings</span><span class="chip">Selections</span><span class="chip">Project Plan</span>
-          </div>
+          <p class="card-desc">Full-service design, selections, and high-value transformations.</p>
+          <div class="chipbar"><span class="chip">Renderings</span><span class="chip">Selections</span></div>
         </div>
       </a>
 
-      <!-- Project Map -->
-      <a class="card" role="listitem" href="project-map.html" aria-label="Project Map">
+      <a class="card" role="listitem" href="project-map.html">
         <div class="card-media">
-          <img src="images/cards/project-map.jpg" alt="DFW area map with project pins"/>
+          <img src="https://source.unsplash.com/800x600/?map,city" alt="DFW project map"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Project Map</h3>
           <p class="card-desc">Explore completed work around DFW.</p>
-          <div class="chipbar">
-            <span class="chip">DFW</span><span class="chip">Live Examples</span>
-          </div>
+          <div class="chipbar"><span class="chip">DFW</span><span class="chip">Live Examples</span></div>
         </div>
       </a>
 
-      <!-- Financing -->
-      <a class="card" role="listitem" href="financing.html" aria-label="Financing by Synchrony">
+      <a class="card" role="listitem" href="financing.html">
         <div class="card-media">
-          <img src="images/cards/financing.jpg" alt="Abstract credit card and soft light"/>
+          <img src="https://source.unsplash.com/800x600/?finance,money" alt="Financing"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Financing by Synchrony</h3>
@@ -193,10 +177,9 @@
         </div>
       </a>
 
-      <!-- Showroom -->
-      <a class="card" role="listitem" href="showroom.html" aria-label="Design Center & Showroom">
+      <a class="card" role="listitem" href="showroom.html">
         <div class="card-media">
-          <img src="images/cards/showroom.jpg" alt="Showroom materials wall and lighting"/>
+          <img src="https://source.unsplash.com/800x600/?showroom,interior" alt="Showroom"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Design Center & Showroom</h3>
@@ -205,22 +188,20 @@
         </div>
       </a>
 
-      <!-- Contact -->
-      <a class="card" role="listitem" href="contact.html" aria-label="Contact ReModa">
+      <a class="card" role="listitem" href="contact.html">
         <div class="card-media">
-          <img src="images/cards/contact.jpg" alt="Phone on stone counter with soft lighting"/>
+          <img src="https://source.unsplash.com/800x600/?phone,contact" alt="Contact"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Contact</h3>
-          <p class="card-desc">401 S. Sherman St #217 • (469) 209‑9288</p>
+          <p class="card-desc">401 S. Sherman St #217 • (469) 209-9288</p>
           <div class="chipbar"><span class="chip">Book a Consult</span></div>
         </div>
       </a>
 
-      <!-- Partners -->
-      <a class="card" role="listitem" href="partners.html" aria-label="Partners">
+      <a class="card" role="listitem" href="partners.html">
         <div class="card-media">
-          <img src="images/cards/partners.jpg" alt="Partner logos and material samples"/>
+          <img src="https://source.unsplash.com/800x600/?architecture,materials" alt="Partners"/>
         </div>
         <div class="card-body">
           <h3 class="card-title">Partners</h3>
@@ -231,31 +212,16 @@
 
     </div>
 
-    <!-- Tiny footer -->
+    <!-- Footer -->
     <div class="foot">
       <span>© <span id="y"></span> ReModa | Design Build</span>
-      <span>•</span>
-      <a href="about.html">About</a>
-      <span>•</span>
-      <a href="blog.html">Blog</a>
+      <span>•</span><a href="about.html">About</a>
+      <span>•</span><a href="blog.html">Blog</a>
     </div>
   </div>
 
   <script>
-    // year
     document.getElementById('y').textContent = new Date().getFullYear();
-
-    // Keyboard nav for cards (arrow left/right, Enter/Space)
-    const cards = Array.from(document.querySelectorAll('.card'));
-    cards.forEach(c=>{
-      c.tabIndex = 0;
-      c.addEventListener('keydown',(e)=>{
-        const i = cards.indexOf(c);
-        if(e.key==='ArrowRight'){ (cards[i+1]||cards[0]).focus(); }
-        if(e.key==='ArrowLeft'){ (cards[i-1]||cards[cards.length-1]).focus(); }
-        if(e.key==='Enter'||e.key===' '){ e.preventDefault(); c.click(); }
-      });
-    });
   </script>
 </body>
 </html>
