@@ -8,10 +8,12 @@
 
 <style>
 :root{
-  /* Palette (darker navy theme) */
+  /* Brand / palette */
   --bg:#0b1a2a;
   --ink:#ffffff;
   --muted:#7f8ea3;
+  --gold:#E7C978;              /* elegant “gold” */
+  --gold-strong:#F2D889;
 
   /* Surfaces / effects (io-like) */
   --surface:#0e1d2e;
@@ -32,99 +34,161 @@
 /* Base */
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink)}
+body{
+  margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink);
+  /* space for fixed topbar */
+  padding-top:68px;
+}
 
-/* ===== Top bar ===== */
+/* ================= TOP BAR (fixed + gold line) ================= */
 .topbar{
-  position:sticky;top:0;z-index:40;
+  position:fixed; top:0; left:0; right:0; z-index:1000;
   backdrop-filter:saturate(140%) blur(10px);
   background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.15));
-  border-bottom:1px solid rgba(255,255,255,.08);
+  border-bottom:1px solid rgba(255,255,255,.05);
 }
 .topbar-inner{
-  max-width:var(--max);margin:0 auto;padding:10px 16px;
-  display:flex;align-items:center;justify-content:space-between;
+  max-width:var(--max); margin:0 auto; padding:10px 16px;
+  display:flex; align-items:center; justify-content:space-between;
 }
 .brand{height:28px}
-.top-cta{background:#fff;color:#000;text-decoration:none;font-weight:800;padding:10px 14px;border-radius:12px}
+.top-cta{
+  background:#fff;color:#000;text-decoration:none;font-weight:800;
+  padding:10px 14px;border-radius:12px
+}
 
-/* ===== Hero ===== */
-.hero{position:relative;overflow:hidden}
-.hero-bg{
-  position:absolute;inset:0;pointer-events:none;opacity:.22;
+/* Gold accent line */
+.topbar::after{
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
   background:
-    radial-gradient(1100px 520px at 75% -10%,rgba(255,255,255,.08),transparent 60%),
-    linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0) 45%,rgba(0,0,0,.45));
+    radial-gradient(60% 120% at 50% 100%, var(--gold), transparent 70%),
+    linear-gradient(90deg, transparent, var(--gold-strong), transparent);
+  box-shadow:0 0 16px 2px rgba(242,216,137,.45), 0 0 30px rgba(242,216,137,.25);
+  transition:opacity .35s ease, transform .35s ease;
+}
+/* fade the gold line when scrolling */
+.scrolled .topbar::after{ opacity:0; transform:translateY(-6px) }
+
+/* ================= “ENGINE” LOGO BURST ================= */
+.logo-hero{
+  position:relative; display:flex; align-items:center; justify-content:center;
+  padding:20px 0 6px;
+}
+.engine{
+  position:relative; display:inline-flex; align-items:center; justify-content:center;
+  width:120px; height:120px;
+}
+.engine img{ width:80%; height:auto; z-index:2; filter: drop-shadow(0 2px 6px rgba(0,0,0,.4)); }
+
+/* Gold glow halo */
+.engine::before{
+  content:""; position:absolute; inset:0; border-radius:50%;
+  background: radial-gradient(closest-side, rgba(242,216,137,.55), rgba(242,216,137,.08) 55%, transparent 70%);
+  filter: blur(6px); z-index:1; opacity:.85;
+  animation: pulse 3.2s ease-in-out infinite;
+}
+
+/* Streaks (conic burst) */
+.engine::after{
+  content:""; position:absolute; inset:-20%; border-radius:50%;
+  background:
+    conic-gradient(from 0deg,
+      rgba(242,216,137,.0) 0deg, rgba(242,216,137,.0) 300deg,
+      rgba(242,216,137,.8) 320deg, rgba(242,216,137,.0) 360deg);
+  filter: blur(8px); mix-blend-mode:screen; z-index:0; opacity:.8;
+  animation: burst 4.5s linear infinite;
+}
+@keyframes pulse{ 0%,100%{transform:scale(1);opacity:.8} 50%{transform:scale(1.04);opacity:1} }
+@keyframes burst{ to{ transform:rotate(360deg) } }
+
+/* one-time startup flash rays */
+.flash{
+  position:absolute; inset:0; pointer-events:none; overflow:visible; z-index:0;
+}
+.flash span{
+  position:absolute; left:50%; top:50%; width:2px; height:0;
+  background:linear-gradient(180deg, var(--gold-strong), rgba(242,216,137,0));
+  box-shadow:0 0 14px rgba(242,216,137,.6);
+  transform-origin:top center; opacity:0;
+  animation: shoot 1.8s ease-out forwards;
+}
+.flash span:nth-child(1){ transform:translate(-50%,-50%) rotate(15deg); }
+.flash span:nth-child(2){ transform:translate(-50%,-50%) rotate(75deg); animation-delay:.15s}
+.flash span:nth-child(3){ transform:translate(-50%,-50%) rotate(135deg); animation-delay:.3s}
+.flash span:nth-child(4){ transform:translate(-50%,-50%) rotate(195deg); animation-delay:.45s}
+.flash span:nth-child(5){ transform:translate(-50%,-50%) rotate(255deg); animation-delay:.6s}
+@keyframes shoot{ 0%{height:0;opacity:1} 60%{height:140px;opacity:1} 100%{height:180px;opacity:0} }
+
+/* ================= HERO ================= */
+.hero{
+  position:relative; overflow:hidden;
+}
+.hero-bg{
+  position:absolute; inset:0; pointer-events:none; opacity:.22;
+  background:
+    radial-gradient(1100px 520px at 75% -10%, rgba(255,255,255,.08), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.6), rgba(0,0,0,0) 45%, rgba(0,0,0,.45));
 }
 .hero-inner{
-  position:relative;max-width:var(--max);margin:0 auto;padding:64px 20px 56px;text-align:center;
+  position:relative; max-width:var(--max); margin:0 auto; padding:28px 20px 56px;
+  text-align:center;
 }
-.hero h1{
-  margin:0 0 12px;font-size:clamp(32px,5.2vw,56px);line-height:1.05;font-weight:900;letter-spacing:.2px
-}
-.hero p{margin:0;color:var(--muted);font-size:clamp(14px,2.5vw,18px)}
-.hero .cta{margin-top:22px;display:inline-block;padding:12px 18px;border-radius:12px;background:#fff;color:#000;font-weight:800;text-decoration:none}
+.hero h1{ margin:0 0 12px; font-size:clamp(32px,5.2vw,56px); line-height:1.05; font-weight:900 }
+.hero p{ margin:0; color:var(--muted); font-size:clamp(14px,2.5vw,18px) }
+.hero .cta{ margin-top:22px; display:inline-block; padding:12px 18px; border-radius:12px;
+  background:#fff; color:#000; font-weight:800; text-decoration:none }
 
-/* ===== Grid ===== */
-.wrap{max-width:var(--max);margin:0 auto;padding:28px 20px 48px}
-.grid{display:grid;gap:18px;grid-template-columns:repeat(3,minmax(0,1fr))}
+/* ================= GRID / CARDS (kept your effect) ================= */
+.wrap{max-width:var(--max); margin:0 auto; padding:28px 20px 48px}
+.grid{display:grid; gap:18px; grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:640px){.grid{grid-template-columns:1fr}}
 
-/* ===== Card (kept your effect, added stability) ===== */
 .card{
-  position:relative;overflow:hidden;border-radius:var(--radius);
-  background:var(--surface);color:var(--ink);text-decoration:none;
-  box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.06);
-  /* glass */
+  position:relative; overflow:hidden; border-radius:var(--radius);
+  background:var(--surface); color:var(--ink); text-decoration:none;
+  box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.06);
   backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
-  transition:transform .35s cubic-bezier(.2,.8,.25,1),box-shadow .35s ease,filter .35s ease;
-
-  /* layout fix: make inner content never spill */
-  display:flex;flex-direction:column;min-height:100%;contain:content;
+  transition:transform .35s cubic-bezier(.2,.8,.25,1), box-shadow .35s ease, filter .35s ease;
+  display:flex; flex-direction:column; min-height:100%; contain:content;
 }
 .card::before{
-  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:linear-gradient(180deg,var(--frame2),transparent 70%);
-  box-shadow:inset 0 0 0 1px var(--frame);mix-blend-mode:screen;
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(180deg, var(--frame2), transparent 70%);
+  box-shadow:inset 0 0 0 1px var(--frame); mix-blend-mode:screen;
 }
 .card::after{
-  content:"";position:absolute;inset:6px;border-radius:var(--inner-radius);pointer-events:none;
+  content:""; position:absolute; inset:6px; border-radius:var(--inner-radius); pointer-events:none;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
 }
 /* media */
-.card-media{position:relative;height:170px;overflow:hidden;flex:0 0 auto}
+.card-media{position:relative; height:170px; overflow:hidden; flex:0 0 auto}
 .card-media img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  transform:scale(1.03);transition:transform .6s cubic-bezier(.2,.8,.2,1);
+  width:100%; height:100%; object-fit:cover; display:block;
+  transform:scale(1.03); transition:transform .6s cubic-bezier(.2,.8,.2,1);
   filter:contrast(1.02) saturate(112%);
 }
 .card-media::before{
-  /* top vignette + bottom fade so no hard seam */
-  content:"";position:absolute;inset:0;pointer-events:none;
+  content:""; position:absolute; inset:0; pointer-events:none;
   background:
-    linear-gradient(to top,rgba(0,0,0,0) 60%,rgba(0,0,0,.6)),
-    linear-gradient(to bottom,rgba(0,0,0,0) 68%,rgba(0,0,0,.75));
+    linear-gradient(to top, rgba(0,0,0,0) 60%, rgba(0,0,0,.6)),
+    linear-gradient(to bottom, rgba(0,0,0,0) 68%, rgba(0,0,0,.75));
 }
-/* body */
-.card-body{padding:18px;flex:1 1 auto;display:flex;flex-direction:column;gap:8px}
-.card-title{margin:0;font-weight:800;font-size:clamp(18px,2.2vw,20px)}
-.card-desc{
-  margin:0;color:var(--muted);line-height:1.45;
-  text-wrap:pretty;overflow-wrap:anywhere; /* <= keep text inside on small screens */
-}
+.card-body{ padding:18px; flex:1 1 auto; display:flex; flex-direction:column; gap:8px }
+.card-title{ margin:0; font-weight:800; font-size:clamp(18px,2.2vw,20px) }
+.card-desc{ margin:0; color:var(--muted); line-height:1.45; text-wrap:pretty; overflow-wrap:anywhere }
 
-/* CTA pill (white) — now integrated with glowing border */
+/* CTA pill (white) — integrated with glowing border */
 .card-cta{
-  margin:12px 18px 18px;align-self:flex-start;
-  background:#fff;color:#000;text-align:center;font-weight:800;
-  padding:10px 14px;border-radius:12px;text-decoration:none;
+  margin:12px 18px 18px; align-self:flex-start;
+  background:#fff; color:#000; text-align:center; font-weight:800;
+  padding:10px 14px; border-radius:12px; text-decoration:none;
   border:1px solid rgba(255,255,255,.8);
   box-shadow:
-     0 0 0 1px rgba(255,255,255,.55) inset,   /* crisp inner edge */
-     0 2px 10px rgba(0,0,0,.25),              /* depth */
-     0 0 20px rgba(255,255,255,.12);          /* subtle outer glow */
+     0 0 0 1px rgba(255,255,255,.55) inset,
+     0 2px 10px rgba(0,0,0,.25),
+     0 0 20px rgba(255,255,255,.12);
   transition:transform .25s ease, box-shadow .25s ease, filter .25s ease;
 }
 .card-cta:hover{
@@ -136,33 +200,32 @@ body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(-
   filter:saturate(105%);
 }
 
-/* Hover lift for the whole card */
-.card:hover{transform:translateY(-10px);filter:saturate(108%);
-  box-shadow:0 0 0 1px rgba(255,255,255,.12),0 36px 120px rgba(0,0,0,.72),0 0 42px var(--halo)}
-.card:hover .card-media img{transform:scale(1.07)}
+/* Hover lift + label show (like io) */
+.card:hover{ transform:translateY(-10px); filter:saturate(108%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.12), 0 36px 120px rgba(0,0,0,.72), 0 0 42px var(--halo) }
+.card:hover .card-media img{ transform:scale(1.07) }
 
-/* Label/badge: hidden until hover/focus/touch (like io) */
 .badge{
-  position:absolute;top:12px;left:12px;font-size:12px;padding:6px 8px;border-radius:8px;
-  background:rgba(255,255,255,.06);color:#fff;backdrop-filter:blur(6px);
+  position:absolute; top:12px; left:12px; font-size:12px; padding:6px 8px; border-radius:8px;
+  background:rgba(255,255,255,.06); color:#fff; backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,.15);
-  opacity:0;transform:translateY(-6px);transition:opacity .25s ease,transform .25s ease;
+  opacity:0; transform:translateY(-6px); transition:opacity .25s ease, transform .25s ease;
   pointer-events:none;
 }
-.card:hover .badge,.card:focus-within .badge,.card.is-hover .badge{opacity:1;transform:none}
+.card:hover .badge, .card:focus-within .badge, .card.is-hover .badge{ opacity:1; transform:none }
 
 /* Footer */
-footer{padding:12px 20px 28px;color:var(--muted);text-align:center;font-size:13px}
+footer{ padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:13px }
 
-/* Mobile “hover” feel */
-@media (pointer:coarse){
-  .card:active{transform:translateY(-6px)}
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .engine::after,.engine::before,.flash span{ animation:none !important }
 }
 </style>
 </head>
 <body>
 
-<!-- Top bar with logo -->
+<!-- FIXED TOP BAR (gold line under, fades on scroll) -->
 <header class="topbar">
   <div class="topbar-inner">
     <img src="images/remoda-logo.png" alt="ReModa" class="brand"/>
@@ -170,20 +233,29 @@ footer{padding:12px 20px 28px;color:var(--muted);text-align:center;font-size:13p
   </div>
 </header>
 
-<!-- Hero -->
+<!-- LOGO “ENGINE” BURST -->
+<div class="logo-hero">
+  <div class="engine">
+    <img src="images/remoda-logo.png" alt="ReModa Logo"/>
+    <div class="flash" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
 <section class="hero">
   <div class="hero-bg" aria-hidden="true"></div>
   <div class="hero-inner">
     <h1>Design + Build Firm</h1>
-    <p>Collaborative mindset for better results — interior design and remodeling across DFW.</p>
+    <p>Collaborative mindset for better results</p>
     <a class="cta" href="remoda-design-services.html">Explore Services →</a>
   </div>
 </section>
 
-<!-- Cards -->
+<!-- CARDS -->
 <main class="wrap">
   <div class="grid">
-
     <a class="card" href="remoda-design-services.html" aria-label="Interior Design Services">
       <div class="badge">Services</div>
       <div class="card-media">
@@ -251,11 +323,10 @@ footer{padding:12px 20px 28px;color:var(--muted);text-align:center;font-size:13p
       </div>
       <div class="card-body">
         <h3 class="card-title">Trusted Brands</h3>
-        <p class="card-desc">Cambria • TileBar • Mohawk • Visual Comfort.</p>
+        <p class="card-desc">Hayley • Addison • Annette • Somoor.</p>
       </div>
       <span class="card-cta">See Partners →</span>
     </a>
-
   </div>
 </main>
 
@@ -265,7 +336,16 @@ footer{padding:12px 20px 28px;color:var(--muted);text-align:center;font-size:13p
   // year
   document.getElementById('y').textContent = new Date().getFullYear();
 
-  // Mobile tap feedback + show badge briefly
+  // Add/remove .scrolled to fade the top gold line
+  const root = document.documentElement;
+  const onScroll = () => {
+    if (window.scrollY > 8) root.classList.add('scrolled');
+    else root.classList.remove('scrolled');
+  };
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll(); // initialize
+
+  // Mobile “hover” feel: show label on tap briefly
   (function(){
     const cards = document.querySelectorAll('.card');
     cards.forEach(c=>{
