@@ -38,10 +38,10 @@
 html,body{height:100%}
 body{
   margin:0; font-family:Inter,system-ui,Arial; background:var(--bg); color:var(--ink);
-  padding-top:84px; /* fixed header space (taller now for big icon) */
+  padding-top:84px; /* fixed header space */
 }
 
-/* ================= TOP BAR (fixed + gold line) ================= */
+/* ================= TOP BAR ================= */
 .topbar{
   position:fixed; top:0; left:0; right:0; z-index:1000;
   backdrop-filter:saturate(140%) blur(10px);
@@ -49,13 +49,13 @@ body{
   border-bottom:1px solid rgba(255,255,255,.05);
 }
 .topbar-inner{
-  height:84px; /* give room so the icon can be as big as possible */
+  height:84px;
   max-width:var(--max); margin:0 auto; padding:10px 16px;
   display:flex; align-items:center; justify-content:space-between; gap:12px;
 }
 .topbar-left{display:flex; align-items:center; gap:12px}
 
-/* ICON ONLY in header (no logo) — make as big as possible in the corner */
+/* Icon only in header */
 .brand-icon{
   height:64px; width:64px; border-radius:10px; object-fit:cover;
   box-shadow:0 3px 12px rgba(0,0,0,.35);
@@ -64,7 +64,7 @@ body{
 
 .topbar-right{display:flex; align-items:center; gap:10px}
 
-/* Header mail button styled like chips (kept) */
+/* Mail chip */
 .chip{
   display:inline-flex; align-items:center; gap:8px;
   background:rgba(255,255,255,.10);
@@ -76,23 +76,53 @@ body{
 .chip:hover{ transform:translateY(-1px); border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.14) }
 .chip .mail-dot{ width:6px; height:6px; border-radius:50%; background:#fff; display:inline-block; opacity:.9 }
 
-/* Gold accent line that fades on scroll */
+/* Gold strip animation */
 .topbar::after{
-  content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  content:"";
+  position:absolute; left:0; right:0; bottom:-1px; height:2px;
   background:
     radial-gradient(60% 120% at 50% 100%, var(--gold), transparent 70%),
     linear-gradient(90deg, transparent, var(--gold-strong), transparent);
   box-shadow:0 0 16px 2px rgba(242,216,137,.45), 0 0 30px rgba(242,216,137,.25);
-  transition:opacity .35s ease, transform .35s ease;
+  transform:scaleX(0);
+  transform-origin:center;
+  animation: goldGrow 900ms cubic-bezier(.2,.8,.2,1) forwards;
+  will-change: transform, opacity;
+  transition: opacity .35s ease, transform .35s ease;
 }
-.scrolled .topbar::after{opacity:0; transform:translateY(-6px)}
+.scrolled .topbar::after{opacity:0; transform:translateY(-6px) scaleX(1)}
+
+@keyframes goldGrow{
+  0%   { transform:scaleX(0);   opacity:.0; }
+  30%  { transform:scaleX(.25); opacity:.6; }
+  60%  { transform:scaleX(.75); opacity:.9; }
+  100% { transform:scaleX(1);   opacity:1; }
+}
+
+/* Optional shimmer sweep */
+.topbar::before{
+  content:"";
+  position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.9), transparent);
+  filter: blur(1px);
+  transform: scaleX(0);
+  transform-origin:center;
+  animation: goldShimmer 1.1s 550ms cubic-bezier(.2,.8,.2,1) forwards;
+  pointer-events:none;
+  opacity:.0;
+}
+@keyframes goldShimmer{
+  0%   { transform:scaleX(.1);  opacity:0; }
+  40%  { transform:scaleX(.6);  opacity:.55; }
+  100% { transform:scaleX(1);   opacity:0; }
+}
 
 /* ================= BIGGER LOGO ABOVE HERO ================= */
 .logo-top{
   max-width:var(--max); margin:10px auto 0; padding:10px 20px 0;
   display:flex; justify-content:center; align-items:center;
 }
-.logo-top img{ height:200px; width:auto } /* bigger scale */
+.logo-top img{ height:200px; width:auto }
 
 /* ================= HERO ================= */
 .hero{position:relative; overflow:hidden}
@@ -107,8 +137,6 @@ body{
 }
 .hero h1{margin:0 0 12px; font-size:clamp(32px,5.2vw,56px); line-height:1.05; font-weight:900}
 .hero p{margin:0; color:var(--muted); font-size:clamp(14px,2.5vw,18px)}
-/* subtitle exactly as requested will be set in HTML below */
-.hero .cta{display:none} /* no hero button for now */
 
 /* ================= GRID / CARDS ================= */
 .wrap{max-width:var(--max); margin:0 auto; padding:20px 20px 48px}
@@ -116,97 +144,43 @@ body{
 @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:640px){.grid{grid-template-columns:1fr}}
 
-/* ---- Card (io-style effects) ---- */
-.card{
-  position:relative; overflow:hidden; border-radius:var(--radius);
+/* ---- Card (effects + expander) ---- */
+.card{position:relative; overflow:hidden; border-radius:var(--radius);
   background:var(--surface); color:var(--ink); text-decoration:none;
   box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.06);
   backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   transition:transform .35s cubic-bezier(.2,.8,.25,1), box-shadow .35s ease, filter .35s ease;
-  display:flex; flex-direction:column; min-height:100%; contain:content;
-}
-.card::before{
-  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-  background:linear-gradient(180deg, var(--frame2), transparent 70%);
-  box-shadow:inset 0 0 0 1px var(--frame); mix-blend-mode:screen;
-}
-.card::after{
-  content:""; position:absolute; inset:6px; border-radius:var(--inner-radius); pointer-events:none;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-}
-/* Hover LIFT + GLOW */
-.card:hover{
-  transform:translateY(-10px); filter:saturate(108%);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.12),
-    0 36px 120px rgba(0,0,0,.72),
-    0 0 42px var(--halo);
-}
-
-/* media */
+  display:flex; flex-direction:column; min-height:100%; contain:content;}
+.card:hover{transform:translateY(-10px); filter:saturate(108%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.12),0 36px 120px rgba(0,0,0,.72),0 0 42px var(--halo);}
 .card-media{position:relative; height:170px; overflow:hidden; flex:0 0 auto}
-.card-media img{
-  width:100%; height:100%; object-fit:cover; display:block;
-  transform:scale(1.03); transition:transform .6s cubic-bezier(.2,.8,.2,1);
-  filter:contrast(1.02) saturate(112%);
-}
+.card-media img{width:100%; height:100%; object-fit:cover; display:block;
+  transform:scale(1.03); transition:transform .6s cubic-bezier(.2,.8,.2,1);}
 .card:hover .card-media img{transform:scale(1.07)}
-.card-media::before{
-  /* top vignette + bottom fade */
-  content:""; position:absolute; inset:0; pointer-events:none;
-  background:
-    linear-gradient(to top, rgba(0,0,0,0) 60%, rgba(0,0,0,.6)),
-    linear-gradient(to bottom, rgba(0,0,0,0) 68%, rgba(0,0,0,.75));
-}
-
-/* small row UNDER the picture for the chevron (right aligned) */
-.expander-row{
-  display:flex; justify-content:flex-end; align-items:center;
-  padding:8px 12px 0 12px; gap:8px;
-}
-
-/* Chevron EXPANDER button (under image, on right) */
-.expander-toggle{
-  height:34px; width:34px; border-radius:10px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.18);
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; backdrop-filter:blur(6px);
-  transition:background .2s ease, border-color .2s ease, transform .2s ease;
-}
-.expander-toggle:hover{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.28); transform:translateY(-1px) }
-.chev{ width:14px; height:14px; border-right:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(45deg); opacity:.85; transition:transform .25s ease }
-.card.open .chev{ transform:rotate(-135deg) } /* up arrow when open */
-
-/* body */
+.expander-row{display:flex; justify-content:flex-end; padding:8px 12px 0}
+.expander-toggle{height:34px; width:34px; border-radius:10px;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(6px);}
+.chev{width:14px; height:14px; border-right:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(45deg);}
+.card.open .chev{transform:rotate(-135deg)}
 .card-body{padding:12px 18px 18px; flex:1 1 auto; display:flex; flex-direction:column; gap:8px}
 .card-title{margin:0; font-weight:800; font-size:clamp(18px,2.2vw,20px)}
-.card-desc{margin:0; color:var(--muted); line-height:1.45; text-wrap:pretty; overflow-wrap:anywhere}
+.card-desc{margin:0; color:var(--muted); line-height:1.45}
 
-/* ===== Sleek EXPANDER PANEL ===== */
-.expander{
-  position:absolute; left:12px; right:12px; bottom:12px; z-index:2;
-  background:var(--expander-bg);
-  border:1px solid var(--expander-stroke);
+/* Expander panel */
+.expander{position:absolute; left:12px; right:12px; bottom:12px; z-index:2;
+  background:var(--expander-bg); border:1px solid var(--expander-stroke);
   border-radius:12px; padding:10px; display:flex; gap:8px; flex-wrap:wrap;
   transform:translateY(12px); opacity:0; pointer-events:none;
   backdrop-filter: blur(10px) saturate(140%);
-  box-shadow: 0 6px 30px rgba(0,0,0,.35), 0 0 16px rgba(255,255,255,.08);
-  transition: opacity .25s ease, transform .25s ease;
-}
-.card.open .expander{ opacity:1; transform:none; pointer-events:auto }
+  box-shadow:0 6px 30px rgba(0,0,0,.35), 0 0 16px rgba(255,255,255,.08);
+  transition: opacity .25s ease, transform .25s ease;}
+.card.open .expander{opacity:1; transform:none; pointer-events:auto}
 
 /* chips inside expander */
-.chip{
-  display:inline-flex; align-items:center; gap:8px;
-  background:rgba(255,255,255,.10);
-  border:1px solid rgba(255,255,255,.22);
-  color:#fff; text-decoration:none;
-  padding:8px 12px; border-radius:999px; font-size:13px; font-weight:700;
-  transition:transform .2s ease, border-color .2s ease, background .2s ease;
-}
-.chip:hover{ transform:translateY(-1px); border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.14) }
+.chip{padding:8px 12px}
+.chip:hover{ transform:translateY(-1px); }
 
 /* Footer */
 footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:13px}
@@ -214,27 +188,21 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
 </head>
 <body>
 
-<!-- FIXED TOP BAR (ICON ONLY) -->
 <header class="topbar">
   <div class="topbar-inner">
     <div class="topbar-left">
-      <!-- Use whichever you uploaded: .jpg or .svg -->
-      <img src="images/remoda-icon.jpeg" onerror="this.onerror=null;this.src='images/remoda-icon.svg';" alt="ReModa Icon" class="brand-icon"/>
+      <img src="images/remoda-icon.jpg" onerror="this.onerror=null;this.src='images/remoda-icon.svg';" alt="ReModa Icon" class="brand-icon"/>
     </div>
     <div class="topbar-right">
-      <a class="chip" href="mailto:info@remodapro.com">
-        <span class="mail-dot" aria-hidden="true"></span> Email
-      </a>
+      <a class="chip" href="mailto:info@remodapro.com"><span class="mail-dot"></span> Email</a>
     </div>
   </div>
 </header>
 
-<!-- BIGGER LOGO ABOVE HERO -->
 <div class="logo-top">
   <img src="images/remoda-logo.png" alt="ReModa Logo">
 </div>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-bg" aria-hidden="true"></div>
   <div class="hero-inner">
@@ -243,117 +211,34 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
   </div>
 </section>
 
-<!-- CARDS -->
 <main class="wrap">
   <div class="grid">
 
-    <!-- Services -->
-    <div class="card" tabindex="0" aria-expanded="false">
+    <div class="card">
       <div class="card-media">
-        <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop" alt="Interior finishes and palette"/>
+        <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop"/>
       </div>
-      <div class="expander-row">
-        <button class="expander-toggle" type="button" aria-label="More options"><span class="chev"></span></button>
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Interior Design Services</h3>
-        <p class="card-desc">Full‑service design, selections, and high‑value transformations.</p>
-      </div>
-      <div class="expander" aria-hidden="true">
-        <a class="chip" href="remoda-design-services.html">Packages</a>
-        <a class="chip" href="project-map.html">Portfolio</a>
-        <a class="chip" href="https://form.jotform.com/252160860802047" target="_blank" rel="noopener">Book Consult</a>
-      </div>
+      <div class="expander-row"><button class="expander-toggle"><span class="chev"></span></button></div>
+      <div class="card-body"><h3 class="card-title">Interior Design Services</h3><p class="card-desc">Full-service design, selections, and transformations.</p></div>
+      <div class="expander"><a class="chip" href="remoda-design-services.html">Packages</a><a class="chip" href="project-map.html">Portfolio</a></div>
     </div>
 
-    <!-- Project Map -->
-    <div class="card" tabindex="0" aria-expanded="false">
+    <div class="card">
       <div class="card-media">
-        <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1600&auto=format&fit=crop" alt="City map with pins"/>
+        <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1600&auto=format&fit=crop"/>
       </div>
-      <div class="expander-row">
-        <button class="expander-toggle" type="button" aria-label="More options"><span class="chev"></span></button>
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">See Our Work</h3>
-        <p class="card-desc">Explore completed projects around Dallas–Fort Worth.</p>
-      </div>
-      <div class="expander" aria-hidden="true">
-        <a class="chip" href="project-map.html">Open Map</a>
-        <a class="chip" href="project-map.html#gallery">Gallery</a>
-      </div>
+      <div class="expander-row"><button class="expander-toggle"><span class="chev"></span></button></div>
+      <div class="card-body"><h3 class="card-title">See Our Work</h3><p class="card-desc">Explore completed projects across Dallas–Fort Worth.</p></div>
+      <div class="expander"><a class="chip" href="project-map.html">Open Map</a></div>
     </div>
 
-    <!-- Financing (placeholder ensured) -->
-    <div class="card" tabindex="0" aria-expanded="false">
+    <div class="card">
       <div class="card-media">
-        <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1600&auto=format&fit=crop" alt="Financing and planning"/>
+        <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1600&auto=format&fit=crop"/>
       </div>
-      <div class="expander-row">
-        <button class="expander-toggle" type="button" aria-label="More options"><span class="chev"></span></button>
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Start Now, Pay Monthly</h3>
-        <p class="card-desc">Flexible options via Synchrony — apply in minutes.</p>
-      </div>
-      <div class="expander" aria-hidden="true">
-        <a class="chip" href="financing.html#apply">Apply</a>
-        <a class="chip" href="financing.html#faq">FAQ</a>
-      </div>
-    </div>
-
-    <!-- Showroom -->
-    <div class="card" tabindex="0" aria-expanded="false">
-      <div class="card-media">
-        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1600&auto=format&fit=crop" alt="Material samples wall"/>
-      </div>
-      <div class="expander-row">
-        <button class="expander-toggle" type="button" aria-label="More options"><span class="chev"></span></button>
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Design Center & Showroom</h3>
-        <p class="card-desc">Materials, finishes, and expert guidance.</p>
-      </div>
-      <div class="expander" aria-hidden="true">
-        <a class="chip" href="showroom.html#visit">Plan Visit</a>
-        <a class="chip" href="https://maps.apple.com/?address=401%20S%20Sherman%20St%20%23217,%20Richardson,%20TX" target="_blank" rel="noopener">Directions</a>
-      </div>
-    </div>
-
-    <!-- Contact -->
-    <div class="card" tabindex="0" aria-expanded="false">
-      <div class="card-media">
-        <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1600&auto=format&fit=crop" alt="Phone on stone counter"/>
-      </div>
-      <div class="expander-row">
-        <button class="expander-toggle" type="button" aria-label="More options"><span class="chev"></span></button>
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Talk With Us</h3>
-        <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209‑9288</p>
-      </div>
-      <div class="expander" aria-hidden="true">
-        <a class="chip" href="tel:+14692099288">Call</a>
-        <a class="chip" href="mailto:info@remodapro.com">Email</a>
-      </div>
-    </div>
-
-    <!-- Partners (simple) -->
-    <div class="card" tabindex="0" aria-expanded="false">
-      <div class="card-media">
-        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1600&auto=format&fit=crop" alt="Material boards & swatches"/>
-      </div>
-      <div class="expander-row">
-        <button class="expander-toggle" type="button" aria-label="More options"><span class="chev"></span></button>
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Partners & Collaborators</h3>
-        <p class="card-desc">Trusted designers, architects, and vendors we work with.</p>
-      </div>
-      <div class="expander" aria-hidden="true">
-        <a class="chip" href="partners.html#team">Meet the Team</a>
-        <a class="chip" href="partners.html#work-with-us">Work With Us</a>
-      </div>
+      <div class="expander-row"><button class="expander-toggle"><span class="chev"></span></button></div>
+      <div class="card-body"><h3 class="card-title">Start Now, Pay Monthly</h3><p class="card-desc">Flexible financing options via Synchrony.</p></div>
+      <div class="expander"><a class="chip" href="financing.html#apply">Apply</a></div>
     </div>
 
   </div>
@@ -362,61 +247,21 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
 <footer>© <span id="y"></span> ReModa | Design • Build • DFW</footer>
 
 <script>
-  // year
-  document.getElementById('y').textContent = new Date().getFullYear();
+document.getElementById('y').textContent = new Date().getFullYear();
+const root=document.documentElement;
+const onScroll=()=>{(window.scrollY>8)?root.classList.add('scrolled'):root.classList.remove('scrolled')};
+document.addEventListener('scroll',onScroll,{passive:true});onScroll();
 
-  // fade the gold line on scroll
-  const root = document.documentElement;
-  const onScroll = () => { (window.scrollY > 8) ? root.classList.add('scrolled') : root.classList.remove('scrolled'); };
-  document.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+function setOpen(card,open){card.classList.toggle('open',open)}
+function closeAll(except){document.querySelectorAll('.card.open').forEach(c=>{if(c!==except){setOpen(c,false)}})}
 
-  // Expander logic
-  function setOpen(card, open){
-    card.classList.toggle('open', open);
-    card.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  function closeAll(except){
-    document.querySelectorAll('.card.open').forEach(c=>{ if(c!==except){ setOpen(c,false); } });
-  }
-
-  document.querySelectorAll('.card').forEach(card=>{
-    const btn = card.querySelector('.expander-toggle');
-
-    // 1) First click anywhere on the card opens the expander
-    card.addEventListener('click', (e)=>{
-      // If the click is on the expander button or inside expander, let it be handled below / don't close
-      if (e.target.closest('.expander-toggle') || e.target.closest('.expander')) return;
-
-      const isOpen = card.classList.contains('open');
-      closeAll(card);
-      // Only open on general card click (don’t toggle shut here; closing is by outside click)
-      if (!isOpen){ setOpen(card,true); }
-    });
-
-    // 2) Chevron toggles open/close explicitly
-    btn.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      const isOpen = card.classList.contains('open');
-      closeAll(card);
-      setOpen(card, !isOpen);
-    });
-
-    // 3) Keyboard accessibility
-    card.addEventListener('keydown', (e)=>{
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const isOpen = card.classList.contains('open'); closeAll(card); setOpen(card, !isOpen); }
-      if (e.key === 'Escape') { setOpen(card,false); }
-    });
-  });
-
-  // Clicking anywhere outside closes expansions
-  document.addEventListener('click', (e)=>{
-    if (!e.target.closest('.card')) closeAll();
-  });
-
-  // Prevent links inside expander from closing card before navigation
-  document.querySelectorAll('.chip, .card a').forEach(a=>{
-    a.addEventListener('click', (e)=>{ e.stopPropagation(); });
-  });
+document.querySelectorAll('.card').forEach(card=>{
+  const btn=card.querySelector('.expander-toggle');
+  card.addEventListener('click',(e)=>{if(e.target.closest('.expander-toggle')||e.target.closest('.expander'))return;
+    const isOpen=card.classList.contains('open');closeAll(card);if(!isOpen){setOpen(card,true)}});
+  btn.addEventListener('click',(e)=>{e.stopPropagation();const isOpen=card.classList.contains('open');closeAll(card);setOpen(card,!isOpen)});
+});
+document.addEventListener('click',(e)=>{if(!e.target.closest('.card'))closeAll()});
 </script>
 </body>
 </html>
