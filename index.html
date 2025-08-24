@@ -18,7 +18,7 @@
   --surface:#0e1d2e;
   --frame:rgba(255,255,255,.08);
   --frame2:rgba(255,255,255,.14);
-  --halo:rgba(255,255,255,.22);
+  --halo:rgba(255,255,255,.22); /* card outer glow */
 
   /* Glassiness */
   --glass-fill:rgba(255,255,255,.04);
@@ -67,6 +67,13 @@ body{
 }
 .scrolled .topbar::after{opacity:0; transform:translateY(-6px)}
 
+/* ================= SIMPLE LOGO ABOVE HERO ================= */
+.logo-top{
+  max-width:var(--max); margin:10px auto 0; padding:6px 20px 0;
+  display:flex; justify-content:center; align-items:center;
+}
+.logo-top img{ height:56px; width:auto }
+
 /* ================= HERO ================= */
 .hero{position:relative; overflow:hidden}
 .hero-bg{
@@ -76,7 +83,7 @@ body{
     linear-gradient(180deg, rgba(0,0,0,.6), rgba(0,0,0,0) 45%, rgba(0,0,0,.45));
 }
 .hero-inner{
-  position:relative; max-width:var(--max); margin:0 auto; padding:34px 20px 56px; text-align:center;
+  position:relative; max-width:var(--max); margin:0 auto; padding:30px 20px 56px; text-align:center;
 }
 .hero h1{margin:0 0 12px; font-size:clamp(32px,5.2vw,56px); line-height:1.05; font-weight:900}
 .hero p{margin:0; color:var(--muted); font-size:clamp(14px,2.5vw,18px)}
@@ -88,7 +95,7 @@ body{
 @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:640px){.grid{grid-template-columns:1fr}}
 
-/* ---- Card (same clean look as before) ---- */
+/* ---- Card (effects restored) ---- */
 .card{
   position:relative; overflow:hidden; border-radius:var(--radius);
   background:var(--surface); color:var(--ink); text-decoration:none;
@@ -97,7 +104,7 @@ body{
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   transition:transform .35s cubic-bezier(.2,.8,.25,1), box-shadow .35s ease, filter .35s ease;
   display:flex; flex-direction:column; min-height:100%; contain:content;
-  cursor:pointer; /* since card toggles expansion */
+  cursor:pointer; /* click to expand drawer */
 }
 .card::before{
   content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
@@ -108,8 +115,14 @@ body{
   content:""; position:absolute; inset:6px; border-radius:var(--inner-radius); pointer-events:none;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
 }
-.card:hover{transform:translateY(-10px); filter:saturate(108%);
-  box-shadow:0 0 0 1px rgba(255,255,255,.12), 0 36px 120px rgba(0,0,0,.72), 0 0 42px var(--halo)}
+/* Hover LIFT + GLOW (effect) */
+.card:hover{
+  transform:translateY(-10px); filter:saturate(108%);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.12),
+    0 36px 120px rgba(0,0,0,.72),
+    0 0 42px var(--halo);
+}
 /* media */
 .card-media{position:relative; height:170px; overflow:hidden; flex:0 0 auto}
 .card-media img{
@@ -117,19 +130,20 @@ body{
   transform:scale(1.03); transition:transform .6s cubic-bezier(.2,.8,.2,1);
   filter:contrast(1.02) saturate(112%);
 }
+.card:hover .card-media img{transform:scale(1.07)}
 .card-media::before{
+  /* top vignette + bottom fade (no hard seam) */
   content:""; position:absolute; inset:0; pointer-events:none;
   background:
     linear-gradient(to top, rgba(0,0,0,0) 60%, rgba(0,0,0,.6)),
     linear-gradient(to bottom, rgba(0,0,0,0) 68%, rgba(0,0,0,.75));
 }
-.card:hover .card-media img{transform:scale(1.07)}
 /* body */
 .card-body{padding:18px; flex:1 1 auto; display:flex; flex-direction:column; gap:8px}
 .card-title{margin:0; font-weight:800; font-size:clamp(18px,2.2vw,20px)}
 .card-desc{margin:0; color:var(--muted); line-height:1.45; text-wrap:pretty; overflow-wrap:anywhere}
 
-/* white pill CTA (unchanged look) */
+/* white pill CTA */
 .card-cta{
   margin:12px 18px 18px; align-self:flex-start;
   background:#fff; color:#000; text-align:center; font-weight:800;
@@ -140,7 +154,7 @@ body{
 }
 .card-cta:hover{transform:translateY(-2px); box-shadow:0 0 0 1px rgba(255,255,255,.75) inset, 0 6px 18px rgba(0,0,0,.38), 0 0 26px rgba(255,255,255,.22); filter:saturate(105%)}
 
-/* label/badge shows on hover/focus */
+/* label/badge shows on hover/focus (like io) */
 .badge{
   position:absolute; top:12px; left:12px; font-size:12px; padding:6px 8px; border-radius:8px;
   background:rgba(255,255,255,.06); color:#fff; backdrop-filter:blur(6px);
@@ -150,7 +164,7 @@ body{
 }
 .card:hover .badge, .card:focus-within .badge{opacity:1; transform:none}
 
-/* ===== Expandable drawer (simple & clean) ===== */
+/* ===== Expandable drawer (click to toggle) ===== */
 .card .drawer{
   overflow:hidden; max-height:0; opacity:0; pointer-events:none;
   transition:max-height .3s ease, opacity .25s ease, transform .25s ease;
@@ -162,7 +176,7 @@ body{
   box-shadow:0 6px 30px rgba(0,0,0,.35), 0 0 16px rgba(255,255,255,.08);
 }
 .card.open .drawer{
-  max-height:200px; opacity:1; pointer-events:auto; transform:none; margin:0 18px 12px;
+  max-height:220px; opacity:1; pointer-events:auto; transform:none; margin:0 18px 12px;
 }
 .drawer-inner{display:flex; gap:8px; flex-wrap:wrap; padding:10px}
 .action{
@@ -179,13 +193,18 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
 </head>
 <body>
 
-<!-- FIXED TOP BAR (no logo glow) -->
+<!-- FIXED TOP BAR -->
 <header class="topbar">
   <div class="topbar-inner">
     <img src="images/remoda-logo.png" alt="ReModa" class="brand"/>
     <a class="top-cta" href="remoda-design-services.html">Get Started</a>
   </div>
 </header>
+
+<!-- SIMPLE LOGO ABOVE HERO -->
+<div class="logo-top">
+  <img src="images/remoda-logo.png" alt="ReModa Logo">
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -301,7 +320,7 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
       <a class="card-cta" href="contact.html">Get In Touch →</a>
     </div>
 
-    <!-- Partners (your actual collaborators) -->
+    <!-- Partners -->
     <div class="card" data-primary="partners.html" tabindex="0" role="button" aria-expanded="false">
       <div class="badge">Partners</div>
       <div class="card-media">
@@ -337,26 +356,24 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
   const onScroll = () => { (window.scrollY > 8) ? root.classList.add('scrolled') : root.classList.remove('scrolled'); };
   document.addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
-  // Expand/collapse cards on click or Enter/Space (clean + simple)
+  // Expand/collapse cards on click or Enter/Space (keeps hover effects)
   const cards = document.querySelectorAll('.card');
   function toggleCard(card){
     const open = card.classList.toggle('open');
     card.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
   cards.forEach(card=>{
-    // click anywhere on the tile toggles drawer
     card.addEventListener('click', (e)=>{
-      // If a link inside was clicked, let it navigate and don't toggle.
+      // Let links inside navigate; clicking other parts toggles.
       if (e.target.closest('a')) return;
       toggleCard(card);
     });
-    // keyboard accessibility
     card.addEventListener('keydown', (e)=>{
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCard(card); }
     });
   });
 
-  // close other cards when one opens
+  // Close other drawers when one opens; click outside closes all
   document.addEventListener('click', (e)=>{
     const current = e.target.closest('.card');
     cards.forEach(c=>{ if (c !== current) { c.classList.remove('open'); c.setAttribute('aria-expanded','false'); } });
