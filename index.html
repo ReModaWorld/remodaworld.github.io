@@ -2,198 +2,204 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>ReModa | Design Build</title>
 <meta name="theme-color" content="#0b1a2a"/>
 
 <style>
-/* =======================
-   TOKENS (edit here)
-   ======================= */
+/* ================== TOKENS ================== */
 :root{
-  --bg:#0b1a2a;            /* deep ReModa navy */
-  --surface:#0f2034;       /* card fill (io-style dark) */
-  --ink:#fff;
-  --muted:#b9c7d8;
+  /* Brand + palette (keep your navy, make theme darker) */
+  --bg:#0b1a2a;             /* page navy */
+  --ink:#ffffff;            /* bright white headings */
+  --muted:#7f8ea3;          /* dimmer secondary text to make white pop */
 
-  /* card look (io.net vibe) */
-  --frame:rgba(255,255,255,.08);     /* thin frame line */
-  --frame2:rgba(255,255,255,.14);    /* brighter at corners */
-  --glow:rgba(255,255,255,.20);      /* soft outside halo */
-  --focus:rgba(255,255,255,.65);     /* focus ring for a11y */
+  /* Surfaces */
+  --surface:#0e1d2e;        /* card fill (darker than before) */
 
-  --radius:16px;
-  --lift:translateY(-10px);
-  --shadow:0 30px 80px rgba(0,0,0,.55);
-  --max:1100px;
+  /* Card chrome (io vibe) */
+  --frame:rgba(255,255,255,.08);
+  --frame2:rgba(255,255,255,.14);
+  --halo:rgba(255,255,255,.22);
+
+  /* Glass-ish lift */
+  --glass-fill:rgba(255,255,255,.04);
+  --glass-blur:34px; --glass-sat:170%; --glass-bright:1.06;
+
+  /* Layout */
+  --radius:16px; --max:1120px;
+  --shadow:0 30px 90px rgba(0,0,0,.6);
 }
 
-/* Base */
+/* ================== BASE ================== */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-  margin:0; font-family: Inter, system-ui, Arial; color:var(--ink);
-  background:var(--bg); display:flex; flex-direction:column; align-items:center;
+  margin:0; font-family:Inter,system-ui,Arial; color:var(--ink);
+  background:var(--bg);
 }
 
-/* =======================
-   LIVE MAP HERO (io vibe)
-   ======================= */
+/* ================== TOP BAR ================== */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  backdrop-filter:saturate(140%) blur(10px);
+  background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.15));
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.topbar-inner{
+  max-width:var(--max); margin:0 auto; padding:10px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.brand{height:28px}
+.top-cta{
+  background:#fff; color:#000; text-decoration:none; font-weight:800;
+  padding:10px 14px; border-radius:12px;
+}
+
+/* ================== HERO ================== */
 .hero{
-  position:relative; width:100%; overflow:hidden;
-  background: radial-gradient(1200px 500px at 75% -10%, rgba(255,255,255,.08), transparent 60%),
-              linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.0) 40%, rgba(0,0,0,.35));
+  position:relative; overflow:hidden;
+  background:
+    radial-gradient(1200px 520px at 75% -10%, rgba(255,255,255,.08), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.6), rgba(0,0,0,0) 45%, rgba(0,0,0,.45));
 }
 .hero-inner{
-  max-width:var(--max); margin:0 auto; padding:72px 20px 60px; text-align:center;
+  max-width:var(--max); margin:0 auto; padding:64px 20px 56px;
+  text-align:center;
 }
-.hero h1{margin:0 0 10px; font-size:clamp(28px,4.5vw,48px)}
+.hero h1{margin:0 0 10px; font-size:clamp(30px,5vw,56px); line-height:1.05}
 .hero p{margin:0; color:var(--muted)}
-.hero-cta{margin-top:24px; display:inline-block; padding:12px 18px; border-radius:12px;
+.hero-cta{margin-top:22px; display:inline-block; padding:12px 18px; border-radius:12px;
   background:#fff; color:#000; font-weight:800; text-decoration:none}
 
-/* animated circuit/dot map (pure SVG) */
-.map-bg{
-  position:absolute; inset:0; pointer-events:none; opacity:.28;
+/* subtle animated “map lines” behind hero */
+.map{
+  position:absolute; inset:0; pointer-events:none; opacity:.22;
 }
-.map-bg svg{width:180%; max-width:none; height:140%; position:absolute; left:-30%; top:-10%}
-@keyframes dash {
-  to { stroke-dashoffset:-1000 }
-}
-@keyframes floatDots {
-  from { transform:translateY(0) }
-  to   { transform:translateY(-8px) }
-}
-.map-bg .wire{
-  stroke:rgba(255,255,255,.25); stroke-width:1.2; fill:none;
+.map svg{position:absolute; width:180%; height:160%; left:-30%; top:-20%}
+@keyframes dash { to{ stroke-dashoffset:-1000 } }
+@keyframes dots { from{ transform:translateY(0) } to{ transform:translateY(-8px) } }
+.map .wire{
+  stroke:rgba(255,255,255,.28); stroke-width:1.2; fill:none;
   stroke-dasharray:6 10; stroke-linecap:round; animation:dash 18s linear infinite;
 }
-.map-bg .dot{
-  fill:#ffffff; opacity:.4; animation:floatDots 3.2s ease-in-out infinite alternate;
-}
+.map .dot{ fill:#fff; opacity:.45; animation:dots 3s ease-in-out infinite alternate }
 
-/* =======================
-   CONTENT WRAPPER
-   ======================= */
-.wrap{max-width:var(--max); width:100%; padding:28px 20px 40px; margin:0 auto}
-.logo{max-width:150px; display:block; margin:0 auto 10px}
-
-/* =======================
-   CARD GRID (io.net look)
-   ======================= */
+/* ================== GRID ================== */
+.wrap{max-width:var(--max); margin:0 auto; padding:28px 20px 48px}
 .grid{display:grid; gap:18px; grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
 @media (max-width:640px){ .grid{grid-template-columns:1fr} }
 
-/* ----- Card ----- */
+/* ================== CARD (io.net-like) ================== */
 .card{
-  position:relative; background:var(--surface); color:var(--ink);
-  border-radius:var(--radius); overflow:hidden; text-decoration:none; display:flex; flex-direction:column;
-  box-shadow: var(--shadow);
-  transform: translateZ(0); /* makes hover smoother */
-  transition: transform .35s cubic-bezier(.2,.8,.25,1), box-shadow .35s ease, filter .35s ease;
+  position:relative; overflow:hidden; border-radius:var(--radius);
+  background:var(--surface); color:var(--ink); text-decoration:none;
+  box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,.06);
+  transition:transform .35s cubic-bezier(.2,.8,.25,1), box-shadow .35s ease, filter .35s ease;
+  /* slight glassiness over dark */
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
 }
-
-/* slim frame like io.net */
+/* slim frame & header glow */
 .card::before{
   content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-  background:
-    linear-gradient(180deg, var(--frame2), transparent 70%); /* header glow */
-  box-shadow:
-    inset 0 0 0 1px var(--frame),                           /* thin hairline */
-    inset 0 0 0 1px var(--frame);                           /* keep crisp on retina */
+  background:linear-gradient(180deg, var(--frame2), transparent 70%);
+  box-shadow:inset 0 0 0 1px var(--frame);
   mix-blend-mode:screen;
 }
-
-/* rounded corner notches with extra light (io.net detail) */
 .card::after{
   content:""; position:absolute; inset:6px; border-radius:12px; pointer-events:none;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
 }
-
 /* image header */
 .card-media{position:relative; height:170px; overflow:hidden}
 .card-media img{
   width:100%; height:100%; object-fit:cover; display:block;
-  transform:scale(1.03); transition: transform .6s cubic-bezier(.2,.8,.2,1);
-  filter: contrast(1.02) saturate(112%);
+  transform:scale(1.03); transition:transform .6s cubic-bezier(.2,.8,.2,1);
+  filter:contrast(1.02) saturate(112%);
 }
-/* subtle top & bottom fades so it blends like their tiles */
+/* fades like io: top vignette + bottom fade */
 .card-media::before{
   content:""; position:absolute; inset:0; pointer-events:none;
   background:
-    linear-gradient(to top, rgba(0,0,0,0) 65%, rgba(0,0,0,.55)),          /* top vignette */
-    linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,.75));       /* bottom fade to body */
+    linear-gradient(to top, rgba(0,0,0,0) 60%, rgba(0,0,0,.6)),
+    linear-gradient(to bottom, rgba(0,0,0,0) 68%, rgba(0,0,0,.75));
 }
-
-/* body */
 .card-body{padding:18px}
-.card-title{margin:0 0 8px; font-size:20px; font-weight:800}
+.card-title{margin:0 0 8px; font-weight:800; font-size:20px}
 .card-desc{margin:0; color:var(--muted); line-height:1.45}
 
-/* CTA bar like io.net (white pill bar) */
+/* pill CTA bar like io */
 .card-cta{
   margin:12px 18px 18px; background:#fff; color:#000; text-align:center; font-weight:800;
   padding:10px 14px; border-radius:12px; text-decoration:none;
 }
 
-/* Hover / touch lift + glow */
-.card:hover, .card.is-hover{
-  transform: var(--lift); filter:saturate(108%);
-  box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 34px 110px rgba(0,0,0,.72), 0 0 40px var(--glow);
+/* ----- HOVER / TOUCH: lift + glow; show label ----- */
+.card:hover,
+.card.is-hover,
+.card:focus-within{
+  transform:translateY(-10px);
+  filter:saturate(108%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.12), 0 36px 120px rgba(0,0,0,.72), 0 0 42px var(--halo);
 }
-.card:hover .card-media img, .card.is-hover .card-media img{ transform:scale(1.07) }
+.card:hover .card-media img,
+.card.is-hover .card-media img{ transform:scale(1.07) }
 
-/* focus ring for keyboard users */
-.card:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--focus) }
-
-/* small caption badge in header (io tag) */
+/* label (badge) — hidden by default; appears on hover/touch/focus (like io) */
 .badge{
-  position:absolute; top:12px; left:12px;
-  font-size:12px; padding:6px 8px; border-radius:8px;
+  position:absolute; top:12px; left:12px; font-size:12px; padding:6px 8px; border-radius:8px;
   background:rgba(255,255,255,.06); color:#fff; backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,.15);
+  opacity:0; transform:translateY(-6px); transition:opacity .25s ease, transform .25s ease;
+  pointer-events:none;
 }
+.card:hover .badge,
+.card.is-hover .badge,
+.card:focus-within .badge{ opacity:1; transform:none }
+
+/* Footer */
+footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:13px}
 </style>
 </head>
 <body>
 
-<!-- ================== HERO WITH LIVE MAP ================== -->
+<!-- ============ TOP BAR (logo restored) ============ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <img src="images/remoda-logo.png" alt="ReModa" class="brand"/>
+    <a class="top-cta" href="remoda-design-services.html">Get Started</a>
+  </div>
+</header>
+
+<!-- ============ HERO (clean + attractive, darker) ============ -->
 <section class="hero">
-  <div class="map-bg" aria-hidden="true">
-    <!-- Simple “circuit world” SVG: dashed lines + dots -->
+  <div class="map" aria-hidden="true">
     <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
-      <!-- wires -->
-      <path class="wire" d="M80,300 C300,120 560,160 820,250 1080,340 1260,340 1520,260" />
-      <path class="wire" d="M60,520 C320,450 560,420 900,520 1180,605 1340,650 1550,600" />
-      <path class="wire" d="M220,720 C520,640 760,700 1040,760 1280,800 1440,780 1560,740" />
-      <path class="wire" d="M100,150 C380,220 640,240 920,180 1200,120 1400,130 1540,170" />
-      <!-- dots (nodes) -->
-      <circle class="dot" cx="320" cy="220" r="3"/>
-      <circle class="dot" cx="620" cy="260" r="3"/>
-      <circle class="dot" cx="960" cy="200" r="3"/>
-      <circle class="dot" cx="1280" cy="180" r="3"/>
-      <circle class="dot" cx="440" cy="520" r="3"/>
-      <circle class="dot" cx="900" cy="520" r="3"/>
-      <circle class="dot" cx="1260" cy="600" r="3"/>
-      <circle class="dot" cx="760" cy="760" r="3"/>
+      <path class="wire" d="M80,300 C300,120 560,160 820,250 1080,340 1260,340 1520,260"/>
+      <path class="wire" d="M60,520 C320,450 560,420 900,520 1180,605 1340,650 1550,600"/>
+      <path class="wire" d="M220,720 C520,640 760,700 1040,760 1280,800 1440,780 1560,740"/>
+      <path class="wire" d="M100,150 C380,220 640,240 920,180 1200,120 1400,130 1540,170"/>
+      <circle class="dot" cx="320" cy="220" r="3"/><circle class="dot" cx="620" cy="260" r="3"/>
+      <circle class="dot" cx="960" cy="200" r="3"/><circle class="dot" cx="1280" cy="180" r="3"/>
+      <circle class="dot" cx="440" cy="520" r="3"/><circle class="dot" cx="900" cy="520" r="3"/>
+      <circle class="dot" cx="1260" cy="600" r="3"/><circle class="dot" cx="760" cy="760" r="3"/>
     </svg>
   </div>
-
   <div class="hero-inner">
-    <img src="images/remoda-logo.png" alt="ReModa" class="logo"/>
     <h1>Design • Build • DFW</h1>
-    <p>Premium remodeling & interior design with a transparent, modern experience.</p>
+    <p>Premium remodeling & interior design. Transparent process, beautiful results.</p>
     <a class="hero-cta" href="remoda-design-services.html">Explore Services →</a>
   </div>
 </section>
 
-<!-- ================== CARDS ================== -->
+<!-- ============ CARDS ============ -->
 <main class="wrap">
   <div class="grid">
 
-    <!-- Services -->
-    <a class="card" href="remoda-design-services.html">
+    <a class="card" href="remoda-design-services.html" aria-label="Interior Design Services">
       <div class="badge">Services</div>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop" alt="Interior finishes and palette"/>
@@ -205,8 +211,7 @@ body{
       <span class="card-cta">See Packages →</span>
     </a>
 
-    <!-- Project Map -->
-    <a class="card" href="project-map.html">
+    <a class="card" href="project-map.html" aria-label="Project Map">
       <div class="badge">Project Map</div>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1600&auto=format&fit=crop" alt="City map with pins"/>
@@ -218,8 +223,7 @@ body{
       <span class="card-cta">Open Map →</span>
     </a>
 
-    <!-- Financing -->
-    <a class="card" href="financing.html">
+    <a class="card" href="financing.html" aria-label="Financing">
       <div class="badge">Financing</div>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1605902711834-8b11c3cd99d7?q=80&w=1600&auto=format&fit=crop" alt="Elegant credit card and soft light"/>
@@ -231,8 +235,7 @@ body{
       <span class="card-cta">Learn More →</span>
     </a>
 
-    <!-- Showroom -->
-    <a class="card" href="showroom.html">
+    <a class="card" href="showroom.html" aria-label="Showroom">
       <div class="badge">Showroom</div>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1600&auto=format&fit=crop" alt="Material samples wall"/>
@@ -244,8 +247,7 @@ body{
       <span class="card-cta">Plan a Visit →</span>
     </a>
 
-    <!-- Contact -->
-    <a class="card" href="contact.html">
+    <a class="card" href="contact.html" aria-label="Contact">
       <div class="badge">Contact</div>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1600&auto=format&fit=crop" alt="Phone on stone counter"/>
@@ -257,11 +259,10 @@ body{
       <span class="card-cta">Get In Touch →</span>
     </a>
 
-    <!-- Partners -->
-    <a class="card" href="partners.html">
+    <a class="card" href="partners.html" aria-label="Partners">
       <div class="badge">Partners</div>
       <div class="card-media">
-        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1600&auto=format&fit=crop" alt="Material boards & brand swatches"/>
+        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1600&auto=format&fit=crop" alt="Material boards & swatches"/>
       </div>
       <div class="card-body">
         <h3 class="card-title">Trusted Brands</h3>
@@ -273,17 +274,22 @@ body{
   </div>
 </main>
 
+<footer>© <span id="y"></span> ReModa | Design Build • DFW</footer>
+
 <script>
-/* Mobile “hover” feel: add/remove a class on touch */
-(function(){
-  const cards = document.querySelectorAll('.card');
-  cards.forEach(c=>{
-    c.addEventListener('touchstart', ()=>{
-      c.classList.add('is-hover');
-      setTimeout(()=>c.classList.remove('is-hover'), 250); // brief lift like io tiles
-    }, {passive:true});
-  });
-})();
+  // year
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  // Mobile “hover”: brief lift + show label on tap (like io tiles)
+  (function(){
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(c=>{
+      c.addEventListener('touchstart', ()=>{
+        c.classList.add('is-hover');
+        setTimeout(()=>c.classList.remove('is-hover'), 260);
+      }, {passive:true});
+    });
+  })();
 </script>
 </body>
 </html>
