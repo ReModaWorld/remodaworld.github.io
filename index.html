@@ -29,9 +29,9 @@
   --max:1120px;
   --shadow:0 30px 90px rgba(0,0,0,.6);
 
-  /* Drawer */
-  --drawer-bg: rgba(255,255,255,.06);
-  --drawer-stroke: rgba(255,255,255,.18);
+  /* Expander */
+  --expander-bg: rgba(255,255,255,.06);
+  --expander-stroke: rgba(255,255,255,.16);
 }
 
 /* Base */
@@ -67,12 +67,12 @@ body{
 }
 .scrolled .topbar::after{opacity:0; transform:translateY(-6px)}
 
-/* ================= SIMPLE LOGO ABOVE HERO ================= */
+/* ================= BIGGER LOGO ABOVE HERO ================= */
 .logo-top{
-  max-width:var(--max); margin:10px auto 0; padding:6px 20px 0;
+  max-width:var(--max); margin:10px auto 0; padding:10px 20px 0;
   display:flex; justify-content:center; align-items:center;
 }
-.logo-top img{ height:56px; width:auto }
+.logo-top img{ height:78px; width:auto } /* bigger scale */
 
 /* ================= HERO ================= */
 .hero{position:relative; overflow:hidden}
@@ -95,7 +95,7 @@ body{
 @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:640px){.grid{grid-template-columns:1fr}}
 
-/* ---- Card (effects restored) ---- */
+/* ---- Card (effects) ---- */
 .card{
   position:relative; overflow:hidden; border-radius:var(--radius);
   background:var(--surface); color:var(--ink); text-decoration:none;
@@ -104,7 +104,6 @@ body{
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   transition:transform .35s cubic-bezier(.2,.8,.25,1), box-shadow .35s ease, filter .35s ease;
   display:flex; flex-direction:column; min-height:100%; contain:content;
-  cursor:pointer; /* click to expand drawer */
 }
 .card::before{
   content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
@@ -115,7 +114,7 @@ body{
   content:""; position:absolute; inset:6px; border-radius:var(--inner-radius); pointer-events:none;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
 }
-/* Hover LIFT + GLOW (effect) */
+/* Hover LIFT + GLOW */
 .card:hover{
   transform:translateY(-10px); filter:saturate(108%);
   box-shadow:
@@ -132,7 +131,7 @@ body{
 }
 .card:hover .card-media img{transform:scale(1.07)}
 .card-media::before{
-  /* top vignette + bottom fade (no hard seam) */
+  /* top vignette + bottom fade */
   content:""; position:absolute; inset:0; pointer-events:none;
   background:
     linear-gradient(to top, rgba(0,0,0,0) 60%, rgba(0,0,0,.6)),
@@ -164,28 +163,48 @@ body{
 }
 .card:hover .badge, .card:focus-within .badge{opacity:1; transform:none}
 
-/* ===== Expandable drawer (click to toggle) ===== */
-.card .drawer{
-  overflow:hidden; max-height:0; opacity:0; pointer-events:none;
-  transition:max-height .3s ease, opacity .25s ease, transform .25s ease;
-  transform:translateY(6px);
-  margin:0 18px 0; border-radius:12px;
-  background:var(--drawer-bg);
-  border:1px solid var(--drawer-stroke);
+/* ===== Sleek EXPANDER =====
+   - Minimal glass strip slides up from bottom
+   - Chevron button indicates expand/collapse
+*/
+.expander-toggle{
+  position:absolute; top:12px; right:12px; z-index:3;
+  height:34px; width:34px; border-radius:10px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; opacity:0; transform:translateY(-6px);
+  transition:opacity .25s ease, transform .25s ease, background .2s ease, border-color .2s ease;
+  backdrop-filter:blur(6px);
+}
+.card:hover .expander-toggle, .card:focus-within .expander-toggle{opacity:1; transform:none}
+.expander-toggle:hover{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.28) }
+.chev{ width:14px; height:14px; border-right:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(45deg); opacity:.8; transition:transform .25s ease, opacity .25s ease }
+.card.open .chev{ transform:rotate(-135deg) } /* up arrow when open */
+
+/* panel */
+.expander{
+  position:absolute; left:12px; right:12px; bottom:12px; z-index:2;
+  background:var(--expander-bg);
+  border:1px solid var(--expander-stroke);
+  border-radius:12px; padding:10px; display:flex; gap:8px; flex-wrap:wrap;
+  transform:translateY(12px); opacity:0; pointer-events:none;
   backdrop-filter: blur(10px) saturate(140%);
-  box-shadow:0 6px 30px rgba(0,0,0,.35), 0 0 16px rgba(255,255,255,.08);
+  box-shadow: 0 6px 30px rgba(0,0,0,.35), 0 0 16px rgba(255,255,255,.08);
+  transition: opacity .25s ease, transform .25s ease;
 }
-.card.open .drawer{
-  max-height:220px; opacity:1; pointer-events:auto; transform:none; margin:0 18px 12px;
+.card.open .expander{ opacity:1; transform:none; pointer-events:auto }
+
+/* chips (modern, minimal) */
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.22);
+  color:#fff; text-decoration:none;
+  padding:8px 12px; border-radius:999px; font-size:13px; font-weight:700;
+  transition:transform .2s ease, border-color .2s ease, background .2s ease;
 }
-.drawer-inner{display:flex; gap:8px; flex-wrap:wrap; padding:10px}
-.action{
-  background:#fff; color:#000; border:1px solid rgba(255,255,255,.8);
-  border-radius:999px; padding:8px 12px; font-weight:800; font-size:13px; text-decoration:none;
-  box-shadow:0 0 0 1px rgba(255,255,255,.55) inset, 0 1px 6px rgba(0,0,0,.25), 0 0 12px rgba(255,255,255,.12);
-  transition:transform .2s ease, box-shadow .2s ease;
-}
-.action:hover{transform:translateY(-1px); box-shadow:0 0 0 1px rgba(255,255,255,.75) inset, 0 4px 12px rgba(0,0,0,.35), 0 0 18px rgba(255,255,255,.2)}
+.chip:hover{ transform:translateY(-1px); border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.14) }
 
 /* Footer */
 footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:13px}
@@ -201,7 +220,7 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
   </div>
 </header>
 
-<!-- SIMPLE LOGO ABOVE HERO -->
+<!-- BIGGER LOGO ABOVE HERO -->
 <div class="logo-top">
   <img src="images/remoda-logo.png" alt="ReModa Logo">
 </div>
@@ -221,8 +240,11 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
   <div class="grid">
 
     <!-- Services -->
-    <div class="card" data-primary="remoda-design-services.html" tabindex="0" role="button" aria-expanded="false">
+    <div class="card" tabindex="0" aria-expanded="false">
       <div class="badge">Services</div>
+      <button class="expander-toggle" type="button" aria-label="More options">
+        <span class="chev" aria-hidden="true"></span>
+      </button>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop" alt="Interior finishes and palette"/>
       </div>
@@ -230,19 +252,20 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
         <h3 class="card-title">Interior Design Services</h3>
         <p class="card-desc">Full‑service design, selections, and high‑value transformations.</p>
       </div>
-      <div class="drawer" aria-hidden="true">
-        <div class="drawer-inner">
-          <a class="action" href="remoda-design-services.html">Packages</a>
-          <a class="action" href="project-map.html">Portfolio</a>
-          <a class="action" href="https://form.jotform.com/252160860802047" target="_blank" rel="noopener">Book Consult</a>
-        </div>
+      <div class="expander" aria-hidden="true">
+        <a class="chip" href="remoda-design-services.html">Packages</a>
+        <a class="chip" href="project-map.html">Portfolio</a>
+        <a class="chip" href="https://form.jotform.com/252160860802047" target="_blank" rel="noopener">Book Consult</a>
       </div>
       <a class="card-cta" href="remoda-design-services.html">See Packages →</a>
     </div>
 
     <!-- Project Map -->
-    <div class="card" data-primary="project-map.html" tabindex="0" role="button" aria-expanded="false">
+    <div class="card" tabindex="0" aria-expanded="false">
       <div class="badge">Project Map</div>
+      <button class="expander-toggle" type="button" aria-label="More options">
+        <span class="chev" aria-hidden="true"></span>
+      </button>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1600&auto=format&fit=crop" alt="City map with pins"/>
       </div>
@@ -250,19 +273,19 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
         <h3 class="card-title">See Our Work</h3>
         <p class="card-desc">Explore completed projects around Dallas–Fort Worth.</p>
       </div>
-      <div class="drawer" aria-hidden="true">
-        <div class="drawer-inner">
-          <a class="action" href="project-map.html">Open Map</a>
-          <a class="action" href="project-map.html#dfw">DFW Only</a>
-          <a class="action" href="project-map.html#gallery">Gallery</a>
-        </div>
+      <div class="expander" aria-hidden="true">
+        <a class="chip" href="project-map.html">Open Map</a>
+        <a class="chip" href="project-map.html#gallery">Gallery</a>
       </div>
       <a class="card-cta" href="project-map.html">Open Map →</a>
     </div>
 
     <!-- Financing -->
-    <div class="card" data-primary="financing.html" tabindex="0" role="button" aria-expanded="false">
+    <div class="card" tabindex="0" aria-expanded="false">
       <div class="badge">Financing</div>
+      <button class="expander-toggle" type="button" aria-label="More options">
+        <span class="chev" aria-hidden="true"></span>
+      </button>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1605902711834-8b11c3cd99d7?q=80&w=1600&auto=format&fit=crop" alt="Elegant credit card and soft light"/>
       </div>
@@ -270,19 +293,19 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
         <h3 class="card-title">Start Now, Pay Monthly</h3>
         <p class="card-desc">Flexible options via Synchrony — apply in minutes.</p>
       </div>
-      <div class="drawer" aria-hidden="true">
-        <div class="drawer-inner">
-          <a class="action" href="financing.html#apply">Apply</a>
-          <a class="action" href="financing.html#calculator">Calculator</a>
-          <a class="action" href="financing.html#faq">Financing FAQ</a>
-        </div>
+      <div class="expander" aria-hidden="true">
+        <a class="chip" href="financing.html#apply">Apply</a>
+        <a class="chip" href="financing.html#faq">FAQ</a>
       </div>
       <a class="card-cta" href="financing.html">Learn More →</a>
     </div>
 
     <!-- Showroom -->
-    <div class="card" data-primary="showroom.html" tabindex="0" role="button" aria-expanded="false">
+    <div class="card" tabindex="0" aria-expanded="false">
       <div class="badge">Showroom</div>
+      <button class="expander-toggle" type="button" aria-label="More options">
+        <span class="chev" aria-hidden="true"></span>
+      </button>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1600&auto=format&fit=crop" alt="Material samples wall"/>
       </div>
@@ -290,19 +313,19 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
         <h3 class="card-title">Design Center & Showroom</h3>
         <p class="card-desc">Materials, finishes, and expert guidance.</p>
       </div>
-      <div class="drawer" aria-hidden="true">
-        <div class="drawer-inner">
-          <a class="action" href="showroom.html#visit">Plan Visit</a>
-          <a class="action" href="showroom.html#materials">Materials</a>
-          <a class="action" href="https://maps.apple.com/?address=401%20S%20Sherman%20St%20%23217,%20Richardson,%20TX" target="_blank" rel="noopener">Directions</a>
-        </div>
+      <div class="expander" aria-hidden="true">
+        <a class="chip" href="showroom.html#visit">Plan Visit</a>
+        <a class="chip" href="https://maps.apple.com/?address=401%20S%20Sherman%20St%20%23217,%20Richardson,%20TX" target="_blank" rel="noopener">Directions</a>
       </div>
       <a class="card-cta" href="showroom.html">Plan a Visit →</a>
     </div>
 
     <!-- Contact -->
-    <div class="card" data-primary="contact.html" tabindex="0" role="button" aria-expanded="false">
+    <div class="card" tabindex="0" aria-expanded="false">
       <div class="badge">Contact</div>
+      <button class="expander-toggle" type="button" aria-label="More options">
+        <span class="chev" aria-hidden="true"></span>
+      </button>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1600&auto=format&fit=crop" alt="Phone on stone counter"/>
       </div>
@@ -310,34 +333,29 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
         <h3 class="card-title">Talk With Us</h3>
         <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209‑9288</p>
       </div>
-      <div class="drawer" aria-hidden="true">
-        <div class="drawer-inner">
-          <a class="action" href="tel:+14692099288">Call</a>
-          <a class="action" href="mailto:info@remodapro.com">Email</a>
-          <a class="action" href="contact.html#location">Location</a>
-        </div>
+      <div class="expander" aria-hidden="true">
+        <a class="chip" href="tel:+14692099288">Call</a>
+        <a class="chip" href="mailto:info@remodapro.com">Email</a>
       </div>
       <a class="card-cta" href="contact.html">Get In Touch →</a>
     </div>
 
-    <!-- Partners -->
-    <div class="card" data-primary="partners.html" tabindex="0" role="button" aria-expanded="false">
+    <!-- Partners (simple) -->
+    <div class="card" tabindex="0" aria-expanded="false">
       <div class="badge">Partners</div>
+      <button class="expander-toggle" type="button" aria-label="More options">
+        <span class="chev" aria-hidden="true"></span>
+      </button>
       <div class="card-media">
         <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1600&auto=format&fit=crop" alt="Material boards & swatches"/>
       </div>
       <div class="card-body">
         <h3 class="card-title">Partners & Collaborators</h3>
-        <p class="card-desc">
-          Hayley — Interior Designer • Addison — Interior Designer • Annette — Architect •
-          Hassan — Real Estate • Shane — Product Manager • Rajai — Outdoor Designer
-        </p>
+        <p class="card-desc">Trusted designers, architects, and vendors we work with.</p>
       </div>
-      <div class="drawer" aria-hidden="true">
-        <div class="drawer-inner">
-          <a class="action" href="partners.html#team">Meet the Team</a>
-          <a class="action" href="partners.html#work-with-us">Work With Us</a>
-        </div>
+      <div class="expander" aria-hidden="true">
+        <a class="chip" href="partners.html#team">Meet the Team</a>
+        <a class="chip" href="partners.html#work-with-us">Work With Us</a>
       </div>
       <a class="card-cta" href="partners.html">See Partners →</a>
     </div>
@@ -356,27 +374,35 @@ footer{padding:12px 20px 28px; color:var(--muted); text-align:center; font-size:
   const onScroll = () => { (window.scrollY > 8) ? root.classList.add('scrolled') : root.classList.remove('scrolled'); };
   document.addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
-  // Expand/collapse cards on click or Enter/Space (keeps hover effects)
-  const cards = document.querySelectorAll('.card');
-  function toggleCard(card){
-    const open = card.classList.toggle('open');
+  // Expander logic
+  function setOpen(card, open){
+    card.classList.toggle('open', open);
     card.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
-  cards.forEach(card=>{
-    card.addEventListener('click', (e)=>{
-      // Let links inside navigate; clicking other parts toggles.
-      if (e.target.closest('a')) return;
-      toggleCard(card);
-    });
+  function closeAll(except){
+    document.querySelectorAll('.card.open').forEach(c=>{ if(c!==except){ setOpen(c,false); } });
+  }
+
+  // Toggle via chevron button or keyboard
+  document.querySelectorAll('.card').forEach(card=>{
+    const btn = card.querySelector('.expander-toggle');
+    // click chevron
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); const isOpen = card.classList.contains('open'); closeAll(card); setOpen(card, !isOpen); });
+    // keyboard on card
     card.addEventListener('keydown', (e)=>{
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCard(card); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const isOpen = card.classList.contains('open'); closeAll(card); setOpen(card, !isOpen); }
+      if (e.key === 'Escape') { setOpen(card,false); }
     });
   });
 
-  // Close other drawers when one opens; click outside closes all
+  // click outside closes
   document.addEventListener('click', (e)=>{
-    const current = e.target.closest('.card');
-    cards.forEach(c=>{ if (c !== current) { c.classList.remove('open'); c.setAttribute('aria-expanded','false'); } });
+    if (!e.target.closest('.card')) closeAll();
+  });
+
+  // prevent chips/links from toggling the card accidentally (allow navigation)
+  document.querySelectorAll('.chip, .card-cta, .card a').forEach(a=>{
+    a.addEventListener('click', (e)=>{ e.stopPropagation(); });
   });
 </script>
 </body>
