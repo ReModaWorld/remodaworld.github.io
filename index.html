@@ -1,250 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ReModa | Design Build</title>
-<meta name="description" content="ReModa Design | Build — Interior & exterior transformations in Dallas–Fort Worth." />
-<meta name="theme-color" content="#0b1a2a" />
+<meta name="theme-color" content="#0b1a2a"/>
 
 <style>
-  /* =============================
-     DESIGN TOKENS (easy tuning)
-     ============================= */
-  :root{
-    /* Brand */
-    --bg:#0b1a2a;          /* deep navy page background */
-    --ink:#ffffff;         /* main text */
-    --muted:#b9c7d8;       /* secondary text */
+/* =======================
+   TOKENS (edit here)
+   ======================= */
+:root{
+  --bg:#0b1a2a;            /* deep ReModa navy */
+  --surface:#0f2034;       /* card fill (io-style dark) */
+  --ink:#fff;
+  --muted:#b9c7d8;
 
-    /* GLASS */
-    --glass-fill: rgba(255,255,255,.04); /* transparency of the card itself */
-    --glass-blur: 36px;                  /* how frosted the glass is */
-    --glass-sat: 180%;
-    --glass-bright: 1.08;
+  /* card look (io.net vibe) */
+  --frame:rgba(255,255,255,.08);     /* thin frame line */
+  --frame2:rgba(255,255,255,.14);    /* brighter at corners */
+  --glow:rgba(255,255,255,.20);      /* soft outside halo */
+  --focus:rgba(255,255,255,.65);     /* focus ring for a11y */
 
-    /* Strokes, glow, speculars (neutral white only) */
-    --edge-soft: rgba(255,255,255,.14);  /* faint outer edge */
-    --edge-inner: rgba(255,255,255,.65); /* crisp inner bevel */
-    --hover-glow: rgba(255,255,255,.26); /* hover halo */
+  --radius:16px;
+  --lift:translateY(-10px);
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+  --max:1100px;
+}
 
-    /* Layout */
-    --radius:18px;
-    --shadow:0 26px 80px rgba(0,0,0,.52);
-    --max:1100px;
+/* Base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family: Inter, system-ui, Arial; color:var(--ink);
+  background:var(--bg); display:flex; flex-direction:column; align-items:center;
+}
 
-    /* Image fades */
-    --fade-top: 85px;    /* stronger fade into the page navy */
-    --fade-bottom: 80px; /* soft fade into the glass body */
-  }
+/* =======================
+   LIVE MAP HERO (io vibe)
+   ======================= */
+.hero{
+  position:relative; width:100%; overflow:hidden;
+  background: radial-gradient(1200px 500px at 75% -10%, rgba(255,255,255,.08), transparent 60%),
+              linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.0) 40%, rgba(0,0,0,.35));
+}
+.hero-inner{
+  max-width:var(--max); margin:0 auto; padding:72px 20px 60px; text-align:center;
+}
+.hero h1{margin:0 0 10px; font-size:clamp(28px,4.5vw,48px)}
+.hero p{margin:0; color:var(--muted)}
+.hero-cta{margin-top:24px; display:inline-block; padding:12px 18px; border-radius:12px;
+  background:#fff; color:#000; font-weight:800; text-decoration:none}
 
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0; font-family:Inter,system-ui,Arial; color:var(--ink);
-    background: var(--bg);
-    min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:40px 20px;
-  }
+/* animated circuit/dot map (pure SVG) */
+.map-bg{
+  position:absolute; inset:0; pointer-events:none; opacity:.28;
+}
+.map-bg svg{width:180%; max-width:none; height:140%; position:absolute; left:-30%; top:-10%}
+@keyframes dash {
+  to { stroke-dashoffset:-1000 }
+}
+@keyframes floatDots {
+  from { transform:translateY(0) }
+  to   { transform:translateY(-8px) }
+}
+.map-bg .wire{
+  stroke:rgba(255,255,255,.25); stroke-width:1.2; fill:none;
+  stroke-dasharray:6 10; stroke-linecap:round; animation:dash 18s linear infinite;
+}
+.map-bg .dot{
+  fill:#ffffff; opacity:.4; animation:floatDots 3.2s ease-in-out infinite alternate;
+}
 
-  .wrap{max-width:var(--max); width:100%; margin:0 auto; display:flex; flex-direction:column; align-items:center}
-  .logo{max-width:180px; height:auto; margin-bottom:16px}
-  h1{margin:6px 0 28px; text-align:center; font-size:clamp(22px,2.5vw,28px); font-weight:800; letter-spacing:.2px}
+/* =======================
+   CONTENT WRAPPER
+   ======================= */
+.wrap{max-width:var(--max); width:100%; padding:28px 20px 40px; margin:0 auto}
+.logo{max-width:150px; display:block; margin:0 auto 10px}
 
-  /* =============================
-     CARD GRID
-     ============================= */
-  .cards{
-    display:grid; gap:18px; width:100%;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-  @media (max-width:980px){ .cards{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:640px){ .cards{grid-template-columns:1fr} }
+/* =======================
+   CARD GRID (io.net look)
+   ======================= */
+.grid{display:grid; gap:18px; grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:640px){ .grid{grid-template-columns:1fr} }
 
-  /* =============================
-     TRUE GLASS CARD
-     - isolation makes blend modes behave
-     - backdrop-filter gives real glass
-     - no hard seams; specular highlights for gloss
-     ============================= */
-  .card{
-    position:relative; isolation:isolate; /* key for proper blending */
-    display:flex; flex-direction:column; overflow:hidden;
-    border-radius:var(--radius);
-    text-decoration:none; color:var(--ink);
+/* ----- Card ----- */
+.card{
+  position:relative; background:var(--surface); color:var(--ink);
+  border-radius:var(--radius); overflow:hidden; text-decoration:none; display:flex; flex-direction:column;
+  box-shadow: var(--shadow);
+  transform: translateZ(0); /* makes hover smoother */
+  transition: transform .35s cubic-bezier(.2,.8,.25,1), box-shadow .35s ease, filter .35s ease;
+}
 
-    background: var(--glass-fill);
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+/* slim frame like io.net */
+.card::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:
+    linear-gradient(180deg, var(--frame2), transparent 70%); /* header glow */
+  box-shadow:
+    inset 0 0 0 1px var(--frame),                           /* thin hairline */
+    inset 0 0 0 1px var(--frame);                           /* keep crisp on retina */
+  mix-blend-mode:screen;
+}
 
-    border:1px solid var(--edge-soft);
-    box-shadow: var(--shadow);
-    transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
-  }
+/* rounded corner notches with extra light (io.net detail) */
+.card::after{
+  content:""; position:absolute; inset:6px; border-radius:12px; pointer-events:none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+}
 
-  /* inner bevel (etched) */
-  .card::before{
-    content:"";
-    position:absolute; inset:0; border-radius:inherit; padding:1px;
-    background: linear-gradient(180deg, var(--edge-inner), rgba(255,255,255,.22));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    pointer-events:none; opacity:.95;
-  }
+/* image header */
+.card-media{position:relative; height:170px; overflow:hidden}
+.card-media img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  transform:scale(1.03); transition: transform .6s cubic-bezier(.2,.8,.2,1);
+  filter: contrast(1.02) saturate(112%);
+}
+/* subtle top & bottom fades so it blends like their tiles */
+.card-media::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(to top, rgba(0,0,0,0) 65%, rgba(0,0,0,.55)),          /* top vignette */
+    linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,.75));       /* bottom fade to body */
+}
 
-  /* glossy speculars (static, premium) */
-  .card::after{
-    content:"";
-    position:absolute; inset:-1px; border-radius:inherit;
-    background:
-      radial-gradient(120% 65% at 0% 0%, rgba(255,255,255,.42), transparent 60%),
-      radial-gradient(110% 50% at 100% 0%, rgba(255,255,255,.12), transparent 60%);
-    mix-blend-mode:screen;
-    pointer-events:none; opacity:.48;
-  }
+/* body */
+.card-body{padding:18px}
+.card-title{margin:0 0 8px; font-size:20px; font-weight:800}
+.card-desc{margin:0; color:var(--muted); line-height:1.45}
 
-  .card:hover{
-    transform: translateY(-6px);
-    box-shadow: 0 34px 100px rgba(0,0,0,.62);
-    border-color: rgba(255,255,255,.22);
-    filter: saturate(108%);
-  }
+/* CTA bar like io.net (white pill bar) */
+.card-cta{
+  margin:12px 18px 18px; background:#fff; color:#000; text-align:center; font-weight:800;
+  padding:10px 14px; border-radius:12px; text-decoration:none;
+}
 
-  /* =============================
-     MEDIA with REAL FADES (CSS masks)
-     - mask-image does the actual transparency
-     - top fade blends to page navy
-     - bottom fade blends to transparent (into the glass)
-     ============================= */
-  .card-media{
-    position:relative; height:170px; overflow:hidden;
-  }
-  .card-media img{
-    width:100%; height:100%; object-fit:cover; display:block;
-    transform:scale(1.03);
-    transition: transform .45s cubic-bezier(.2,.8,.2,1);
-    filter: saturate(112%) contrast(1.02);
-    /* top & bottom fades using a single mask */
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      var(--bg) 0,             /* fully masked by page color (top) */
-      rgba(0,0,0,1) calc(var(--fade-top) + 0px),  /* fully visible */
-      rgba(0,0,0,1) calc(100% - var(--fade-bottom)),
-      rgba(0,0,0,0) 100%       /* fade to transparent at bottom */
-    );
-            mask-image: linear-gradient(
-      to bottom,
-      var(--bg) 0,
-      rgba(0,0,0,1) calc(var(--fade-top) + 0px),
-      rgba(0,0,0,1) calc(100% - var(--fade-bottom)),
-      rgba(0,0,0,0) 100%
-    );
-    /* make the top blend feel softer */
-    mix-blend-mode:normal;
-  }
-  .card:hover .card-media img{ transform:scale(1.07) }
+/* Hover / touch lift + glow */
+.card:hover, .card.is-hover{
+  transform: var(--lift); filter:saturate(108%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 34px 110px rgba(0,0,0,.72), 0 0 40px var(--glow);
+}
+.card:hover .card-media img, .card.is-hover .card-media img{ transform:scale(1.07) }
 
-  /* Content */
-  .card-body{ padding:16px 16px 18px }
-  .card-title{ margin:0 0 6px; font-weight:800; font-size:18px; letter-spacing:.2px }
-  .card-desc{ margin:0; color:var(--muted); font-size:14px; line-height:1.45 }
+/* focus ring for keyboard users */
+.card:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--focus) }
 
-  /* tasteful white halo on hover/focus (no animation) */
-  .card:focus-visible,
-  .card:hover{
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.18),
-      0 0 18px 4px var(--hover-glow),
-      0 34px 100px rgba(0,0,0,.62);
-    outline:none;
-  }
-
-  footer{ margin-top:32px; color:var(--muted); font-size:13px; text-align:center }
-
-  @media (prefers-reduced-motion: reduce){
-    .card, .card-media img{ transition:none !important }
-  }
+/* small caption badge in header (io tag) */
+.badge{
+  position:absolute; top:12px; left:12px;
+  font-size:12px; padding:6px 8px; border-radius:8px;
+  background:rgba(255,255,255,.06); color:#fff; backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.15);
+}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo" />
-    <h1>ReModa | Design Build</h1>
 
-    <div class="cards" role="list">
-
-      <!-- Interior Design Services -->
-      <a href="remoda-design-services.html" class="card" role="listitem" aria-label="Interior Design Services">
-        <div class="card-media">
-          <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop" alt="Interior design finishes and palette">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">Interior Design Services</h3>
-          <p class="card-desc">Full‑service design, selections, and high‑value transformations.</p>
-        </div>
-      </a>
-
-      <!-- Project Map -->
-      <a href="project-map.html" class="card" role="listitem" aria-label="Project Map">
-        <div class="card-media">
-          <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1600&auto=format&fit=crop" alt="City map with pins">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">Project Map</h3>
-          <p class="card-desc">Explore completed projects across Dallas–Fort Worth.</p>
-        </div>
-      </a>
-
-      <!-- Financing (image header, no overlay text) -->
-      <a href="financing.html" class="card" role="listitem" aria-label="Financing">
-        <div class="card-media">
-          <img src="https://images.unsplash.com/photo-1605902711834-8b11c3cd99d7?q=80&w=1600&auto=format&fit=crop" alt="Elegant credit card and soft light">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">Financing</h3>
-          <p class="card-desc">Start your project now with flexible monthly payments via Synchrony.</p>
-        </div>
-      </a>
-
-      <!-- Showroom -->
-      <a href="showroom.html" class="card" role="listitem" aria-label="Design Center & Showroom">
-        <div class="card-media">
-          <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1600&auto=format&fit=crop" alt="Material samples wall in a showroom">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">Design Center & Showroom</h3>
-          <p class="card-desc">Visit our design center for materials, finishes, and expert guidance.</p>
-        </div>
-      </a>
-
-      <!-- Contact -->
-      <a href="contact.html" class="card" role="listitem" aria-label="Contact">
-        <div class="card-media">
-          <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1600&auto=format&fit=crop" alt="Phone on stone counter with soft lighting">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">Contact</h3>
-          <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209‑9288</p>
-        </div>
-      </a>
-
-      <!-- Partners -->
-      <a href="partners.html" class="card" role="listitem" aria-label="Partners">
-        <div class="card-media">
-          <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1600&auto=format&fit=crop" alt="Material boards and brand swatches">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">Partners</h3>
-          <p class="card-desc">Cambria • TileBar • Mohawk • Visual Comfort</p>
-        </div>
-      </a>
-
-    </div>
-
-    <footer>© <span id="y"></span> ReModa | Design Build</footer>
+<!-- ================== HERO WITH LIVE MAP ================== -->
+<section class="hero">
+  <div class="map-bg" aria-hidden="true">
+    <!-- Simple “circuit world” SVG: dashed lines + dots -->
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+      <!-- wires -->
+      <path class="wire" d="M80,300 C300,120 560,160 820,250 1080,340 1260,340 1520,260" />
+      <path class="wire" d="M60,520 C320,450 560,420 900,520 1180,605 1340,650 1550,600" />
+      <path class="wire" d="M220,720 C520,640 760,700 1040,760 1280,800 1440,780 1560,740" />
+      <path class="wire" d="M100,150 C380,220 640,240 920,180 1200,120 1400,130 1540,170" />
+      <!-- dots (nodes) -->
+      <circle class="dot" cx="320" cy="220" r="3"/>
+      <circle class="dot" cx="620" cy="260" r="3"/>
+      <circle class="dot" cx="960" cy="200" r="3"/>
+      <circle class="dot" cx="1280" cy="180" r="3"/>
+      <circle class="dot" cx="440" cy="520" r="3"/>
+      <circle class="dot" cx="900" cy="520" r="3"/>
+      <circle class="dot" cx="1260" cy="600" r="3"/>
+      <circle class="dot" cx="760" cy="760" r="3"/>
+    </svg>
   </div>
 
+  <div class="hero-inner">
+    <img src="images/remoda-logo.png" alt="ReModa" class="logo"/>
+    <h1>Design • Build • DFW</h1>
+    <p>Premium remodeling & interior design with a transparent, modern experience.</p>
+    <a class="hero-cta" href="remoda-design-services.html">Explore Services →</a>
+  </div>
+</section>
+
+<!-- ================== CARDS ================== -->
+<main class="wrap">
+  <div class="grid">
+
+    <!-- Services -->
+    <a class="card" href="remoda-design-services.html">
+      <div class="badge">Services</div>
+      <div class="card-media">
+        <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop" alt="Interior finishes and palette"/>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Interior Design Services</h3>
+        <p class="card-desc">Full‑service design, selections, and high‑value transformations.</p>
+      </div>
+      <span class="card-cta">See Packages →</span>
+    </a>
+
+    <!-- Project Map -->
+    <a class="card" href="project-map.html">
+      <div class="badge">Project Map</div>
+      <div class="card-media">
+        <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1600&auto=format&fit=crop" alt="City map with pins"/>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">See Our Work</h3>
+        <p class="card-desc">Explore completed projects around Dallas–Fort Worth.</p>
+      </div>
+      <span class="card-cta">Open Map →</span>
+    </a>
+
+    <!-- Financing -->
+    <a class="card" href="financing.html">
+      <div class="badge">Financing</div>
+      <div class="card-media">
+        <img src="https://images.unsplash.com/photo-1605902711834-8b11c3cd99d7?q=80&w=1600&auto=format&fit=crop" alt="Elegant credit card and soft light"/>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Start Now, Pay Monthly</h3>
+        <p class="card-desc">Flexible options via Synchrony—apply in minutes.</p>
+      </div>
+      <span class="card-cta">Learn More →</span>
+    </a>
+
+    <!-- Showroom -->
+    <a class="card" href="showroom.html">
+      <div class="badge">Showroom</div>
+      <div class="card-media">
+        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1600&auto=format&fit=crop" alt="Material samples wall"/>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Design Center & Showroom</h3>
+        <p class="card-desc">Materials, finishes, and expert guidance.</p>
+      </div>
+      <span class="card-cta">Plan a Visit →</span>
+    </a>
+
+    <!-- Contact -->
+    <a class="card" href="contact.html">
+      <div class="badge">Contact</div>
+      <div class="card-media">
+        <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1600&auto=format&fit=crop" alt="Phone on stone counter"/>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Talk With Us</h3>
+        <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209‑9288</p>
+      </div>
+      <span class="card-cta">Get In Touch →</span>
+    </a>
+
+    <!-- Partners -->
+    <a class="card" href="partners.html">
+      <div class="badge">Partners</div>
+      <div class="card-media">
+        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1600&auto=format&fit=crop" alt="Material boards & brand swatches"/>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Trusted Brands</h3>
+        <p class="card-desc">Cambria • TileBar • Mohawk • Visual Comfort.</p>
+      </div>
+      <span class="card-cta">See Partners →</span>
+    </a>
+
+  </div>
+</main>
+
 <script>
-  document.getElementById('y').textContent = new Date().getFullYear();
+/* Mobile “hover” feel: add/remove a class on touch */
+(function(){
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(c=>{
+    c.addEventListener('touchstart', ()=>{
+      c.classList.add('is-hover');
+      setTimeout(()=>c.classList.remove('is-hover'), 250); // brief lift like io tiles
+    }, {passive:true});
+  });
+})();
 </script>
 </body>
 </html>
