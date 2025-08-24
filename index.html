@@ -10,20 +10,18 @@
 
 <style>
   :root{
-    /* Brand palette (matches your services page) */
-    --bg:#0b1a2a;        /* deep navy base */
-    --ink:#ffffff;       /* main text */
-    --muted:#b9c7d8;     /* secondary text */
+    --bg:#0b1a2a;
+    --ink:#ffffff;
+    --muted:#b9c7d8;
 
-    /* Glass card tuning */
-    --glass-fill: rgba(255,255,255,.03);   /* see-through amount */
-    --glass-blur: 28px;                    /* frost blur */
-    --glass-sat: 180%;                     /* color pop behind glass */
-    --glass-bright: 1.02;                  /* tiny lift for glass */
+    --glass-fill: rgba(255,255,255,.06);
+    --glass-blur: 28px;
+    --glass-sat: 180%;
+    --glass-bright: 1.08;
 
-    --edge-soft: rgba(255,255,255,.16);    /* faint outer edge */
-    --edge-inner: rgba(255,255,255,.62);   /* crisp inner bevel */
-    --hover-glow: rgba(255,255,255,.28);   /* white glow on hover */
+    --edge-soft: rgba(255,255,255,.16);
+    --edge-inner: rgba(255,255,255,.62);
+    --hover-glow: rgba(255,255,255,.28);
 
     --radius:16px;
     --shadow:0 22px 60px rgba(0,0,0,.45);
@@ -31,18 +29,11 @@
   }
 
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
   body{
     margin:0;
     font-family: Inter, system-ui, Arial;
     color:var(--ink);
-
-    /* Keep your deep navy, but add ultra‑subtle texture so blur reads.
-       This still *looks* like the same color, just not a flat plate. */
-    background:
-      radial-gradient(1200px 600px at 85% -10%, rgba(255,255,255,.05), transparent 60%),
-      radial-gradient(900px 500px at 0% 10%, rgba(0,0,0,.18), transparent 55%),
-      var(--bg);
+    background:var(--bg);
     min-height:100vh;
     display:flex;
     flex-direction:column;
@@ -51,24 +42,14 @@
   }
 
   .wrap{max-width:var(--max); width:100%; margin:0 auto; display:flex; flex-direction:column; align-items:center}
-  .logo{max-width:180px; height:auto; margin-bottom:16px}
-  h1{
-    margin:6px 0 28px;
-    text-align:center;
-    font-size:clamp(22px,2.5vw,28px);
-    font-weight:800;
-    letter-spacing:.2px;
-  }
+  .logo{max-width:180px; margin-bottom:16px}
+  h1{margin:6px 0 28px;text-align:center;font-size:clamp(22px,2.5vw,28px);font-weight:800;}
 
-  /* CARD GRID */
-  .cards{
-    display:grid; gap:18px; width:100%;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-  @media (max-width:980px){ .cards{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:640px){ .cards{grid-template-columns:1fr} }
+  .cards{display:grid;gap:18px;width:100%;grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:640px){.cards{grid-template-columns:1fr}}
 
-  /* ===== GLASS CARD (no motion border) ===== */
+  /* ===== GLASS CARD ===== */
   .card{
     position:relative;
     display:flex; flex-direction:column; overflow:hidden;
@@ -77,102 +58,70 @@
     box-shadow: var(--shadow);
     border:1px solid var(--edge-soft);
     background: var(--glass-fill);
-    background-clip: padding-box;
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
     transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
   }
-
-  /* inner bevel (etched edge) */
   .card::before{
     content:"";
     position:absolute; inset:0; border-radius:inherit; padding:1px;
-    background: linear-gradient(180deg, var(--edge-inner), rgba(255,255,255,.22));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    pointer-events:none; opacity:.95;
+    background:linear-gradient(180deg,var(--edge-inner),rgba(255,255,255,.22));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;
+    pointer-events:none;opacity:.95;
   }
-
-  /* glossy static highlights (no animation) */
-  .card::after{
-    content:"";
-    position:absolute; inset:-1px; border-radius:inherit;
-    background:
-      radial-gradient(110% 60% at 0% 0%, rgba(255,255,255,.35), transparent 60%),
-      radial-gradient(110% 50% at 100% 0%, rgba(255,255,255,.12), transparent 60%);
-    mix-blend-mode:screen;
-    pointer-events:none; opacity:.5;
-  }
-
   .card:hover{
-    transform: translateY(-6px);
-    box-shadow: 0 28px 80px rgba(0,0,0,.6);
-    border-color: rgba(255,255,255,.22);
-    filter: saturate(108%);
+    transform:translateY(-6px);
+    box-shadow:0 28px 80px rgba(0,0,0,.6);
+    border-color:rgba(255,255,255,.22);
+    filter:saturate(108%);
   }
 
-  /* media area */
+  /* ===== IMAGE AREA WITH FADE ===== */
   .card-media{
+    position:relative;
     height:160px;
     overflow:hidden;
-    border-bottom:1px solid rgba(255,255,255,.15);
-    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
   }
   .card-media img{
-    width:100%; height:100%; object-fit:cover; display:block;
-    transform: scale(1.03);
-    transition: transform .45s cubic-bezier(.2,.8,.2,1);
-    filter: saturate(115%) contrast(1.02);
+    width:100%;height:100%;object-fit:cover;display:block;
+    transform:scale(1.03);
+    transition:transform .45s cubic-bezier(.2,.8,.2,1);
   }
-  .card:hover .card-media img{ transform: scale(1.07) }
+  .card:hover .card-media img{transform:scale(1.07)}
 
-  /* text area */
-  .card-body{ padding:16px 16px 18px }
-  .card-title{ margin:0 0 6px; font-weight:800; font-size:18px; letter-spacing:.2px }
-  .card-desc{ margin:0; color:var(--muted); font-size:14px; line-height:1.45 }
-
-  /* tasteful white glow ring on hover (static, no motion) */
-  .card:focus-visible,
-  .card:hover{
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.18),
-      0 0 18px 4px var(--hover-glow),
-      0 28px 80px rgba(0,0,0,.6);
-    outline:none;
+  /* fade mask: white -> transparent downwards */
+  .card-media::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:60px;
+    background:linear-gradient(to bottom, rgba(0,0,0,0) 0%, var(--card-bg, var(--bg)) 100%);
   }
 
-  footer{
-    margin-top:32px; color:var(--muted); font-size:13px; text-align:center;
-  }
+  .card-body{padding:16px}
+  .card-title{margin:0 0 6px;font-weight:800;font-size:18px}
+  .card-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.45}
 
-  /* Optional: reduce motion respect */
-  @media (prefers-reduced-motion: reduce){
-    .card, .card-media img{ transition:none !important }
-  }
+  footer{margin-top:32px;color:var(--muted);font-size:13px;text-align:center}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- Brand -->
     <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo" />
     <h1>ReModa | Design Build</h1>
 
-    <!-- GLASS CARDS -->
-    <div class="cards" role="list">
+    <div class="cards">
 
-      <!-- Interior Design Services -->
-      <a href="remoda-design-services.html" class="card" role="listitem" aria-label="Interior Design Services">
+      <a href="remoda-design-services.html" class="card">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1200&auto=format&fit=crop" alt="Interior design finishes and palette">
         </div>
         <div class="card-body">
           <h3 class="card-title">Interior Design Services</h3>
-          <p class="card-desc">Full‑service design, selections, and high‑value transformations.</p>
+          <p class="card-desc">Full-service design, selections, and high-value transformations.</p>
         </div>
       </a>
 
-      <!-- Project Map -->
-      <a href="project-map.html" class="card" role="listitem" aria-label="Project Map">
+      <a href="project-map.html" class="card">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1200&auto=format&fit=crop" alt="City map with pins">
         </div>
@@ -182,8 +131,7 @@
         </div>
       </a>
 
-      <!-- Financing -->
-      <a href="financing.html" class="card" role="listitem" aria-label="Financing">
+      <a href="financing.html" class="card">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1605902711834-8b11c3cd99d7?q=80&w=1200&auto=format&fit=crop" alt="Elegant credit card and soft light">
         </div>
@@ -193,8 +141,7 @@
         </div>
       </a>
 
-      <!-- Showroom -->
-      <a href="showroom.html" class="card" role="listitem" aria-label="Design Center & Showroom">
+      <a href="showroom.html" class="card">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1200&auto=format&fit=crop" alt="Material samples wall in a showroom">
         </div>
@@ -204,25 +151,23 @@
         </div>
       </a>
 
-      <!-- Contact -->
-      <a href="contact.html" class="card" role="listitem" aria-label="Contact">
+      <a href="contact.html" class="card">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1200&auto=format&fit=crop" alt="Phone on stone counter with soft lighting">
         </div>
         <div class="card-body">
           <h3 class="card-title">Contact</h3>
-          <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209‑9288</p>
+          <p class="card-desc">401 S. Sherman St #217, Richardson • (469) 209-9288</p>
         </div>
       </a>
 
-      <!-- Partners -->
-      <a href="partners.html" class="card" role="listitem" aria-label="Partners">
+      <a href="partners.html" class="card">
         <div class="card-media">
           <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop" alt="Material boards and brand swatches">
         </div>
         <div class="card-body">
           <h3 class="card-title">Partners</h3>
-          <p class="card-desc">Hayley • Addison • Annette • Somoor</p>
+          <p class="card-desc">Cambria • TileBar • Mohawk • Visual Comfort</p>
         </div>
       </a>
 
