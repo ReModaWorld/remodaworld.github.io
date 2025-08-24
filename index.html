@@ -5,45 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ReModa | Design Build</title>
 <meta name="description" content="Design-first transformations across DFW."/>
-
 <style>
   :root{
-    /* Brand */
-    --navy-900:#0D2240;
-    --navy-800:#122957;
+    /* YOUR BRAND NAVY — unchanged */
+    --brand-1:#001f3f;  /* top */
+    --brand-2:#003366;  /* bottom */
 
-    /* Background (made lighter so glass reads through) */
-    --overlay-1: rgba(13,34,64,.45);
-    --overlay-2: rgba(18,41,87,.55);
+    /* Neutral glass effects (no new colors) */
+    --glass-fill: rgba(255,255,255,.06);  /* more see-through */
+    --glass-blur: 34px;
+    --glass-sat: 185%;
+    --glass-bright: 1.10;
 
-    /* Glass tuning (more transparent + stronger blur) */
-    --glass-bg: rgba(255,255,255,.06);
-    --glass-bright: 1.12;
-    --glass-sat: 190%;
-    --glass-blur: 38px;
+    --edge-soft: rgba(255,255,255,.14);   /* subtle outer edge */
+    --edge-inner: rgba(255,255,255,.68);  /* crisp inner bevel */
+    --glow: rgba(255,255,255,.55);        /* neutral white glow */
 
-    /* Strokes/Glow */
-    --soft-edge: rgba(255,255,255,.14);    /* faint outer border */
-    --inner-stroke: rgba(255,255,255,.65); /* crisp inner bevel */
-    --glow: rgba(164,186,255,.55);         /* blue glow ring */
+    --radius:22px;
+    --shadow:0 32px 100px rgba(0,0,0,.55);
+    --max:1140px;
 
-    /* Layout */
-    --radius: 22px;
-    --shadow: 0 36px 120px rgba(5,10,30,.58);
-    --max: 1140px;
+    --ink:#ffffff;        /* text inside tiles */
+    --ink-dim:#eaf0ff;    /* secondary text */
+    --icon-stroke:#f5f8ff;/* icon stroke (white) */
   }
 
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;
-    font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, Arial;
+    font-family:ui-sans-serif,system-ui,-apple-system,"SF Pro Text","Segoe UI",Roboto,Arial;
     color:#fff;
-
-    /* Lighter overlays so you can SEE through the glass */
     background:
-      linear-gradient(180deg, var(--overlay-1), var(--overlay-2)),
-      url("https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?q=80&w=1920&auto=format&fit=crop") center/cover no-repeat fixed;
+      linear-gradient(180deg, var(--brand-1), var(--brand-2));
     display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:42px 20px;
   }
 
@@ -52,44 +46,46 @@
   .title{margin:2px 0 8px; text-align:center; opacity:.96; font-weight:800; letter-spacing:.3px}
   .subtitle{margin:0 0 28px; text-align:center; color:#dbe2ff; max-width:760px; line-height:1.55}
 
+  /* GRID */
   .cards{display:grid; gap:26px; width:100%; grid-template-columns:repeat(3,minmax(0,1fr))}
   @media (max-width:980px){ .cards{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .cards{grid-template-columns:1fr} }
 
-  /* ========= LIQUID GLASS TILE (Apple-like) ========= */
+  /* ===== APPLE-LIKE LIQUID GLASS TILE ===== */
   .card{
     position:relative; display:flex; flex-direction:column; justify-content:flex-end;
     height:220px; border-radius:var(--radius); overflow:hidden;
-    text-decoration:none; color:#fff; outline:none; padding:16px 16px 18px;
+    text-decoration:none; color:var(--ink); outline:none; padding:16px 16px 18px;
 
-    /* Transparent glass */
-    background: var(--glass-bg);
+    /* true glass over your navy gradient */
+    background: var(--glass-fill);
     background-clip: padding-box;
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
 
-    /* faint outer edge + depth */
-    border:1px solid var(--soft-edge);
+    border:1px solid var(--edge-soft);
     box-shadow: var(--shadow);
-
-    /* subtle internal reflection strip (helps “wet” look) */
-    /* (placed as gradient overlay below content) */
+    transition: transform .45s cubic-bezier(.2,.8,.2,1),
+               box-shadow .45s cubic-bezier(.2,.8,.2,1),
+               filter .45s cubic-bezier(.2,.8,.2,1);
   }
-  /* inner bevel (etched edge) */
+
+  /* crisp inner bevel */
   .card::before{
     content:"";
     position:absolute; inset:0; border-radius:inherit; padding:1px;
-    background: linear-gradient(180deg, var(--inner-stroke), rgba(255,255,255,.22));
+    background: linear-gradient(180deg, var(--edge-inner), rgba(255,255,255,.22));
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor; mask-composite: exclude;
     pointer-events:none; opacity:.95;
   }
-  /* glossy highlight + animated sheen */
+
+  /* glossy highlight + neutral sheen */
   .card::after{
     content:"";
     position:absolute; inset:-1px; border-radius:inherit;
     background:
-      radial-gradient(120% 65% at 0% 0%, rgba(255,255,255,.50), transparent 60%),
+      radial-gradient(120% 65% at 0% 0%, rgba(255,255,255,.46), transparent 60%),
       radial-gradient(120% 55% at 100% 0%, rgba(255,255,255,.16), transparent 60%),
       linear-gradient(75deg, transparent 35%, rgba(255,255,255,.65) 50%, transparent 65%);
     background-size:100% 100%, 100% 100%, 320% 100%;
@@ -99,8 +95,9 @@
     transition: background-position 1.2s ease, opacity .45s ease;
     pointer-events:none;
   }
-  /* glow ring (separate element for stronger effect) */
-  .card .glow{
+
+  /* separate glow ring so it stays neutral */
+  .glow{
     position:absolute; inset:0; border-radius:inherit; pointer-events:none;
     box-shadow: 0 0 0 0 var(--glow);
     transition: box-shadow .45s ease;
@@ -108,22 +105,22 @@
 
   .card:hover{
     transform: translateY(-10px);
-    box-shadow: 0 44px 140px rgba(5,10,30,.68);
-    filter: saturate(114%);
+    box-shadow: 0 40px 120px rgba(0,0,0,.62);
+    filter: saturate(110%);
   }
-  .card:hover::after{ background-position:center, center, 170% 0% } /* sheen sweep */
-  .card:hover .glow{ box-shadow: 0 0 0 2px var(--glow), 0 0 22px 6px rgba(164,186,255,.25) }
+  .card:hover::after{ background-position:center, center, 170% 0% }
+  .card:hover .glow{ box-shadow: 0 0 0 2px var(--glow), 0 0 22px 6px rgba(255,255,255,.20) }
 
   .card:focus-visible{
     transform: translateY(-4px);
-    box-shadow: 0 0 0 3px rgba(164,186,255,.75), 0 36px 110px rgba(5,10,30,.62);
+    box-shadow: 0 0 0 3px rgba(255,255,255,.75), 0 32px 100px rgba(0,0,0,.60);
   }
 
-  /* Content inside tile */
+  /* CONTENT INSIDE TILE */
   .kicker{
     font-size:.74rem; letter-spacing:.18em; text-transform:uppercase;
-    color:#f1f6ff; opacity:.9; margin:0 0 8px;
-    text-shadow:0 1px 2px rgba(0,0,0,.35);
+    color:var(--ink); opacity:.9; margin:0 0 8px;
+    text-shadow:0 1px 2px rgba(0,0,0,.25);
   }
   .row{display:flex; align-items:center; gap:10px}
   .icon{
@@ -134,25 +131,19 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,.48), 0 6px 16px rgba(0,0,0,.20);
     backdrop-filter: blur(8px) saturate(140%);
   }
-  .icon svg{display:block}
-  .title-in{
-    font-weight:800; letter-spacing:.2px; margin:0;
-    text-shadow:0 1px 2px rgba(0,0,0,.35);
-  }
-  .desc{
-    margin:6px 0 0; font-size:.95rem; color:#e7efff; opacity:.94;
-    text-shadow:0 1px 2px rgba(0,0,0,.35);
-  }
+  .icon svg path, .icon svg rect{ stroke:var(--icon-stroke) }
+  .title-in{ font-weight:800; letter-spacing:.2px; margin:0; text-shadow:0 1px 2px rgba(0,0,0,.25) }
+  .desc{ margin:6px 0 0; font-size:.95rem; color:var(--ink-dim); opacity:.95; text-shadow:0 1px 2px rgba(0,0,0,.25) }
 
-  /* Extra: micro-noise to sell the glass (very subtle) */
+  /* super‑subtle global noise (neutral, won’t shift brand color) */
   .noise{
     position:fixed; inset:0; pointer-events:none; z-index:-1;
-    background-image: url("data:image/svg+xml;utf8,\
+    background-image:url("data:image/svg+xml;utf8,\
       <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>\
-        <filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 0 0 0 0'/></feComponentTransfer></filter>\
-        <rect width='100%' height='100%' filter='url(%23n)' />\
+        <filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .028 0 0 0 0'/></feComponentTransfer></filter>\
+        <rect width='100%' height='100%' filter='url(%23n)' fill='white' />\
       </svg>");
-    opacity:.25; mix-blend-mode:overlay;
+    opacity:.18; mix-blend-mode:overlay;
   }
 
   /* Footer */
@@ -161,7 +152,7 @@
     display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
     color:#cbd5e1; font-size:.95rem; opacity:.9
   }
-  .foot a{color:#dbe2ff; text-decoration:none}
+  .foot a{color:#e4ecff; text-decoration:none}
   .foot a:hover{text-decoration:underline}
 
   @media (prefers-reduced-motion: reduce){
@@ -170,13 +161,12 @@
 </style>
 </head>
 <body>
-  <!-- subtle global noise for realism -->
   <div class="noise"></div>
 
   <div class="wrap">
     <img src="images/remoda-logo.png" alt="ReModa Logo" class="logo"/>
     <div class="title">ReModa | Design Build</div>
-    <div class="subtitle">Glass tiles you can actually see through — glossy, beveled, and softly glowing.</div>
+    <div class="subtitle">Liquid‑glass tiles over your **exact** navy gradient. Glossy, beveled, and see‑through.</div>
 
     <div class="cards" role="list">
       <!-- Interior Design Services -->
@@ -186,7 +176,7 @@
         <div class="row">
           <div class="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M20 7H4m16 5H4m16 5H4" stroke="#0E2246" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M20 7H4m16 5H4m16 5H4" stroke-width="1.6" stroke-linecap="round"/>
             </svg>
           </div>
           <h3 class="title-in">Interior Design Services</h3>
@@ -201,7 +191,7 @@
         <div class="row">
           <div class="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 2C8.1 2 5 5.1 5 9c0 5 7 13 7 13s7-8 7-13c0-3.9-3.1-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" stroke="#0E2246" stroke-width="1.6"/>
+              <path d="M12 2C8.1 2 5 5.1 5 9c0 5 7 13 7 13s7-8 7-13c0-3.9-3.1-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" stroke-width="1.6"/>
             </svg>
           </div>
           <h3 class="title-in">Project Map</h3>
@@ -216,8 +206,8 @@
         <div class="row">
           <div class="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="6" width="18" height="12" rx="2" stroke="#0E2246" stroke-width="1.6"/>
-              <path d="M3 10h18" stroke="#0E2246" stroke-width="1.6"/>
+              <rect x="3" y="6" width="18" height="12" rx="2" stroke-width="1.6"/>
+              <path d="M3 10h18" stroke-width="1.6"/>
             </svg>
           </div>
           <h3 class="title-in">Financing by Synchrony</h3>
@@ -232,7 +222,7 @@
         <div class="row">
           <div class="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M4 10l8-6 8 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8Z" stroke="#0E2246" stroke-width="1.6"/>
+              <path d="M4 10l8-6 8 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8Z" stroke-width="1.6"/>
             </svg>
           </div>
           <h3 class="title-in">Design Center & Showroom</h3>
@@ -247,7 +237,7 @@
         <div class="row">
           <div class="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M21 8v8a2 2 0 0 1-2 2H5l-2 2V6a2 2 0 0 1 2-2h10" stroke="#0E2246" stroke-width="1.6"/>
+              <path d="M21 8v8a2 2 0 0 1-2 2H5l-2 2V6a2 2 0 0 1 2-2h10" stroke-width="1.6"/>
             </svg>
           </div>
           <h3 class="title-in">Contact</h3>
@@ -262,7 +252,7 @@
         <div class="row">
           <div class="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M8 7a4 4 0 1 0 0 8m8-8a4 4 0 1 0 0 8" stroke="#0E2246" stroke-width="1.6"/>
+              <path d="M8 7a4 4 0 1 0 0 8m8-8a4 4 0 1 0 0 8" stroke-width="1.6"/>
             </svg>
           </div>
           <h3 class="title-in">Partners</h3>
